@@ -54,9 +54,6 @@ fn part2(input: &str) -> usize {
     visited.len()
 }
 
-
-
-
 fn main() {
     let input = include_str!("../../inputs/2015/03");
             
