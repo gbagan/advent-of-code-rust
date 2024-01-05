@@ -35,6 +35,30 @@ path = "src/2015/day06.rs"
 name = "2015-07"
 path = "src/2015/day07.rs"
 
+[[bin]]
+name = "2017-01"
+path = "src/2017/day01.rs"
+
+[[bin]]
+name = "2017-02"
+path = "src/2017/day02.rs"
+
+[[bin]]
+name = "2017-03"
+path = "src/2017/day03.rs"
+
+[[bin]]
+name = "2017-04"
+path = "src/2017/day04.rs"
+
+[[bin]]
+name = "2017-05"
+path = "src/2017/day05.rs"
+
+[[bin]]
+name = "2017-06"
+path = "src/2017/day06.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
