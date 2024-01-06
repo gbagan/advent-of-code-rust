@@ -10,15 +10,15 @@ use nom::{
     IResult,
 };
 
-pub enum Op {
+enum Op {
     And, Or, LShift, RShift
 }
 
-pub enum Wire {
+enum Wire {
     Signal(u16), Wire(String)
 }
 
-pub enum Gate {
+enum Gate {
     Const(Wire), Gate2(Wire, Op, Wire), Not(Wire)
 }
 

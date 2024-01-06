@@ -10,15 +10,15 @@ use nom::{
 };
 use aoc::iter::AOCIter;
 
-pub enum Command {
+enum Command {
     On, Off, Toggle
 }
-pub struct Instruction {
-  pub cmd: Command,
-  pub x1: u64,
-  pub y1: u64,
-  pub x2: u64,
-  pub y2: u64,
+struct Instruction {
+    cmd: Command,
+    x1: u64,
+    y1: u64,
+    x2: u64,
+    y2: u64,
 }
 
 fn input_parser(input: &str) -> IResult<&str, Vec<Instruction>> {
