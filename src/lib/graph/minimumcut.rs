@@ -30,28 +30,12 @@ where
         );
     }
 
-    /*
-    for node in graph.node_identifiers() {
-        
-        for edge in graph.edges(node) {
-            let source = node_to_node[&edge.source()];
-            let target = node_to_node[&edge.target()];
-            if source < target {
-                graph2.add_edge(
-                    source,
-                    target,
-                    ((edge.source(), edge.target()), weight_function(edge))
-                );
-            }
-        }
-    }*/
-
     minimum_cut_aux(&mut graph2)
 }
 
 
-fn merge_vertices<E, Node, Ix>(
-    graph: &mut Graph<Node, E, Undirected, Ix>,
+fn merge_vertices<E, N, Ix>(
+    graph: &mut Graph<N, E, Undirected, Ix>,
     node1: NodeIndex<Ix>,
     node2: NodeIndex<Ix>,
 )
@@ -110,13 +94,13 @@ where
     (edges, weight, last, before_last)
 }
 
-fn minimum_cut_aux<E, Node, Edge, Ix>(
-    graph: &mut Graph<Node, (Edge, E), Undirected, Ix>
-) -> (Vec<Edge>, E)
+fn minimum_cut_aux<E, N, EdgeId, Ix>(
+    graph: &mut Graph<N, (EdgeId, E), Undirected, Ix>
+) -> (Vec<EdgeId>, E)
 where
     Ix: IndexType,
     E: Measure + Sum + Ord + Copy,
-    Edge: Copy,
+    EdgeId: Copy,
 {
     let mut best_cut = vec![];
     let mut best_weight = graph.edge_weights().map(|e| e.1).sum();

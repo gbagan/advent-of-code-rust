@@ -1,4 +1,5 @@
 use std::ops::{Add,Mul,Neg,Sub};
+use std::iter::Sum;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub struct Coord {
@@ -118,5 +119,19 @@ impl Sub for Coord {
             x: self.x - other.x,
             y: self.y - other.y,
         }
+    }
+}
+
+impl Sum for Coord {
+    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+        iter.fold(Self::origin(), |a, b| a + b)
+    }
+}
+
+impl<'a> Sum<&'a Self> for Coord {
+    fn sum<I>(iter: I) -> Self
+    where I: Iterator<Item = &'a Self>,
+     {
+        iter.fold(Coord::origin(), |a, b| a + *b)
     }
 }
