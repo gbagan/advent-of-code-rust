@@ -1,4 +1,4 @@
-use std::ops::{Add,Mul,Neg,Sub};
+use std::ops::{Add,AddAssign,Mul,Neg,Sub};
 use std::iter::Sum;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
@@ -86,6 +86,15 @@ impl Add for Coord {
             x: self.x + other.x,
             y: self.y + other.y,
         }
+    }
+}
+
+impl AddAssign for Coord {
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        };
     }
 }
 

@@ -72,6 +72,14 @@ name = "2017-09"
 path = "src/2017/day09.rs"
 
 [[bin]]
+name = "2017-10"
+path = "src/2017/day10.rs"
+
+[[bin]]
+name = "2017-11"
+path = "src/2017/day11.rs"
+
+[[bin]]
 name = "2023-25"
 path = "src/2023/day25.rs"
 

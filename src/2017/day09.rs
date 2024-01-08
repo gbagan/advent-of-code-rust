@@ -33,7 +33,7 @@ fn count_garbage_aux(input: &str) -> IResult<&str, i64> {
 fn count_garbage(input: &str) -> IResult<&str, Coord> {
     delimited(
         char('<'),
-map(many0(count_garbage_aux), |x| Coord::new(0, x.iter().sum())),
+        map(many0(count_garbage_aux), |x| Coord::new(0, x.iter().sum())),
         char('>')
     )(input)
 }
