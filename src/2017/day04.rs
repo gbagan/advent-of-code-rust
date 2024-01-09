@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 use aoc::iter::AOCIter;
 use itertools::Itertools;
 
@@ -17,12 +17,8 @@ fn main() {
                                     .map(|line| line.split_whitespace().collect())
                                     .collect();
 
-    let start = Instant::now();
-    let p1 = passwords.iter().count_by(is_valid);
-    let p2 = passwords.iter().count_by(is_valid2);
-    let end = start.elapsed().as_micros();
-
-    println!("Part 1: {}", p1);
-    println!("Part 2: {}", p2);
-    println!("Time: {} μs", end);
+    aoc(|| (
+        passwords.iter().count_by(is_valid),
+        passwords.iter().count_by(is_valid2),
+    ))
 }

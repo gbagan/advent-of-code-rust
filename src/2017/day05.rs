@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 
 use nom::{
     character::complete::{line_ending,i32},
@@ -49,14 +49,10 @@ fn main() {
     match input_parser(input) {
         Err(_) => println!("parsing error"),
         Ok ((_, jumps)) => {
-            let start = Instant::now();
-            let p1 = part1(&jumps);
-            let p2 = part2(&jumps);
-            let end = start.elapsed().as_micros();
-        
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
+            aoc(|| (
+                part1(&jumps),
+                part2(&jumps),
+            ))
         }
     }
 }

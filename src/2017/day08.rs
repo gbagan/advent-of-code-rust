@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 use std::collections::HashMap;
 use nom::{
     branch::alt,
@@ -99,14 +99,6 @@ fn main() {
     let input = include_str!("../../inputs/2017/08");
     match input_parser(input) {
         Err(_) => println!("parsing error"),
-        Ok ((_, instrs)) => {
-            let start = Instant::now();
-            let (p1, p2) = run(&instrs);
-            let end = start.elapsed().as_micros();
-        
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
-        }
+        Ok ((_, instrs)) => aoc(|| run(&instrs)),
     }
 }

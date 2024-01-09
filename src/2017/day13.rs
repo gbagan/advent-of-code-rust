@@ -1,5 +1,4 @@
-use std::time::Instant;
-
+use aoc::aoc;
 use nom::{
     bytes::complete::tag,
     character::complete::{line_ending,u64},
@@ -42,14 +41,7 @@ fn main() {
     match input_parser(input) {
         Err(_) => println!("parsing error"),
         Ok ((_, pairs)) => {
-            let start = Instant::now();
-            let p1 = part1(&pairs);
-            let p2 = part2(&pairs);
-            let end = start.elapsed().as_micros();
-        
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
+            aoc(|| (part1(&pairs), part2(&pairs)))
         }
     }
 }

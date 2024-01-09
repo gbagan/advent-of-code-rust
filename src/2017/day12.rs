@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 use std::collections::HashMap;
 use nom::{
     bytes::complete::tag,
@@ -27,35 +27,31 @@ fn main() {
     match input_parser(input) {
         Err(_) => println!("parsing error"),
         Ok ((_, nodes)) => {
-            let start = Instant::now();
+            aoc(|| {
 
-            let mut graph = Graph::new_undirected();
-            let mut node_map = HashMap::new();
+                let mut graph = Graph::new_undirected();
+                let mut node_map = HashMap::new();
 
-            for (node, _) in &nodes {
-                let node_index = graph.add_node(node);
-                node_map.insert(node, node_index);
-            }
+                for (node, _) in &nodes {
+                    let node_index = graph.add_node(node);
+                    node_map.insert(node, node_index);
+                }
 
-            for (node, nbors) in &nodes {
-                for nbor in nbors {
-                    if node < nbor {
-                        graph.add_edge(node_map[&node], node_map[&nbor], ());
+                for (node, nbors) in &nodes {
+                    for nbor in nbors {
+                        if node < nbor {
+                            graph.add_edge(node_map[&node], node_map[&nbor], ());
+                        }
                     }
                 }
-            }
 
-            let mut dfs = Dfs::new(&graph, node_map[&0]);
-            let mut p1 = 0;
-            while let Some(_) = dfs.next(&graph) { p1 += 1; }
+                let mut dfs = Dfs::new(&graph, node_map[&0]);
+                let mut p1 = 0;
+                while let Some(_) = dfs.next(&graph) { p1 += 1; }
 
-            let p2 = connected_components(&graph);
-
-            let end = start.elapsed().as_micros();
-
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
+                let p2 = connected_components(&graph);
+                (p1, p2)
+            })
         }
     }
 }

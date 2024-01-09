@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -34,23 +34,15 @@ fn main() {
     match input_parser(input) {
         Err(_) => println!("parsing error"),
         Ok ((_, dirs)) => {
-            let start = Instant::now();
-
-            let coords: Vec<_> = dirs.iter().scan(Coord::origin(), |acc, dir| {
-                *acc += *dir;
-                Some (*acc)
-            }).collect();
-
-            println!("{}", dirs.len());
-
-            let p1 = distance(coords.last().unwrap());
-            let p2 = coords.iter().map(distance).max().unwrap();
-
-            let end = start.elapsed().as_micros();
-
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
+            aoc(|| {
+                let coords: Vec<_> = dirs.iter().scan(Coord::origin(), |acc, dir| {
+                    *acc += *dir;
+                    Some (*acc)
+                }).collect();
+                let p1 = distance(coords.last().unwrap());
+                let p2 = coords.iter().map(distance).max().unwrap();
+                (p1, p2)
+            })
         }
     }
 }

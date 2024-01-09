@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 use itertools::Itertools;
 
 use nom::{
@@ -30,14 +30,7 @@ fn main() {
     match input_parser(input) {
         Err(_) => println!("parsing error"),
         Ok ((_, vec)) => {
-            let start = Instant::now();
-            let p1 = part1(&vec);
-            let p2 = part2(&vec);
-            let end = start.elapsed().as_micros();
-        
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
+            aoc(|| (part1(&vec), part2(&vec)))
         }
     }
 }

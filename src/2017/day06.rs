@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 use itertools::iterate;
 use aoc::iter::AOCIter;
 
@@ -32,14 +32,10 @@ fn main() {
     match input_parser(input) {
         Err(_) => println!("parsing error"),
         Ok ((_, banks)) => {
-            let start = Instant::now();
-            let (i, j, _) = iterate(banks.clone(), step).find_repetition().unwrap();
-            let (p1, p2) = (j, j-i);
-            let end = start.elapsed().as_micros();
-
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
+            aoc(|| {
+                let (i, j, _) = iterate(banks.clone(), step).find_repetition().unwrap();
+                (j, j-i)
+            })
         }
     }
 }

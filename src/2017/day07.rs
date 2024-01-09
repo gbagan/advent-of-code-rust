@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 use std::collections::HashMap;
 use petgraph::algo::toposort;
 use petgraph::{Graph,graph::NodeIndex};
@@ -85,15 +85,10 @@ fn main() {
     match input_parser(input) {
         Err(_) => println!("parsing error"),
         Ok ((_, treelist)) => {
-            let start = Instant::now();
-            let (mut graph, ordering) = build_graph_and_ordering(&treelist);            
-            let p1 = graph[ordering[0]].id.clone();
-            let p2 = part2(&mut graph, &ordering).unwrap();
-            let end = start.elapsed().as_micros();
-        
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
+            aoc(|| {
+                let (mut graph, ordering) = build_graph_and_ordering(&treelist);            
+                (graph[ordering[0]].id.clone(), part2(&mut graph, &ordering).unwrap())
+            })
         }
     }
 }

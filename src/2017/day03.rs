@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 use std::collections::HashMap;
 use std::str::FromStr;
 use aoc::coord::Coord;
@@ -27,7 +27,6 @@ fn part2(n: u64) -> u64 {
             for _ in 0..steps {
                 c = c + dir;
                 let r = fill(&grid, &c);
-                println!("{:?} {}", c, r);
                 if r > n {
                     return r;
                 }
@@ -43,14 +42,7 @@ fn main() {
     match u64::from_str(input) {
         Err(_) => println!("parsing error"),
         Ok(n) => {
-            let start = Instant::now();
-            let p1 = part1(n as i64);
-            let p2 = part2(n);
-            let end = start.elapsed().as_micros();
-
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
+            aoc(|| (part1(n as i64), part2(n)))
         }
     }
 }
