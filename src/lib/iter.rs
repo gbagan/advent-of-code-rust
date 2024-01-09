@@ -47,8 +47,6 @@ pub trait AOCIter: Iterator {
         }
         None
     }
-
-
 }
 
 impl<I: Iterator> AOCIter for I {}

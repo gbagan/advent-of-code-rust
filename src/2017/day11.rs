@@ -5,7 +5,7 @@ use nom::{
     character::complete::char,
     combinator::map,
     IResult,
-    multi::separated_list0,
+    multi::separated_list1,
 };
 use aoc::coord::Coord;
 
@@ -21,13 +21,12 @@ fn direction(input: &str) -> IResult<&str,Coord> {
 }
 
 fn input_parser(input: &str) -> IResult<&str,Vec<Coord>> {
-    separated_list0(char(','), direction)(input)
+    separated_list1(char(','), direction)(input)
 }
 
 fn distance(Coord {x, y}: &Coord) -> i64 {
     x.abs().max(y.abs()).max((x-y).abs())
 }
-
 
 fn main() {
     let input = include_str!("../../inputs/2017/11");
