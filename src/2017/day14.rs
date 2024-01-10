@@ -25,10 +25,9 @@ fn count_ones(n: u8) -> u32 {
 fn part1(hashes: &Vec<Vec<u8>>) -> u32 {
     hashes
     .iter()
-    .map(|h| h
-                        .iter()
-                        .map(|&n| count_ones(n))
-                        .sum::<u32>()
+    .map(|h| h.iter()
+              .map(|&n| count_ones(n))
+              .sum::<u32>()
         )
     .sum()
 }

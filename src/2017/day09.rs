@@ -1,4 +1,4 @@
-use aoc::aoc;
+use aoc::aoc_with_parser;
 use nom::{
     branch::alt,
     character::complete::{anychar, char, none_of},
@@ -45,8 +45,5 @@ fn input_parser(input: &str) -> IResult<&str, Coord> {
 
 fn main() {
     let input = include_str!("../../inputs/2017/09");
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, c)) => aoc(|| (c.x, c.y))
-    }
+    aoc_with_parser(input, input_parser, |c| (c.x, c.y))
 }

@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc_with_parser;
 use nom::{
     character::complete::{char,u64},
     multi::separated_list1,
@@ -6,10 +6,10 @@ use nom::{
     IResult,
   };
 
-pub struct Box {
-  pub l: u64,
-  pub h: u64,
-  pub w: u64,
+struct Box {
+    l: u64,
+    h: u64,
+    w: u64,
 }
 
 fn box_parser(input: &str) -> IResult<&str, Box> {
@@ -41,18 +41,5 @@ fn part2 (boxes: &Vec<Box>) -> u64 {
 
 fn main() {
     let input = include_str!("../../inputs/2015/02");
-
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, boxes)) => {
-            let start = Instant::now();
-            let p1 = part1(&boxes);
-            let p2 = part2(&boxes);
-            let end = start.elapsed().as_micros();
-        
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
-        }
-    }
+    aoc_with_parser(input, input_parser, |boxes| (part1(&boxes), part2(&boxes)))
 }

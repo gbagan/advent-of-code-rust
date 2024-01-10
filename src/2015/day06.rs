@@ -1,5 +1,5 @@
+use aoc::aoc_with_parser;
 use std::cmp::max;
-use std::time::Instant;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -82,18 +82,7 @@ fn part2 (instrs: &Vec<Instruction>) -> u64 {
 
 fn main() {
     let input = include_str!("../../inputs/2015/06");
-
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, instrs)) => {
-            let start = Instant::now();
-            let p1 = part1(&instrs);
-            let p2 = part2(&instrs);
-            let end = start.elapsed().as_micros();
-        
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
-        }
-    }
+    aoc_with_parser(input, input_parser, |instrs| {
+        (part1(&instrs), part2(&instrs))
+    })
 }

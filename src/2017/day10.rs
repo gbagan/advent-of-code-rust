@@ -1,4 +1,4 @@
-use aoc::aoc;
+use aoc::aoc_with_parser;
 use nom::{
     character::complete::{char,u8},
     IResult,
@@ -18,15 +18,10 @@ fn part2(input: &str) -> String {
 
 fn main() {
     let input = include_str!("../../inputs/2017/10");
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, lengths)) => {
-            aoc(|| {
-                let knot = reverse(&lengths, 1);
-                let p1 = knot[0] as usize * knot[1] as usize;
-                let p2 = part2(&input);
-                (p1, p2)
-            })
-        }
-    }
+    aoc_with_parser(input, input_parser, |lengths| {
+        let knot = reverse(&lengths, 1);
+        let p1 = knot[0] as usize * knot[1] as usize;
+        let p2 = part2(&input);
+        (p1, p2)
+    })
 }

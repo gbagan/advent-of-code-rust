@@ -1,4 +1,4 @@
-use aoc::aoc;
+use aoc::aoc_with_parser;
 use itertools::iterate;
 use aoc::iter::AOCIter;
 
@@ -46,10 +46,7 @@ fn part2(a: u64, b: u64) -> usize {
 
 fn main() {
     let input = include_str!("../../inputs/2017/15");
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, (a, b))) => {
-            aoc(|| (part1(a, b), part2(a, b)))            
-        }
-    }
+    aoc_with_parser(input, input_parser, |(a, b)| {
+        (part1(a, b), part2(a, b))
+    })
 }

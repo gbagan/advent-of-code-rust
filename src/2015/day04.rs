@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 
 fn solve_for(input: &str, pattern: &str) -> isize {
     let mut i = 0;
@@ -13,13 +13,9 @@ fn solve_for(input: &str, pattern: &str) -> isize {
 
 fn main() {
     let input = include_str!("../../inputs/2015/04");
-            
-    let start = Instant::now();
-    let p1 = solve_for(input, "00000");
-    let p2 = solve_for(input, "000000");
-    let end = start.elapsed().as_micros();
-        
-    println!("Part 1: {}", p1);
-    println!("Part 2: {}", p2);
-    println!("Time: {} μs", end);
+    aoc(|| {
+        let p1 = solve_for(input, "00000");
+        let p2 = solve_for(input, "000000");
+        (p1, p2)
+    })
 }

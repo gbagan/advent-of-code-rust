@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 use itertools::Itertools;
 use aoc::iter::AOCIter;
 
@@ -19,14 +19,9 @@ fn is_nice_string2 (s: &str) -> bool {
 
 fn main() {
     let input = include_str!("../../inputs/2015/05");
-    let start = Instant::now();
-
-    let p1 = input.lines().count_by(is_nice_string);
-    let p2 = input.lines().count_by(is_nice_string2);
-
-    let end = start.elapsed().as_micros();
-
-    println!("Part 1: {}", p1);
-    println!("Part 2: {}", p2);
-    println!("Time: {} μs", end);
+    aoc(|| {
+        let p1 = input.lines().count_by(is_nice_string);
+        let p2 = input.lines().count_by(is_nice_string2);
+        (p1, p2)
+    })
 }

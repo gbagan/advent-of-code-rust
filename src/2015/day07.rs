@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc_with_parser;
 use std::collections::HashMap;
 use nom::{
     branch::alt,
@@ -108,25 +108,14 @@ fn eval_circuit(circuit: &Circuit) -> u16 {
     }
     
     get_val(&circuit, &mut vals, "a".to_string())
-
 }
-
 
 fn main() {
     let input = include_str!("../../inputs/2015/07");
-
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, mut circuit)) => {
-            let start = Instant::now();
-            let p1 = eval_circuit(&circuit);
-            circuit.insert("b".to_string(), Gate::Const(Wire::Signal(p1)));
-            let p2 = eval_circuit(&circuit);
-            let end = start.elapsed().as_micros();
-        
-            println!("Part 1: {}", p1);
-            println!("Part 2: {}", p2);
-            println!("Time: {} μs", end);
-        }
-    }
+    aoc_with_parser(input, input_parser, |mut circuit| {
+        let p1 = eval_circuit(&circuit);
+        circuit.insert("b".to_string(), Gate::Const(Wire::Signal(p1)));
+        let p2 = eval_circuit(&circuit);
+        (p1, p2)
+    })
 }

@@ -1,4 +1,4 @@
-use aoc::aoc;
+use aoc::aoc_with_parser;
 use std::collections::HashMap;
 use petgraph::algo::toposort;
 use petgraph::{Graph,graph::NodeIndex};
@@ -82,13 +82,10 @@ fn part2(graph: &mut Graph<Node,()>, ordering: &Vec<NodeIndex>) -> Option<i32> {
 
 fn main() {
     let input = include_str!("../../inputs/2017/07");
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, treelist)) => {
-            aoc(|| {
-                let (mut graph, ordering) = build_graph_and_ordering(&treelist);            
-                (graph[ordering[0]].id.clone(), part2(&mut graph, &ordering).unwrap())
-            })
-        }
-    }
+    aoc_with_parser(input, input_parser, |treelist| {
+        let (mut graph, ordering) = build_graph_and_ordering(&treelist);            
+        let p1 = graph[ordering[0]].id.clone();
+        let p2 = part2(&mut graph, &ordering).unwrap();
+        (p1, p2)
+    })
 }

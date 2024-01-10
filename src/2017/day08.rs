@@ -1,4 +1,4 @@
-use aoc::aoc;
+use aoc::aoc_with_parser;
 use std::collections::HashMap;
 use nom::{
     branch::alt,
@@ -97,8 +97,5 @@ fn run(instrs: &Vec<Instr>) -> (i32, i32) {
 
 fn main() {
     let input = include_str!("../../inputs/2017/08");
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, instrs)) => aoc(|| run(&instrs)),
-    }
+    aoc_with_parser(input, input_parser, |instrs| run(&instrs))
 }

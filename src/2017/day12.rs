@@ -1,4 +1,4 @@
-use aoc::aoc;
+use aoc::aoc_with_parser;
 use std::collections::HashMap;
 use nom::{
     bytes::complete::tag,
@@ -23,35 +23,28 @@ fn input_parser(input: &str) -> IResult<&str,Vec<(u32, Vec<u32>)>> {
 
 fn main() {
     let input = include_str!("../../inputs/2017/12");
-    //let input = "AoC 2017";
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, nodes)) => {
-            aoc(|| {
+    aoc_with_parser(input, input_parser, |nodes| {
+        let mut graph = Graph::new_undirected();
+        let mut node_map = HashMap::new();
 
-                let mut graph = Graph::new_undirected();
-                let mut node_map = HashMap::new();
-
-                for (node, _) in &nodes {
-                    let node_index = graph.add_node(node);
-                    node_map.insert(node, node_index);
-                }
-
-                for (node, nbors) in &nodes {
-                    for nbor in nbors {
-                        if node < nbor {
-                            graph.add_edge(node_map[&node], node_map[&nbor], ());
-                        }
-                    }
-                }
-
-                let mut dfs = Dfs::new(&graph, node_map[&0]);
-                let mut p1 = 0;
-                while let Some(_) = dfs.next(&graph) { p1 += 1; }
-
-                let p2 = connected_components(&graph);
-                (p1, p2)
-            })
+        for (node, _) in &nodes {
+            let node_index = graph.add_node(node);
+            node_map.insert(node, node_index);
         }
-    }
+
+        for (node, nbors) in &nodes {
+            for nbor in nbors {
+                if node < nbor {
+                    graph.add_edge(node_map[&node], node_map[&nbor], ());
+                }
+            }
+        }
+
+        let mut dfs = Dfs::new(&graph, node_map[&0]);
+        let mut p1 = 0;
+        while let Some(_) = dfs.next(&graph) { p1 += 1; }
+
+        let p2 = connected_components(&graph);
+        (p1, p2)
+    })
 }

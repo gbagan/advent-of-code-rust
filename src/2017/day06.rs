@@ -1,7 +1,6 @@
-use aoc::aoc;
+use aoc::aoc_with_parser;
 use itertools::iterate;
 use aoc::iter::AOCIter;
-
 use nom::{
     character::complete::{u32, space1},
     multi::separated_list1,
@@ -29,13 +28,8 @@ fn step(banks: &Vec<u32>) -> Vec<u32> {
 
 fn main() {
     let input = include_str!("../../inputs/2017/06");
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, banks)) => {
-            aoc(|| {
-                let (i, j, _) = iterate(banks.clone(), step).find_repetition().unwrap();
-                (j, j-i)
-            })
-        }
-    }
+    aoc_with_parser(input, input_parser, |banks| {
+        let (i, j, _) = iterate(banks.clone(), step).find_repetition().unwrap();
+        (j, j-i)
+    })
 }

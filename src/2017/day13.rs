@@ -1,4 +1,4 @@
-use aoc::aoc;
+use aoc::aoc_with_parser;
 use nom::{
     bytes::complete::tag,
     character::complete::{line_ending,u64},
@@ -38,10 +38,7 @@ fn part2(pairs: &Vec<(u64, u64)>) -> u64 {
 
 fn main() {
     let input = include_str!("../../inputs/2017/13");
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, pairs)) => {
-            aoc(|| (part1(&pairs), part2(&pairs)))
-        }
-    }
+    aoc_with_parser(input, input_parser, |pairs| {
+        (part1(&pairs), part2(&pairs))
+    })
 }

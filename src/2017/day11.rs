@@ -1,4 +1,4 @@
-use aoc::aoc;
+use aoc::aoc_with_parser;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -30,19 +30,13 @@ fn distance(Coord {x, y}: &Coord) -> i64 {
 
 fn main() {
     let input = include_str!("../../inputs/2017/11");
-    //let input = "AoC 2017";
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, dirs)) => {
-            aoc(|| {
-                let coords: Vec<_> = dirs.iter().scan(Coord::origin(), |acc, dir| {
-                    *acc += *dir;
-                    Some (*acc)
-                }).collect();
-                let p1 = distance(coords.last().unwrap());
-                let p2 = coords.iter().map(distance).max().unwrap();
-                (p1, p2)
-            })
-        }
-    }
+    aoc_with_parser(input, input_parser, |dirs| {
+        let coords: Vec<_> = dirs.iter().scan(Coord::origin(), |acc, dir| {
+            *acc += *dir;
+            Some (*acc)
+        }).collect();
+        let p1 = distance(coords.last().unwrap());
+        let p2 = coords.iter().map(distance).max().unwrap();
+        (p1, p2)
+    })
 }

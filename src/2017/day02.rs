@@ -1,4 +1,4 @@
-use aoc::aoc;
+use aoc::aoc_with_parser;
 use itertools::Itertools;
 
 use nom::{
@@ -27,10 +27,7 @@ fn part2(vec: &Vec<Vec<u32>>) -> u32 {
 
 fn main() {
     let input = include_str!("../../inputs/2017/02");
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, vec)) => {
-            aoc(|| (part1(&vec), part2(&vec)))
-        }
-    }
+    aoc_with_parser(input, input_parser, |vec| {
+        (part1(&vec), part2(&vec))
+    })
 }

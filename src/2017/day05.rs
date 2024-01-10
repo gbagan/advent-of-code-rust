@@ -1,4 +1,4 @@
-use aoc::aoc;
+use aoc::aoc_with_parser;
 
 use nom::{
     character::complete::{line_ending,i32},
@@ -46,13 +46,7 @@ fn part2(jumps: &Vec<i32>) -> u32 {
 
 fn main() {
     let input = include_str!("../../inputs/2017/05");
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, jumps)) => {
-            aoc(|| (
-                part1(&jumps),
-                part2(&jumps),
-            ))
-        }
-    }
+    aoc_with_parser(input, input_parser, |jumps| {
+        (part1(&jumps), part2(&jumps))
+    })
 }

@@ -1,4 +1,4 @@
-use std::time::Instant;
+use aoc::aoc;
 use std::collections::HashSet;
 #[derive(PartialEq)]
 pub struct Box {
@@ -56,13 +56,5 @@ fn part2(input: &str) -> usize {
 
 fn main() {
     let input = include_str!("../../inputs/2015/03");
-            
-    let start = Instant::now();
-    let p1 = part1(input);
-    let p2 = part2(input);
-    let end = start.elapsed().as_micros();
-        
-    println!("Part 1: {}", p1);
-    println!("Part 2: {}", p2);
-    println!("Time: {} μs", end);
+    aoc(|| (part1(input), part2(input)))
 }

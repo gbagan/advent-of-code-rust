@@ -13,7 +13,6 @@ fn captcha_sum (bytes: &[u8], shift: usize) -> usize {
 
 fn main() {
     let input = include_bytes!("../../inputs/2017/01");
-    
     aoc(|| {
         let p1 = captcha_sum(input, 1);
         let p2 = captcha_sum(input, input.len()/2);
