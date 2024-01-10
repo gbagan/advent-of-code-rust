@@ -4,25 +4,28 @@ use nom::{
     character::complete::{anychar, char, u8},
     combinator::map,
     multi::separated_list1,
-    sequence::preceded,
+    sequence::{preceded, tuple},
     IResult,
 };
-use itertools::iterate;
-use aoc::iter::AOCIter;
+use aoc::permutation::Permutation;
+use aoc::number::power;
 
 enum Move {
     Spin(u8), Exchange(u8, u8), Partner(char, char)
 }
 
+// a dance is a tuple of (p, q)
+// p represents the permutation implied by Spin and Exchange
+// q represents the permutation implied by Partner
+type Dance = (Permutation, Permutation);
+
 fn exchange_parser (input: &str) -> IResult<&str, Move> {
-    let (input, a) = preceded(char('x'), u8)(input)?;
-    let (input, b) = preceded(char('/'), u8)(input)?;
+    let (input, (_, a, _, b)) = tuple((char('x'), u8, char('/'), u8))(input)?;
     Ok((input, Move::Exchange(a, b)))
 }
 
 fn partner_parser (input: &str) -> IResult<&str, Move> {
-    let (input, a) = preceded(char('p'),  anychar)(input)?;
-    let (input, b) = preceded(char('/'), anychar)(input)?;
+    let (input, (_, a, _, b)) = tuple((char('p'), anychar, char('/'), anychar))(input)?;
     Ok((input, Move::Partner(a, b)))
 }
 
@@ -38,38 +41,25 @@ fn input_parser (input: &str) -> IResult<&str, Vec<Move>> {
     separated_list1(char(','), move_parser)(input)
 }
 
-fn dance(programs: &Vec<char>, moves: &Vec<Move>) -> Vec<char> {
-    let mut programs = programs.clone();
+fn letter_to_int (c: char) -> usize {
+    (c as usize) - ('a' as usize)     
+}
+
+fn perform_dance(moves: &Vec<Move>) -> Dance {
+    let mut perm1 = Permutation::one(16);
+    let mut perm2 = Permutation::one(16);
     for move_ in moves {
         match move_ {
-            Move::Spin(n) => programs.rotate_right(*n as usize),
-            Move::Exchange(a, b) => programs.swap(*a as usize, *b as usize),
-            Move::Partner(a, b) => {
-                let i = programs.iter().position(|&r| r == *a).unwrap();
-                let j = programs.iter().position(|&r| r == *b).unwrap();
-                programs.swap(i, j);
-            },
+            Move::Spin(n) => perm1.indices.rotate_right(*n as usize),
+            Move::Exchange(a, b) => perm1.indices.swap(*a as usize, *b as usize),
+            Move::Partner(a, b) => perm2.indices.swap(letter_to_int(*a), letter_to_int(*b)),
         }
     }
-    programs
+    (perm1.inv(), perm2)
 }
 
-fn part1(moves: &Vec<Move>) -> String {
-    let programs: Vec<_> = "abcdefghijklmnop".chars().collect();
-    let programs = dance(&programs, moves);
-    programs.iter().collect()
-}
-
-fn part2(moves: &Vec<Move>) -> String {
-    let programs: Vec<_> = "abcdefghijklmnop".chars().collect();
-    let (i, j, mut progs) = iterate(programs, |p| dance(&p, &moves))
-                                                .find_repetition()
-                                                .unwrap();
-    let n = (1_000_000_000 - i) % (j - i);
-    for _ in 0..n {
-        progs = dance(&progs, &moves);
-    }
-    progs.iter().collect()
+fn compose_dance(d1: &Dance, d2: &Dance) -> Dance {
+    (&d1.0 >> &d2.0, &d1.1 >> &d2.1)
 }
 
 fn main() {
@@ -78,8 +68,19 @@ fn main() {
     match input_parser(input) {
         Err(_) => println!("parsing error"),
         Ok ((_, moves)) => {
-            println!("{}", moves.len());
-            aoc(|| (part1(&moves), part2(&moves)))
+            aoc(|| {
+                let programs: Vec<_> = "abcdefghijklmnop".chars().collect();
+                let dance = perform_dance(&moves);
+            
+                let p1 = (&dance.1 >> &dance.0).apply(&programs);
+                let p1: String = p1.iter().collect();
+            
+                let pdance = power(compose_dance, dance.clone(), 1_000_000_000);
+                let p2 = (&pdance.1 >> &pdance.0).apply(&programs);
+                let p2: String = p2.iter().collect();
+
+                (p1, p2)
+            })
         }
     }
 }
