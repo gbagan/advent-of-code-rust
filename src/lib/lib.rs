@@ -5,6 +5,8 @@ pub mod iter;
 pub mod coord;
 pub mod graph;
 pub mod knothash;
+pub mod number;
+pub mod permutation;
 
 pub fn aoc<A,B, F>(f: F)
     where

@@ -8,54 +8,67 @@ pub struct Coord {
 }
 
 impl Coord {
+    #[inline]
     pub fn origin() -> Coord {
         Coord { x: 0, y: 0 }
     }
 
+    #[inline]
     pub fn new(x: i64, y: i64) -> Coord {
         Coord { x: x, y: y }
     }
 
+    #[inline]
     pub fn north() -> Coord {
         Coord { x: 0, y: -1 }
     }
 
+    #[inline]
     pub fn south() -> Coord {
         Coord { x: 0, y: 1 }
     }
 
+    #[inline]
     pub fn west() -> Coord {
         Coord { x: -1, y: 0 }
     }
 
+    #[inline]
     pub fn east() -> Coord {
         Coord { x: 1, y: 0 }
     }
 
+    #[inline]
     pub fn left(&self) -> Coord {
         Coord { x: self.x-1, y: self.y }
     }
 
+    #[inline]
     pub fn right(&self) -> Coord {
         Coord { x: self.x+1, y: self.y }
     }
 
+    #[inline]
     pub fn above(&self) -> Coord {
         Coord { x: self.x, y: self.y-1 }
     }
 
+    #[inline]
     pub fn below(&self) -> Coord {
         Coord { x: self.x, y: self.y+1 }
     }
 
+    #[inline]
     pub fn turn_left(&self) -> Coord {
         Coord { x: self.y, y: -self.x }
     }
 
+    #[inline]
     pub fn turn_right(&self) -> Coord {
         Coord { x: -self.y, y: self.x }
     }
 
+    #[inline]
     pub fn adjacent(&self) -> Vec<Coord> {
         vec!( Coord { x: self.x, y: self.y-1 },
               Coord { x: self.x, y: self.y+1 },
@@ -64,6 +77,7 @@ impl Coord {
             )
     }
 
+    #[inline]
     pub fn surrounding(&self) -> Vec<Coord> {
         vec!( 
               Coord { x: self.x, y: self.y-1 },
@@ -81,6 +95,7 @@ impl Coord {
 impl Add for Coord {
     type Output = Self;
 
+    #[inline]
     fn add(self, other: Coord) -> Coord {
         Coord {
             x: self.x + other.x,
@@ -90,6 +105,7 @@ impl Add for Coord {
 }
 
 impl AddAssign for Coord {
+    #[inline]
     fn add_assign(&mut self, other: Self) {
         *self = Self {
             x: self.x + other.x,
@@ -101,6 +117,7 @@ impl AddAssign for Coord {
 impl Neg for Coord {
     type Output = Self;
 
+    #[inline]
     fn neg (self) -> Self::Output {
         Coord {
             x: -self.x,
@@ -112,6 +129,7 @@ impl Neg for Coord {
 impl Mul<i64> for Coord {
     type Output = Self;
 
+    #[inline]
     fn mul(self, n: i64) -> Self::Output {
         Coord {
             x: n * self.x,
@@ -123,6 +141,7 @@ impl Mul<i64> for Coord {
 impl Sub for Coord {
     type Output = Self;
 
+    #[inline]
     fn sub(self, other: Coord) -> Coord {
         Coord {
             x: self.x - other.x,
