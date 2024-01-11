@@ -19,17 +19,17 @@ enum Move {
 // q represents the permutation implied by Partner
 type Dance = (Permutation, Permutation);
 
-fn exchange_parser (input: &str) -> IResult<&str, Move> {
+fn exchange_parser(input: &str) -> IResult<&str, Move> {
     let (input, (_, a, _, b)) = tuple((char('x'), u8, char('/'), u8))(input)?;
     Ok((input, Move::Exchange(a, b)))
 }
 
-fn partner_parser (input: &str) -> IResult<&str, Move> {
+fn partner_parser(input: &str) -> IResult<&str, Move> {
     let (input, (_, a, _, b)) = tuple((char('p'), anychar, char('/'), anychar))(input)?;
     Ok((input, Move::Partner(a, b)))
 }
 
-fn move_parser (input: &str) -> IResult<&str, Move> {
+fn move_parser(input: &str) -> IResult<&str, Move> {
     alt((
         map(preceded(char('s'), u8), |a| Move::Spin(a)),
         exchange_parser,
@@ -37,11 +37,11 @@ fn move_parser (input: &str) -> IResult<&str, Move> {
     ))(input)
 }
 
-fn input_parser (input: &str) -> IResult<&str, Vec<Move>> {
+fn input_parser(input: &str) -> IResult<&str, Vec<Move>> {
     separated_list1(char(','), move_parser)(input)
 }
 
-fn letter_to_int (c: char) -> usize {
+fn letter_to_int(c: char) -> usize {
     (c as usize) - ('a' as usize)     
 }
 
@@ -78,25 +78,3 @@ fn main() {
         (p1, p2)
     })
 }
-
-
-    /* 
-    match input_parser(input) {
-        Err(_) => println!("parsing error"),
-        Ok ((_, moves)) => {
-            aoc(|| {
-                let programs: Vec<_> = "abcdefghijklmnop".chars().collect();
-                let dance = perform_dance(&moves);
-            
-                let p1 = (&dance.1 >> &dance.0).apply(&programs);
-                let p1: String = p1.iter().collect();
-            
-                let pdance = power(compose_dance, dance.clone(), 1_000_000_000);
-                let p2 = (&pdance.1 >> &pdance.0).apply(&programs);
-                let p2: String = p2.iter().collect();
-
-                (p1, p2)
-            })
-        }
-    }
-    */
