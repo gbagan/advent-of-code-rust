@@ -5,6 +5,7 @@ use nom::IResult;
 pub mod iter;
 pub mod coord;
 pub mod graph;
+pub mod grid;
 pub mod knothash;
 pub mod number;
 pub mod permutation;
