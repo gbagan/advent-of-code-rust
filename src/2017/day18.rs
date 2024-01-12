@@ -3,7 +3,6 @@ use std::collections::{HashMap, VecDeque};
 use nom::{
     bytes::complete::tag,
     branch::alt,
-    character::is_alphabetic,
     character::complete::{satisfy, line_ending, i64, space1},
     multi::separated_list1,
     combinator::map,

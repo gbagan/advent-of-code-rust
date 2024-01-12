@@ -9,18 +9,16 @@ use nom::{
 };
 use aoc::coord::Coord;
 
-fn direction(input: &str) -> IResult<&str,Coord> {
-    alt((
+fn input_parser(input: &str) -> IResult<&str,Vec<Coord>> {
+    let direction = alt((
         map(tag("nw"), |_| Coord::new(-1, -1)),
         map(tag("ne"), |_| Coord::new(1, 0)),
         map(tag("n"), |_| Coord::new(0, -1)),
         map(tag("sw"), |_| Coord::new(-1, 0)),
         map(tag("se"), |_| Coord::new(1, 1)),
         map(tag("s"), |_| Coord::new(0, 1)),
-    ))(input)
-}
-
-fn input_parser(input: &str) -> IResult<&str,Vec<Coord>> {
+    ));
+    
     separated_list1(char(','), direction)(input)
 }
 

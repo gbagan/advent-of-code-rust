@@ -28,7 +28,6 @@ fn input_parser(input: &str) -> IResult<&str, TreeList> {
         let ns = ns.unwrap_or(Vec::new()).iter().map(|s| s.to_string()).collect();
         Ok((input, (node.to_string(), weight, ns)))
     }
-
     fn children(input: &str) -> IResult<&str, Option<Vec<&str>>> {
         opt(preceded(tag(" -> "), separated_list1(tag(", "), alpha1)))(input)
     }

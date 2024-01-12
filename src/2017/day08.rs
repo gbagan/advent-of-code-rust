@@ -6,6 +6,7 @@ use nom::{
     character::complete::{alpha1, line_ending, i32, space1},
     combinator::map,
     multi::separated_list1,
+    sequence::tuple,
     IResult,
 };
 enum Command { Inc, Dec }
@@ -22,45 +23,25 @@ struct Instr {
 }
 
 fn input_parser(input: &str) -> IResult<&str, Vec<Instr>> {
-    fn instr(input: &str) -> IResult<&str, Instr> {
-        let (input, var1) = alpha1(input)?;
-        let (input, _) = space1(input)?;
-        let (input, cmd) = command(input)?;
-        let (input, _) = space1(input)?;
-        let (input, val1) = i32(input)?;
-        let (input, _) = tag(" if ")(input)?;
-        let (input, var2) = alpha1(input)?;
-        let (input, _) = space1(input)?;
-        let (input, cmp) = cmp_parser(input)?;
-        let (input, _) = space1(input)?;
-        let (input, val2) = i32(input)?;
-        Ok((input, Instr {
-            var1: var1.to_string(),
-            cmd: cmd,
-            val1: val1,
-            var2: var2.to_string(),
-            cmp: cmp,
-            val2: val2
-        }))
-    }
-
-    fn command(input: &str) -> IResult<&str, Command> {
-        alt((
-            map(tag("inc"), |_| Command::Inc),
-            map(tag("dec"), |_| Command::Dec),
-        ))(input)
-    }
-
-    fn cmp_parser(input: &str) -> IResult<&str, Cmp> {
-        alt((
-            map(tag("=="), |_| Cmp::Eq),
+    let cmp_parser = alt((
+            map(tag("=="), |_: &str| Cmp::Eq),
             map(tag("!="), |_| Cmp::Neq),
             map(tag("<="), |_| Cmp::Le),
             map(tag(">="), |_| Cmp::Ge),
             map(tag("<"), |_| Cmp::Lt),
             map(tag(">"), |_| Cmp::Gt),
-        ))(input)
-    }
+        ));
+
+    let command= alt((
+                map(tag("inc"), |_| Command::Inc),
+                map(tag("dec"), |_| Command::Dec),
+            ));
+
+    let instr = map(
+        tuple((alpha1, space1, command, space1, i32, tag(" if "), alpha1, space1, cmp_parser, space1, i32)),
+        |(var1, _, cmd, _, val1, _, var2, _, cmp, _, val2)|
+            Instr { var1: var1.to_string(), cmd, val1, var2: var2.to_string(), cmp, val2 }
+    );
 
     separated_list1(line_ending, instr)(input)
 }
