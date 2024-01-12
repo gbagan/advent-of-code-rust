@@ -19,26 +19,17 @@ enum Move {
 // q represents the permutation implied by Partner
 type Dance = (Permutation, Permutation);
 
-fn exchange_parser(input: &str) -> IResult<&str, Move> {
-    let (input, (_, a, _, b)) = tuple((char('x'), u8, char('/'), u8))(input)?;
-    Ok((input, Move::Exchange(a, b)))
-}
-
-fn partner_parser(input: &str) -> IResult<&str, Move> {
-    let (input, (_, a, _, b)) = tuple((char('p'), anychar, char('/'), anychar))(input)?;
-    Ok((input, Move::Partner(a, b)))
-}
-
-fn move_parser(input: &str) -> IResult<&str, Move> {
-    alt((
-        map(preceded(char('s'), u8), |a| Move::Spin(a)),
-        exchange_parser,
-        partner_parser,
-    ))(input)
-}
-
 fn input_parser(input: &str) -> IResult<&str, Vec<Move>> {
-    separated_list1(char(','), move_parser)(input)
+    let spin = map(preceded(char('s'), u8), |a| Move::Spin(a));
+    let exchange = map(
+        tuple((char('x'), u8, char('/'), u8)),
+        |(_, a, _, b)| Move::Exchange(a, b));
+    
+    let partner = map(
+        tuple((char('p'), anychar, char('/'), anychar)),
+        |(_, a, _, b)| Move::Partner(a, b));
+    
+    separated_list1(char(','), alt((spin, exchange, partner)))(input)
 }
 
 fn letter_to_int(c: char) -> usize {

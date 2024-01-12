@@ -60,7 +60,6 @@ fn part2(hashes: &Vec<Vec<u8>>) -> usize {
     connected_components(&graph)
 }
 
-
 fn main() {
     let input = include_str!("../../inputs/2017/14");
     aoc(|| {

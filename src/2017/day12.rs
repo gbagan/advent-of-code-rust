@@ -4,21 +4,16 @@ use nom::{
     bytes::complete::tag,
     character::complete::{line_ending,u32},
     IResult,
+    sequence::separated_pair,
     multi::separated_list1,
 };
 use petgraph::Graph;
 use petgraph::visit::Dfs;
 use petgraph::algo::connected_components;
 
-fn node_parser(input: &str) -> IResult<&str,(u32, Vec<u32>)> {
-    let (input, node) = u32(input)?;
-    let (input, _) = tag(" <-> ")(input)?;
-    let (input, nbors) = separated_list1(tag(", "), u32)(input)?;
-    Ok((input, (node, nbors)))
-}
-
 fn input_parser(input: &str) -> IResult<&str,Vec<(u32, Vec<u32>)>> {
-    separated_list1(line_ending, node_parser)(input)
+    let node = separated_pair(u32, tag(" <-> "), separated_list1(tag(", "), u32));
+    separated_list1(line_ending, node)(input)
 }
 
 fn main() {

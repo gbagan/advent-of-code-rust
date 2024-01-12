@@ -2,19 +2,14 @@ use aoc::aoc_with_parser;
 use nom::{
     bytes::complete::tag,
     character::complete::{line_ending,u64},
+    sequence::separated_pair,
     multi::separated_list1,
     IResult,
 };
 
-fn pair_parser(input: &str) -> IResult<&str, (u64, u64)> {
-    let (input, depth) = u64(input)?;
-    let (input, _) = tag(": ")(input)?;
-    let (input, range) = u64(input)?;
-    Ok((input, (depth, range)))
-}
-
 fn input_parser(input: &str) -> IResult<&str, Vec<(u64, u64)>> {
-    separated_list1(line_ending, pair_parser)(input)
+    let pair = separated_pair(u64, tag(": "), u64);
+    separated_list1(line_ending, pair)(input)
 }
 
 #[inline]
