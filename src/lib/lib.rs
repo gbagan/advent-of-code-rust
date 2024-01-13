@@ -9,6 +9,7 @@ pub mod grid;
 pub mod knothash;
 pub mod number;
 pub mod permutation;
+pub mod range;
 
 pub fn aoc<A,B, F>(f: F)
     where
