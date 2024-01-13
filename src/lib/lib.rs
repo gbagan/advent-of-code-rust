@@ -34,10 +34,11 @@ pub fn aoc_with_parser<A,B,I,F,P>(input: &str, parser: P, f: F)
         F: Fn(I) -> (A, B),
         P: Fn(&str) -> IResult<&str, I>
 {
+    let start = Instant::now();
     match parser(input) {
         Err(_) => println!("parsing error"),
         Ok ((_, data)) => {
-            let start = Instant::now();
+            
             let (p1, p2) = f(data);
             let end = start.elapsed().as_micros();
 
