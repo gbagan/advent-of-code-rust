@@ -7,19 +7,27 @@ pub struct Range {
 }
 
 impl Range {
+    #[inline]
     pub fn new(lower: i64, upper: i64) -> Self {
         Range { lower, upper }
     }
     
+    #[inline]
     pub fn contains(&self, v: i64) -> bool {
         v >= self.lower && v <= self.upper
     }
 
+    #[inline]
+    pub fn length(&self) -> i64 {
+        self.upper + 1 -  self.lower
+    }
+
+    #[inline]
     pub fn translate(&self, v: i64) -> Self {
         Range { lower: self.lower + v, upper: self.upper + v }       
     }
 
-    pub fn to_disjoint_unions(ranges: &Vec<Range>) -> Vec<Range> {
+    pub fn disjoint_union(ranges: &Vec<Range>) -> Vec<Range> {
         let mut ranges = ranges.clone();
         ranges.sort_by_key(|r| r.lower);
         let mut it = ranges.iter();
@@ -74,8 +82,14 @@ impl BitOr for Range {
 }
 
 #[test]
-fn to_disjoint_unions_test () {
+fn length_test () {
+    let range = Range::new(3, 4);
+    assert_eq!(range.length(), 2);
+}
+
+#[test]
+fn disjoint_union_test () {
     let ranges = vec!(Range::new(3, 4), Range::new(0, 1), Range::new(6, 7), Range::new(1, 2));
     let res = vec!(Range::new(0, 4), Range::new(6, 7));
-    assert_eq!(Range::to_disjoint_unions(&ranges), res);
+    assert_eq!(Range::disjoint_union(&ranges), res);
 }
