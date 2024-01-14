@@ -38,7 +38,7 @@ fn input_parser(input: &str) -> IResult<&str, Almanac> {
 }
 
 fn next_range(arange: &ARange, range: &Range) -> Option<Range> {
-    let inter = range.intersection(&Range::new(arange.source, arange.source + arange.length - 1))?;
+    let inter = (range & &Range::new(arange.source, arange.source + arange.length - 1))?;
     Some(inter.translate(arange.dest - arange.source))
 }
 
