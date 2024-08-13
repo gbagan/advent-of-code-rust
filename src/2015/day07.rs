@@ -4,10 +4,9 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::{alpha1, char, u16},
-    combinator::map,
     multi::separated_list1,
     sequence::{preceded,tuple},
-    IResult,
+    IResult, Parser,
 };
 
 enum Op {
@@ -26,16 +25,16 @@ type Circuit = HashMap<String,Gate>;
 
 fn input_parser(input: &str) -> IResult<&str, Circuit> {
     fn wire(input: &str) -> IResult<&str, Wire> {
-        alt((map(u16,|x| Wire::Signal(x)),
-            map(alpha1, |x:&str| Wire::Wire(x.to_string()))
+        alt((u16.map(|x| Wire::Signal(x)),
+            alpha1.map(|x:&str| Wire::Wire(x.to_string()))
         ))(input)
     }
 
     fn operator(input: &str) -> IResult<&str, Op> {
-        alt((map(tag(" AND "), |_| Op::And),
-            map(tag(" OR "), |_| Op::Or),
-            map(tag(" LSHIFT "), |_| Op::LShift),
-            map(tag(" RSHIFT "), |_| Op::RShift)
+        alt((tag(" AND ").map(|_| Op::And),
+            tag(" OR ").map(|_| Op::Or),
+            tag(" LSHIFT ").map(|_| Op::LShift),
+            tag(" RSHIFT ").map(|_| Op::RShift)
             ))(input)
         }
 
@@ -45,9 +44,9 @@ fn input_parser(input: &str) -> IResult<&str, Circuit> {
     }
 
     fn gate(input: &str) -> IResult<&str, Gate> {
-        alt((map(preceded(tag("NOT "), wire), Gate::Not),
+        alt((preceded(tag("NOT "), wire).map(Gate::Not),
             gate2,
-            map(wire, Gate::Const)
+            wire.map(Gate::Const)
             ))(input)
     }
     

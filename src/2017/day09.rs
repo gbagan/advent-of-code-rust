@@ -2,8 +2,7 @@ use aoc::aoc_with_parser;
 use nom::{
     branch::alt,
     character::complete::{anychar, char, none_of},
-    combinator::map,
-    IResult,
+    IResult, Parser,
     sequence::{preceded, delimited},
     multi::{many0, separated_list0},
 };
@@ -12,29 +11,28 @@ use aoc::coord::Coord;
 fn parse_group(level: i64, input: &str) -> IResult<&str,Coord> {
     delimited(
         char('{'),
-        map(
-            separated_list0(
+        separated_list0(
                 char(','),
                 alt((
                     |i| parse_group (level+1, i),
                     count_garbage
                 ))
-            ), |x| Coord::new(level, 0) + x.iter().sum::<Coord>()),
+            ).map(|x| Coord::new(level, 0) + x.iter().sum::<Coord>()),
         char('}'),
     )(input)
 }
 
 fn count_garbage_aux(input: &str) -> IResult<&str, i64> {
     alt((
-        map(preceded(char('!'), anychar), |_| 0),
-        map(none_of("!>"), |_| 1)
+        preceded(char('!'), anychar).map(|_| 0),
+        none_of("!>").map(|_| 1)
     ))(input)
 }
 
 fn count_garbage(input: &str) -> IResult<&str, Coord> {
     delimited(
         char('<'),
-        map(many0(count_garbage_aux), |x| Coord::new(0, x.iter().sum())),
+        many0(count_garbage_aux).map(|x| Coord::new(0, x.iter().sum())),
         char('>')
     )(input)
 }

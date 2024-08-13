@@ -2,22 +2,19 @@ use aoc::aoc_with_parser;
 use nom::{
     bytes::complete::{take_till, tag},
     character::complete::{line_ending,space1,i64},
-    combinator::map,
     multi::separated_list1,
     sequence::{pair, preceded, tuple},
-    IResult,
+    IResult,Parser,
 };
 use itertools::Itertools;
 use aoc::range::Range;
 
-#[derive(Debug)]
 struct ARange {
     dest: i64,
     source: i64,
     length: i64,
 }
 
-#[derive(Debug)]
 struct Almanac {
     seeds: Vec<i64>,
     maps: Vec<Vec<ARange>>
@@ -25,20 +22,19 @@ struct Almanac {
 
 fn input_parser(input: &str) -> IResult<&str, Almanac> {
     let seeds = preceded(tag("seeds: "), separated_list1(space1, i64));
-    let range = map(
-        tuple((i64, space1, i64, space1, i64)),
+    let range = // map(
+        tuple((i64, space1, i64, space1, i64)).map(
         |(dest, _, source, _, length)| ARange { dest, source, length});
     let skip_line = pair(take_till(|c| c=='\n'), line_ending);
     let amap = preceded(skip_line, separated_list1(line_ending, range));
 
-    map(
-        tuple((seeds, line_ending, line_ending, separated_list1(pair(line_ending, line_ending), amap))),
-        |(seeds, _, _, maps)| Almanac { seeds, maps }
-    )(input)
+    tuple((seeds, line_ending, line_ending, separated_list1(pair(line_ending, line_ending), amap)))
+    .map(|(seeds, _, _, maps)| Almanac { seeds, maps })
+    .parse(input)
 }
 
-fn next_range(arange: &ARange, range: &Range) -> Option<Range> {
-    let inter = (range & &Range::new(arange.source, arange.source + arange.length - 1))?;
+fn next_range(arange: &ARange, &range: &Range) -> Option<Range> {
+    let inter = (range & Range::new(arange.source, arange.source + arange.length - 1))?;
     Some(inter.translate(arange.dest - arange.source))
 }
 

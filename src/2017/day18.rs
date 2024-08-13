@@ -5,9 +5,8 @@ use nom::{
     branch::alt,
     character::complete::{satisfy, line_ending, i64, space1},
     multi::separated_list1,
-    combinator::map,
     sequence::{preceded, tuple},
-    IResult,
+    IResult, Parser,
 };
 
 #[derive(Debug)]
@@ -35,22 +34,22 @@ fn input_parser(input: &str) -> IResult<&str, Vec<Instr>> {
     
     fn value(input: &str) -> IResult<&str, Value> {
         alt((
-            map(i64, Value::Val),
-            map(register, Value::Reg),
+            i64.map(Value::Val),
+            register.map(Value::Reg),
         ))(input)
     }
-    let sound = map(preceded(tag("snd "), value), Instr::Snd);
-    let set = map(tuple((tag("set "), register, space1, value)),
-                    |(_, x, _, y)| Instr::Set(x, y));
-    let add = map(tuple((tag("add "), register, space1, value)),
-                    |(_, x, _, y)| Instr::Add(x, y));
-    let mul = map(tuple((tag("mul "), register, space1, value)),
-                    |(_, x, _, y)| Instr::Mul(x, y));
-    let mod_ = map(tuple((tag("mod "), register, space1, value)),
-                    |(_, x, _, y)| Instr::Mod(x, y));
-    let recover = map(preceded(tag("rcv "), register), Instr::Rcv);
-    let jgz = map(tuple((tag("jgz "), value, space1, value)),
-                    |(_, x, _, y)| Instr::Jgz(x, y));
+    let sound = preceded(tag("snd "), value).map(Instr::Snd);
+    let set = tuple((tag("set "), register, space1, value))
+                .map(|(_, x, _, y)| Instr::Set(x, y));
+    let add = tuple((tag("add "), register, space1, value))
+                .map(|(_, x, _, y)| Instr::Add(x, y));
+    let mul = tuple((tag("mul "), register, space1, value))
+                .map(|(_, x, _, y)| Instr::Mul(x, y));
+    let mod_ = tuple((tag("mod "), register, space1, value))
+                .map(|(_, x, _, y)| Instr::Mod(x, y));
+    let recover = preceded(tag("rcv "), register).map(Instr::Rcv);
+    let jgz = tuple((tag("jgz "), value, space1, value))
+                .map(|(_, x, _, y)| Instr::Jgz(x, y));
     let instr = alt((sound, set, add, mul, mod_, recover, jgz));
 
     separated_list1(line_ending, instr)(input)

@@ -4,9 +4,9 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::{char,space1,u64},
-    combinator::map,
     multi::separated_list1,
-    IResult,
+    sequence::tuple,
+    IResult, Parser,
 };
 use aoc::iter::AOCIter;
 
@@ -22,25 +22,15 @@ struct Instruction {
 }
 
 fn input_parser(input: &str) -> IResult<&str, Vec<Instruction>> {
-    fn command(input: &str) -> IResult<&str,  Command> {
-        alt((map(tag("turn on"), |_| Command::On), 
-             map(tag("turn off"), |_| Command::Off),
-             map(tag("toggle"), |_| Command::Toggle)
-            ))(input)
-    }
+    let command = alt((
+        tag("turn on").map(|_| Command::On), 
+        tag("turn off").map(|_| Command::Off),
+        tag("toggle").map(|_| Command::Toggle)
+    ));
 
-    fn instr(input: &str) -> IResult<&str, Instruction> {
-        let (input, cmd) = command(input)?;
-        let (input, _) = space1(input)?;
-        let (input, x1) = u64(input)?;
-        let (input, _) = tag(",")(input)?;
-        let (input, y1) = u64(input)?;
-        let (input, _) = tag(" through ")(input)?;
-        let (input, x2) = u64(input)?;
-        let (input, _) = tag(",")(input)?;
-        let (input, y2) = u64(input)?;
-        Ok((input, Instruction { cmd, x1, y1, x2, y2 }))
-    }
+    let instr =
+        tuple((command, space1, u64, tag(","), u64, tag(" through "), u64, tag(","), u64))
+        .map(|(cmd, _, x1, _, y1, _, x2, _, y2)| Instruction { cmd, x1, y1, x2, y2 });
             
     separated_list1(char('\n'), instr)(input)
 }

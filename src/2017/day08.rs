@@ -4,10 +4,9 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::{alpha1, line_ending, i32, space1},
-    combinator::map,
     multi::separated_list1,
     sequence::tuple,
-    IResult,
+    IResult, Parser
 };
 enum Command { Inc, Dec }
 
@@ -24,24 +23,23 @@ struct Instr {
 
 fn input_parser(input: &str) -> IResult<&str, Vec<Instr>> {
     let cmp_parser = alt((
-            map(tag("=="), |_: &str| Cmp::Eq),
-            map(tag("!="), |_| Cmp::Neq),
-            map(tag("<="), |_| Cmp::Le),
-            map(tag(">="), |_| Cmp::Ge),
-            map(tag("<"), |_| Cmp::Lt),
-            map(tag(">"), |_| Cmp::Gt),
+            tag("==").map(|_: &str| Cmp::Eq),
+            tag("!=").map(|_| Cmp::Neq),
+            tag("<=").map(|_| Cmp::Le),
+            tag(">=").map(|_| Cmp::Ge),
+            tag("<").map(|_| Cmp::Lt),
+            tag(">").map(|_| Cmp::Gt),
         ));
 
-    let command= alt((
-                map(tag("inc"), |_| Command::Inc),
-                map(tag("dec"), |_| Command::Dec),
+    let command = alt((
+                tag("inc").map(|_| Command::Inc),
+                tag("dec").map(|_| Command::Dec),
             ));
 
-    let instr = map(
-        tuple((alpha1, space1, command, space1, i32, tag(" if "), alpha1, space1, cmp_parser, space1, i32)),
-        |(var1, _, cmd, _, val1, _, var2, _, cmp, _, val2)|
-            Instr { var1: var1.to_string(), cmd, val1, var2: var2.to_string(), cmp, val2 }
-    );
+    let instr =
+        tuple((alpha1, space1, command, space1, i32, tag(" if "), alpha1, space1, cmp_parser, space1, i32))
+        .map(|(var1, _, cmd, _, val1, _, var2, _, cmp, _, val2)|
+            Instr { var1: var1.to_string(), cmd, val1, var2: var2.to_string(), cmp, val2 });
 
     separated_list1(line_ending, instr)(input)
 }

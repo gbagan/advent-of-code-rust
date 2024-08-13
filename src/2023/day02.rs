@@ -2,11 +2,11 @@ use aoc::aoc_with_parser;
 use nom::{
     branch::alt,
     bytes::complete::tag,
+    combinator::flat_map,
     character::complete::{line_ending,space1,u32},
-    combinator::map,
     multi::separated_list1,
     sequence::{terminated, tuple},
-    IResult,
+    IResult, Parser,
 };
 
 struct RGB {
@@ -38,19 +38,17 @@ struct Game {
 }
 
 fn input_parser(input: &str) -> IResult<&str, Vec<Game>> {
-    fn color_set (input: &str) -> IResult<&str, RGB> {
-        let (input, n) = terminated(u32, space1)(input)?;
-        let (input, bag) = alt((
-            map(tag("red"), |_| RGB { r: n, g: 0, b: 0}),
-            map(tag("green"), |_| RGB { r: 0, g: n, b: 0}),
-            map(tag("blue"), |_| RGB { r: 0, g: 0, b: n}),
-        ))(input)?;
-        Ok((input, bag))
-    }
+    let color_set = flat_map(
+        terminated(u32, space1), |n|
+        alt((
+            tag("red").map(move |_| RGB { r: n, g: 0, b: 0}),
+            tag("green").map(move |_| RGB { r: 0, g: n, b: 0}),
+            tag("blue").map(move |_| RGB { r: 0, g: 0, b: n}),
+        )));
 
-    let game = map(
-        tuple((tag("Game "), u32, tag(": "), separated_list1(alt((tag("; "), tag(", "))), color_set))),
-        |(_, id, _, bags)| Game {id, bags });
+    let game =
+        tuple((tag("Game "), u32, tag(": "), separated_list1(alt((tag("; "), tag(", "))), color_set)))
+        .map(|(_, id, _, bags)| Game {id, bags});
 
     separated_list1(line_ending, game)(input)
 }

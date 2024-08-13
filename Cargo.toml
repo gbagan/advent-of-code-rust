@@ -3,6 +3,10 @@ name = "aoc"
 version = "0.1.0"
 edition = "2021"
 
+[profile.release]
+opt-level = 3
+overflow-checks = false
+
 [lib]
 name = "aoc"
 path = "src/lib/lib.rs"
@@ -130,6 +134,10 @@ path = "src/2023/day02.rs"
 [[bin]]
 name = "2023-05"
 path = "src/2023/day05.rs"
+
+[[bin]]
+name = "2023-06"
+path = "src/2023/day06.rs"
 
 [[bin]]
 name = "2023-23"

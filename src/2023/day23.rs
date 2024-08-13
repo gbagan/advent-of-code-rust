@@ -7,7 +7,7 @@ fn neighbors1 (grid: &Grid<u8>, c: Coord) -> Vec<Coord> {
         b'.' => c.adjacent()
                        .iter()
                        .filter(|&n| grid.contains(*n) && grid[*n] != b'#')
-                       .map(|&n| n)
+                       .copied()
                        .collect(),
         b'^' => vec!(c.above()),
         b'v' => vec!(c.below()),
@@ -24,7 +24,7 @@ fn neighbors2 (grid: &Grid<u8>, c: Coord) -> Vec<Coord> {
         c.adjacent()
         .iter()
         .filter(|&n| grid.contains(*n) && grid[*n] != b'#')
-        .map(|&n| n)
+        .copied()
         .collect()
     }
 }

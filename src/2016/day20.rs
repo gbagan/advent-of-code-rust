@@ -1,17 +1,16 @@
 use aoc::aoc_with_parser;
 use nom::{
     character::complete::{char, i64, line_ending},
-    combinator::map,
     multi::separated_list1,
     sequence::separated_pair,
-    IResult,
+    IResult, Parser
 };
 use aoc::range::Range;
 
 fn input_parser(input: &str) -> IResult<&str, Vec<Range>> {
-    let range = map(
-        separated_pair(i64, char('-'), i64),
-        |(x, y)| Range::new(x, y));
+    let range =
+        separated_pair(i64, char('-'), i64)
+        .map(|(x, y)| Range::new(x, y));
     
     separated_list1(line_ending, range)(input)
 }

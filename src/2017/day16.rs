@@ -2,10 +2,9 @@ use aoc::aoc_with_parser;
 use nom::{
     branch::alt,
     character::complete::{anychar, char, u8},
-    combinator::map,
     multi::separated_list1,
     sequence::{preceded, tuple},
-    IResult,
+    IResult, Parser
 };
 use aoc::permutation::Permutation;
 use aoc::number::power;
@@ -20,14 +19,14 @@ enum Move {
 type Dance = (Permutation, Permutation);
 
 fn input_parser(input: &str) -> IResult<&str, Vec<Move>> {
-    let spin = map(preceded(char('s'), u8), |a| Move::Spin(a));
-    let exchange = map(
-        tuple((char('x'), u8, char('/'), u8)),
-        |(_, a, _, b)| Move::Exchange(a, b));
+    let spin = preceded(char('s'), u8).map(|a| Move::Spin(a));
+    let exchange =
+        tuple((char('x'), u8, char('/'), u8))
+        .map(|(_, a, _, b)| Move::Exchange(a, b));
     
-    let partner = map(
-        tuple((char('p'), anychar, char('/'), anychar)),
-        |(_, a, _, b)| Move::Partner(a, b));
+    let partner =
+        tuple((char('p'), anychar, char('/'), anychar))
+        .map(|(_, a, _, b)| Move::Partner(a, b));
     
     separated_list1(char(','), alt((spin, exchange, partner)))(input)
 }

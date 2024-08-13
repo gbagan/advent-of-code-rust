@@ -4,9 +4,8 @@ use nom::{
     bytes::complete::tag,
     character::complete::{char, line_ending, i64},
     multi::separated_list1,
-    combinator::map,
     sequence::tuple,
-    IResult,
+    IResult, Parser
 };
 use itertools::Itertools;
 
@@ -27,14 +26,13 @@ impl Particle {
 
 fn input_parser(input: &str) -> IResult<&str, Vec<Particle>> {
     fn coord(input: &str) -> IResult<&str, Coord3> {
-        map(
-            tuple((char('<'), i64, char(','), i64, char(','), i64, char('>'))),
-            |(_, x, _, y, _, z, _)| Coord3::new(x, y, z)
-        )(input)
+        tuple((char('<'), i64, char(','), i64, char(','), i64, char('>')))
+        .map(|(_, x, _, y, _, z, _)| Coord3::new(x, y, z))
+        .parse(input)
     }
-    let row = map(
-        tuple((tag("p="), coord, tag(", v="), coord, tag(", a="), coord)),
-        |(_, p, _, v, _, a)| Particle {p, v, a});
+    let row =
+        tuple((tag("p="), coord, tag(", v="), coord, tag(", a="), coord))
+        .map(|(_, p, _, v, _, a)| Particle {p, v, a});
 
     separated_list1(line_ending, row)(input)
 }
