@@ -1,4 +1,4 @@
-use crate::coord::Coord;
+use crate::util::coord::Coord;
 use std::ops::{Index, IndexMut};
 
 #[derive(Clone, PartialEq, Eq, Hash)]

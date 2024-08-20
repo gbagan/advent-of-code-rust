@@ -1,14 +1,11 @@
-use aoc::aoc;
 use std::collections::HashSet;
-#[derive(PartialEq)]
-pub struct Box {
-  pub l: isize,
-  pub h: isize,
-  pub w: isize,
+
+pub fn parse(input: &str) -> &str {
+    input
 }
 
-fn part1(input: &str) -> usize {
-    let origin: (isize, isize) = (0, 0);
+pub fn part1(input: &str) -> Option<u32> {
+    let origin: (i32, i32) = (0, 0);
 
     let positions = input.chars().scan(origin, |acc, dir| {
         match dir {
@@ -20,12 +17,12 @@ fn part1(input: &str) -> usize {
         }
         Some (acc.clone())
     });
-    let mut visited: HashSet<(isize, isize)> = HashSet::from_iter(positions);
+    let mut visited: HashSet<(i32, i32)> = HashSet::from_iter(positions);
     visited.insert(origin);
-    visited.len()
+    Some(visited.len() as u32)
 }
 
-fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> Option<u32> {
     let origin: (isize, isize) = (0, 0);
 
     let positions = input.chars().enumerate().scan((origin, origin), |(acc1, acc2), (i, dir)| {
@@ -51,10 +48,5 @@ fn part2(input: &str) -> usize {
     });
     let mut visited: HashSet<(isize, isize)> = HashSet::from_iter(positions);
     visited.insert(origin);
-    visited.len()
-}
-
-fn main() {
-    let input = include_str!("../../inputs/2015/03");
-    aoc(|| (part1(input), part2(input)))
+    Some(visited.len() as u32)
 }

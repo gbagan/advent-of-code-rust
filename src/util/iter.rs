@@ -4,10 +4,10 @@ use std::collections::HashMap;
 
 pub trait AOCIter: Iterator {
     #[inline]
-    fn count_by<P>(self, predicate: P) -> usize
+    fn count_by<P>(self, mut predicate: P) -> usize
     where
         Self: Sized,
-        P: Fn(Self::Item) -> bool,
+        P: FnMut(Self::Item) -> bool,
     {
         let mut counter = 0;
         for x in self {
