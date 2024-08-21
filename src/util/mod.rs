@@ -2,7 +2,9 @@ use std::mem;
 
 pub mod boxes;
 pub mod coord;
+pub mod graph;
 pub mod grid;
+pub mod heap;
 pub mod iter;
 pub mod knothash;
 pub mod number;

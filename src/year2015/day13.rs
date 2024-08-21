@@ -9,7 +9,7 @@ fn parse_line(s: &str) -> Option<(&str, i32, &str)> {
     Some((name1, gain, name2))
 }
 
-pub fn parse(input: &str) -> (i32, i32) {
+pub fn parse(input: &str) -> Option<(i32, i32)> {
     let entries: Vec<_> = input.lines().filter_map(parse_line).collect();
     let mut i = 0;
     let mut dict: HashMap<&str, usize> = HashMap::new();
@@ -40,20 +40,20 @@ pub fn parse(input: &str) -> (i32, i32) {
     let mut p2 = 0;
 
     for perm in (1..n).permutations(n-1) {
-        let mut sum = table[perm[0]];
+        let mut sum = table[perm[0]]; // edge between 0 and first element of perm
         let mut min_edge = sum;
         for (i, j) in perm.iter().tuple_windows() {
             let edge = table[i*n+j];
             sum += edge;
             min_edge = min_edge.min(edge);
         }
-        let edge = table[perm[n-2]];
+        let edge = table[perm[n-2]]; // edge between 0 and last element of perm
         sum += edge;
         min_edge = min_edge.min(edge);
         p1 = p1.max(sum);
         p2 = p2.max(sum - min_edge);
     }
-    (p1, p2)
+    Some((p1, p2))
 }
 
 pub fn part1(input: &(i32, i32)) -> Option<i32> {

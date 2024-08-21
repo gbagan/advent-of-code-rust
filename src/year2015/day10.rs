@@ -1,6 +1,6 @@
 use crate::util::times;
 
-pub fn parse(input: &str) -> (usize, usize) {
+pub fn parse(input: &str) -> Option<(usize, usize)> {
     let integers = input
         .trim_end()
         .chars()
@@ -12,7 +12,7 @@ pub fn parse(input: &str) -> (usize, usize) {
     let p1 = integers.len();
     let integers = times(10, next, integers);
     let p2 = integers.len();
-    (p1, p2)
+    Some((p1, p2))
 }
 
 fn next(v: &Vec<u8>) -> Vec<u8> {

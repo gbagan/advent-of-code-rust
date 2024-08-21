@@ -38,7 +38,7 @@ fn two_pairs(pwd: &Vec<u8>) -> bool {
 	return pairs >= 2
 }
 
-pub fn parse(input: &str) -> (String, String) {
+pub fn parse(input: &str) -> Option<(String, String)> {
     let mut pwd = input.trim_end().as_bytes().to_vec();
     let mut i = 0;
     let mut p1 = "".to_string();
@@ -47,7 +47,7 @@ pub fn parse(input: &str) -> (String, String) {
             i += 1;
             let p = from_utf8(&pwd).map(|p| p.to_string()).unwrap();
             if i == 2 {
-                return (p1, p);
+                return Some((p1, p));
             } else {
                 p1 = p;
             }

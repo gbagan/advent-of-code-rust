@@ -1,10 +1,10 @@
 use std::collections::HashSet;
 
-pub fn parse(input: &str) -> &str {
-    input
+pub fn parse(input: &str) -> Option<&str> {
+    Some(input)
 }
 
-pub fn part1(input: &str) -> Option<u32> {
+pub fn part1(input: &str) -> Option<usize> {
     let origin: (i32, i32) = (0, 0);
 
     let positions = input.chars().scan(origin, |acc, dir| {
@@ -19,10 +19,10 @@ pub fn part1(input: &str) -> Option<u32> {
     });
     let mut visited: HashSet<(i32, i32)> = HashSet::from_iter(positions);
     visited.insert(origin);
-    Some(visited.len() as u32)
+    Some(visited.len())
 }
 
-pub fn part2(input: &str) -> Option<u32> {
+pub fn part2(input: &str) -> Option<usize> {
     let origin: (isize, isize) = (0, 0);
 
     let positions = input.chars().enumerate().scan((origin, origin), |(acc1, acc2), (i, dir)| {
@@ -34,7 +34,7 @@ pub fn part2(input: &str) -> Option<u32> {
                 'v' => acc1.1 += 1,
                 _ => panic!("invalid direction: {dir}"),
             }
-            Some (acc1.clone())
+            Some (*acc1)
         } else {
             match dir {
                 '<' => acc2.0 -= 1,
@@ -43,10 +43,10 @@ pub fn part2(input: &str) -> Option<u32> {
                 'v' => acc2.1 += 1,
                 _ => panic!("invalid direction: {dir}"),
             }
-            Some (acc2.clone())
+            Some (*acc2)
         }    
     });
     let mut visited: HashSet<(isize, isize)> = HashSet::from_iter(positions);
     visited.insert(origin);
-    Some(visited.len() as u32)
+    Some(visited.len())
 }

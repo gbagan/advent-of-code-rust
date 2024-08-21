@@ -15,11 +15,12 @@ fn parse_box(s: &str) -> Option<Box> {
     Some(Box { l, h, w })
 }
 
-pub fn parse(input: &str) -> Vec<Box> {
-    input
-    .lines()
-    .filter_map(parse_box)
-    .collect()
+pub fn parse(input: &str) -> Option<Vec<Box>> {
+    Some(input
+        .lines()
+        .filter_map(parse_box)
+        .collect()
+    )
 }
 
 fn paper (Box {l, h, w}: &Box) -> u32 {

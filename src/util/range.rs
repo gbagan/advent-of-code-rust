@@ -23,7 +23,7 @@ impl Range {
     }
 
     #[inline]
-    pub fn translate(&self, v: i64) -> Self {
+    pub fn shift(&self, v: i64) -> Self {
         Range { lower: self.lower + v, upper: self.upper + v }       
     }
 

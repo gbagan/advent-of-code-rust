@@ -59,7 +59,7 @@ fn do_cmd2(cmd: Command, v: &mut i64) {
 }
 
 
-pub fn parse(input: &str) -> Input
+pub fn parse(input: &str) -> Option<Input>
 {
     let instrs: Vec<_> = input.lines().filter_map(parse_instruction).collect();
     
@@ -87,7 +87,7 @@ pub fn parse(input: &str) -> Input
         y_index[y as usize] = i;
     }
 
-    Input {instrs, rect_xs, rect_ys, x_index, y_index }
+    Some(Input {instrs, rect_xs, rect_ys, x_index, y_index })
 }
 
 pub fn part1(input: &Input) -> Option<i64> {

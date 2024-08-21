@@ -9,7 +9,7 @@ pub struct Shared {
     second: AtomicU32,
 }
 
-pub fn parse(input: &str) -> Shared {
+pub fn parse(input: &str) -> Option<Shared> {
     let input = input.trim();
     let shared = Shared {
         done: AtomicBool::new(false),
@@ -24,7 +24,7 @@ pub fn parse(input: &str) -> Shared {
         }
     });
 
-    shared
+    Some(shared)
 }
 
 fn worker(input: &str, shared: &Shared) {

@@ -5,7 +5,7 @@ use std::ops::{Index, IndexMut};
 pub struct Grid<T> {
     pub width: usize,
     pub height: usize,
-    vec: Vec<T>,
+    pub vec: Vec<T>,
 }
 
 impl<T> Grid<T> {
@@ -13,7 +13,17 @@ impl<T> Grid<T> {
     pub fn contains(&self, c: Coord) -> bool {
         c.x >= 0 && c.x < (self.width as i64) && c.y >= 0 && c.y < (self.height as i64)
     }
-    pub fn map_with_indices<U, F>(&self, mut f: F) -> Grid<U> 
+
+    pub fn map<A>(&self, f: fn(&T) -> A) -> Grid<A> {
+        let vec = self.vec.iter().map(f).collect();
+        Grid {
+            width: self.width,
+            height: self.height,
+            vec
+        }
+    }
+
+    pub fn map_with_indices<F,U>(&self, mut f: F) -> Grid<U> 
         where F: FnMut(Coord, &T) -> U
     {
         let mut vec = Vec::with_capacity(self.width * self.height);
@@ -39,10 +49,42 @@ impl<T> Index<Coord> for Grid<T> {
     }
 }
 
+impl<T> Index<(i32, i32)> for Grid<T> {
+    type Output = T;
+
+    #[inline]
+    fn index(&self, p: (i32, i32)) -> &Self::Output {
+        &self.vec[self.width * p.1 as usize + p.0 as usize]
+    }
+}
+
+impl<T> Index<(i64, i64)> for Grid<T> {
+    type Output = T;
+
+    #[inline]
+    fn index(&self, p: (i64, i64)) -> &Self::Output {
+        &self.vec[self.width * p.1 as usize + p.0 as usize]
+    }
+}
+
 impl<T> IndexMut<Coord> for Grid<T> {
     #[inline]
     fn index_mut(&mut self, c: Coord) -> &mut Self::Output {
         &mut self.vec[self.width * c.y as usize + c.x as usize]
+    }
+}
+
+impl<T> IndexMut<(i32, i32)> for Grid<T> {
+    #[inline]
+    fn index_mut(&mut self, p: (i32, i32)) -> &mut Self::Output {
+        &mut self.vec[self.width * p.1 as usize + p.0 as usize]
+    }
+}
+
+impl<T> IndexMut<(i64, i64)> for Grid<T> {
+    #[inline]
+    fn index_mut(&mut self, p: (i64, i64)) -> &mut Self::Output {
+        &mut self.vec[self.width * p.1 as usize + p.0 as usize]
     }
 }
 

@@ -1,7 +1,7 @@
 use crate::util::iter::AOCIter;
 
-pub fn parse(input: &str) -> Vec<&[u8]> {
-    input.lines().map(str::as_bytes).collect()
+pub fn parse(input: &str) -> Option<Vec<&[u8]>> {
+    Some(input.lines().map(str::as_bytes).collect())
 }
 
 fn is_nice_string (line: &[u8]) -> bool {

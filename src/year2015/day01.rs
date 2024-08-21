@@ -1,5 +1,5 @@
-pub fn parse(input: &str) -> &str {
-    input
+pub fn parse(input: &str) -> Option<&str> {
+    Some(input)
 }
 
 pub fn part1(input: &str) -> Option<i32> {

@@ -95,12 +95,12 @@ fn eval_circuit(circuit: &Circuit) -> u16 {
     get_val(&circuit, &mut vals, "a".to_string())
 }
 
-pub fn parse(input: &str) -> (u16, u16) {
+pub fn parse(input: &str) -> Option<(u16, u16)> {
     let mut circuit = HashMap::from_iter(input.lines().filter_map(parse_line));
     let p1 = eval_circuit(&circuit);
     circuit.insert("b".to_string(), Gate::Const(Wire::Signal(p1)));
     let p2 = eval_circuit(&circuit);
-    (p1, p2)
+    Some((p1, p2))
 }
 
 pub fn part1(tuple: &(u16, u16)) -> Option<u16> {

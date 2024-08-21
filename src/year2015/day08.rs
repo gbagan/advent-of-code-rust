@@ -23,8 +23,8 @@ fn diff2(s: &str) -> u32 {
     2 + s.chars().count_by(|c| c == '\\' || c == '"') as u32
 }
 
-pub fn parse(input: &str) -> Vec<&str> {
-    input.lines().collect()
+pub fn parse(input: &str) -> Option<Vec<&str>> {
+    Some(input.lines().collect())
 }
 
 pub fn part1(input: &[&str]) -> Option<u32> {

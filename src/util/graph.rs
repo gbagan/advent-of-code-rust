@@ -1,1 +1,1 @@
-pub mod minimumcut;
+pub mod search;
