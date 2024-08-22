@@ -3,96 +3,66 @@ use std::iter::Sum;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord, Hash)]
 pub struct Coord {
-    pub y: i64,
-    pub x: i64,
+    pub y: i32,
+    pub x: i32,
 }
 
 impl Coord {
     #[inline]
-    pub fn origin() -> Coord {
-        Coord { x: 0, y: 0 }
+    pub fn new(x: i32, y: i32) -> Coord {
+        Coord { x, y }
     }
 
-    #[inline]
-    pub fn new(x: i64, y: i64) -> Coord {
-        Coord { x: x, y: y }
-    }
-
-    pub fn manhattan(&self, other: &Self) -> i64 {
+    pub fn manhattan(&self, other: &Self) -> i32 {
         (self.x - other.x).abs() +  (self.y - other.y).abs()
     }
 
-    #[inline]
-    pub fn north() -> Coord {
-        Coord { x: 0, y: -1 }
-    }
+    pub const ORIGIN: Coord = Coord { x: 0, y: 0 };
+    pub const NORTH: Coord = Coord { x: 0, y: -1 };
+    pub const SOUTH: Coord = Coord { x: 0, y: 1 };
+    pub const WEST: Coord = Coord { x: -1, y: 0 };
+    pub const EAST: Coord = Coord { x: 1, y: 0 };
 
     #[inline]
-    pub fn south() -> Coord {
-        Coord { x: 0, y: 1 }
-    }
-
-    #[inline]
-    pub fn west() -> Coord {
-        Coord { x: -1, y: 0 }
-    }
-
-    #[inline]
-    pub fn east() -> Coord {
-        Coord { x: 1, y: 0 }
-    }
-
-    #[inline]
-    pub fn left(&self) -> Coord {
+    pub fn left(&self) -> Self {
         Coord { x: self.x-1, y: self.y }
     }
 
     #[inline]
-    pub fn right(&self) -> Coord {
+    pub fn right(&self) -> Self {
         Coord { x: self.x+1, y: self.y }
     }
 
     #[inline]
-    pub fn above(&self) -> Coord {
+    pub fn above(&self) -> Self {
         Coord { x: self.x, y: self.y-1 }
     }
 
     #[inline]
-    pub fn below(&self) -> Coord {
+    pub fn below(&self) -> Self {
         Coord { x: self.x, y: self.y+1 }
     }
 
     #[inline]
-    pub fn turn_left(&self) -> Coord {
+    pub fn turn_left(&self) -> Self {
         Coord { x: self.y, y: -self.x }
     }
 
     #[inline]
-    pub fn turn_right(&self) -> Coord {
+    pub fn turn_right(&self) -> Self {
         Coord { x: -self.y, y: self.x }
     }
 
     #[inline]
-    pub fn adjacent(&self) -> Vec<Coord> {
-        vec!( Coord { x: self.x, y: self.y-1 },
-              Coord { x: self.x, y: self.y+1 },
-              Coord { x: self.x-1, y: self.y },
-              Coord { x: self.x+1, y: self.y },
-            )
+    pub fn adjacent(&self) -> Vec<Self> {
+        vec!( self.left(), self.right(), self.above(), self.below())
     }
 
     #[inline]
-    pub fn surrounding(&self) -> Vec<Coord> {
-        vec!( 
-              Coord { x: self.x, y: self.y-1 },
-              Coord { x: self.x, y: self.y+1 },
-              Coord { x: self.x-1, y: self.y },
-              Coord { x: self.x+1, y: self.y },
-              Coord { x: self.x+1, y: self.y+1 },
-              Coord { x: self.x+1, y: self.y-1 },
-              Coord { x: self.x-1, y: self.y+1 },
-              Coord { x: self.x-1, y: self.y-1 },
-            )
+    pub fn surrounding(&self) -> Vec<Self> {
+        let left = self.left();
+        let right = self.right();
+        vec!(left, right, self.above(), self.below(), left.above(), left.below(), right.above(), right.below())
     }
 }
 
@@ -100,7 +70,7 @@ impl Add for Coord {
     type Output = Self;
 
     #[inline]
-    fn add(self, other: Coord) -> Coord {
+    fn add(self, other: Self) -> Coord {
         Coord {
             x: self.x + other.x,
             y: self.y + other.y,
@@ -130,11 +100,11 @@ impl Neg for Coord {
     }
 }
 
-impl Mul<i64> for Coord {
+impl Mul<i32> for Coord {
     type Output = Self;
 
     #[inline]
-    fn mul(self, n: i64) -> Self::Output {
+    fn mul(self, n: i32) -> Self::Output {
         Coord {
             x: n * self.x,
             y: n * self.y,
@@ -156,7 +126,7 @@ impl Sub for Coord {
 
 impl Sum for Coord {
     fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
-        iter.fold(Self::origin(), |a, b| a + b)
+        iter.fold(Self::ORIGIN, |a, b| a + b)
     }
 }
 
@@ -164,7 +134,7 @@ impl<'a> Sum<&'a Self> for Coord {
     fn sum<I>(iter: I) -> Self
     where I: Iterator<Item = &'a Self>,
      {
-        iter.fold(Self::origin(), |a, b| a + *b)
+        iter.fold(Self::ORIGIN, |a, b| a + *b)
     }
 }
 

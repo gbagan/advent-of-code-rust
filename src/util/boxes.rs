@@ -1,10 +1,10 @@
 use crate::util::coord::Coord;
 
 pub struct Box {
-    pub xmin: i64,
-    pub ymin: i64,
-    pub xmax: i64,
-    pub ymax: i64,
+    pub xmin: i32,
+    pub ymin: i32,
+    pub xmax: i32,
+    pub ymax: i32,
 }
 
 impl Box {

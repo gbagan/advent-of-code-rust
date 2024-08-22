@@ -58,8 +58,8 @@ pub fn parse(input: &str) -> Option<(u32, u32)> {
         }
     }
 
-    for y in 0..(grid.width as i64) {
-        for x in 0..(grid.height as i64) {
+    for y in 0..(grid.width as i32) {
+        for x in 0..(grid.height as i32) {
             if grid[(x, y)] == b'*' {
                 let p = Coord::new(x, y);
                 let adj_numbers: Vec<_> =

@@ -13,8 +13,8 @@ struct Instruction {
 
 pub struct Input {
     instrs: Vec<Instruction>,
-    rect_xs: Vec<i64>,
-    rect_ys: Vec<i64>,
+    rect_xs: Vec<i32>,
+    rect_ys: Vec<i32>,
     x_index: [usize; 1001],
     y_index: [usize; 1001],
 }
@@ -50,7 +50,7 @@ fn do_cmd1(cmd: Command, v: &mut bool) {
     }
 }
 
-fn do_cmd2(cmd: Command, v: &mut i64) {
+fn do_cmd2(cmd: Command, v: &mut i32) {
     match cmd {
         Command::On     => *v += 1,
         Command::Off    => *v = (*v-1).max(0),
@@ -63,8 +63,8 @@ pub fn parse(input: &str) -> Option<Input>
 {
     let instrs: Vec<_> = input.lines().filter_map(parse_instruction).collect();
     
-    let mut rect_xs: Vec<i64> = Vec::with_capacity(2*instrs.len());
-    let mut rect_ys: Vec<i64> = Vec::with_capacity(2*instrs.len());
+    let mut rect_xs: Vec<i32> = Vec::with_capacity(2*instrs.len());
+    let mut rect_ys: Vec<i32> = Vec::with_capacity(2*instrs.len());
     
     for instr in &instrs {
         rect_xs.push(instr.rectangle.xmin);
@@ -90,7 +90,7 @@ pub fn parse(input: &str) -> Option<Input>
     Some(Input {instrs, rect_xs, rect_ys, x_index, y_index })
 }
 
-pub fn part1(input: &Input) -> Option<i64> {
+pub fn part1(input: &Input) -> Option<i32> {
     let width = input.rect_xs.len();
     let size = width * input.rect_ys.len();
 
@@ -122,7 +122,7 @@ pub fn part1(input: &Input) -> Option<i64> {
     Some(total)
 }
 
-pub fn part2(input: &Input) -> Option<i64> {
+pub fn part2(input: &Input) -> Option<i32> {
     let width = input.rect_xs.len();
     let size = width * input.rect_ys.len();
 
