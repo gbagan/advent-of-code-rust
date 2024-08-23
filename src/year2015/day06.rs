@@ -58,7 +58,6 @@ fn do_cmd2(cmd: Command, v: &mut i32) {
     }
 }
 
-
 pub fn parse(input: &str) -> Option<Input>
 {
     let instrs: Vec<_> = input.lines().filter_map(parse_instruction).collect();
@@ -72,9 +71,9 @@ pub fn parse(input: &str) -> Option<Input>
         rect_ys.push(instr.rectangle.ymin);
         rect_ys.push(instr.rectangle.ymax+1);
     }
-    rect_xs.sort();
+    rect_xs.sort_unstable();
     rect_xs.dedup();
-    rect_ys.sort();
+    rect_ys.sort_unstable();
     rect_ys.dedup();
 
     let mut x_index = [0; 1001];

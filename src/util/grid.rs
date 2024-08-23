@@ -8,10 +8,18 @@ pub struct Grid<T> {
     pub vec: Vec<T>,
 }
 
-impl<T> Grid<T> {
+impl<T: Copy> Grid<T> {
     #[inline]
     pub fn contains(&self, c: Coord) -> bool {
         c.x >= 0 && c.x < (self.width as i32) && c.y >= 0 && c.y < (self.height as i32)
+    }
+
+    pub fn new(width: usize, height: usize, init_value: T) -> Grid<T> {
+        let mut vec = Vec::with_capacity(width * height);
+        for _ in 0..width * height {
+            vec.push(init_value);
+        }
+        Grid { width, height, vec }
     }
 
     pub fn map<A>(&self, f: fn(&T) -> A) -> Grid<A> {
@@ -95,6 +103,13 @@ impl<T> IndexMut<(i64, i64)> for Grid<T> {
     #[inline]
     fn index_mut(&mut self, p: (i64, i64)) -> &mut Self::Output {
         &mut self.vec[self.width * p.1 as usize + p.0 as usize]
+    }
+}
+
+impl<T> IndexMut<(usize, usize)> for Grid<T> {
+    #[inline]
+    fn index_mut(&mut self, p: (usize, usize)) -> &mut Self::Output {
+        &mut self.vec[self.width * p.1 + p.0]
     }
 }
 

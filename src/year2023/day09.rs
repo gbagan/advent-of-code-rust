@@ -34,7 +34,6 @@ pub fn parse(input: &str) -> Option<(i64, i64)> {
 }
 
 pub fn part1(input: &(i64, i64)) -> Option<i64> {
-    println!("{:?}", pascal_triangle(5));
     Some(input.0)
 }
 

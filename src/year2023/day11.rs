@@ -1,8 +1,13 @@
-use crate::util::{coord::Coord, grid::Grid};
+// use the following formula
+// given a non decreasing sequence v_1, ... v_n
+// sum_{1 <= i < j <= n} |v_i - v_j| = sum_{1 <= i <= n} v_i * (2i - n - 1)
+
+use crate::util::grid::Grid;
 
 pub fn parse(input: &str) -> Option<(i64, i64)>{
     let grid = Grid::parse(input);
-    let mut galaxies = Vec::new();
+    let mut galaxy_xs: Vec<i64> = Vec::new();
+    let mut galaxy_ys: Vec<i64> = Vec::new();
     let mut empty_rows: Vec<i64> = Vec::new();
     let mut empty_cols: Vec<i64> = Vec::new();
     let mut nb_empty_rows = 0;
@@ -12,7 +17,8 @@ pub fn parse(input: &str) -> Option<(i64, i64)>{
         let mut is_empty = true;
         for x in 0..grid.width {
             if grid[(x, y)] == b'#' {
-                galaxies.push(Coord::new(x as i32, y as i32));
+                galaxy_xs.push(x as i64);
+                galaxy_ys.push(y as i64);
                 is_empty = false;
             }
         }
@@ -35,20 +41,21 @@ pub fn parse(input: &str) -> Option<(i64, i64)>{
         empty_cols.push(nb_empty_cols);
     }
 
+    galaxy_xs.sort_unstable();
+    galaxy_ys.sort_unstable();
+    let n = galaxy_xs.len();
+
     let mut p1 = 0;
     let mut p2 = 0;
-
-    for g1 in &galaxies {
-        for g2 in &galaxies {
-            let dist =  g1.manhattan(&g2) as i64;
-            let expansion = (empty_cols[g1.x as usize] - empty_cols[g2.x as usize]).abs()
-                            + (empty_rows[g1.y as usize] - empty_rows[g2.y as usize]).abs();
-            p1 += dist + expansion;
-            p2 += dist + 999_999 * expansion;
-        }
+    
+    for i in 0..n {
+        let c = 2 * (i as i64) - (n as i64) + 1;
+        let expansion = empty_cols[galaxy_xs[i] as usize] + empty_rows[galaxy_ys[i] as usize];
+        p1 += c * (galaxy_xs[i] + galaxy_ys[i] + expansion); 
+        p2 += c * (galaxy_xs[i] + galaxy_ys[i] + 999_999 * expansion);
     }
 
-    Some((p1/2, p2/2))
+    Some((p1, p2))
 }
 
 
