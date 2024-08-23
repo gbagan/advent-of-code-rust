@@ -8,9 +8,9 @@ pub fn parse(input: &str) -> Option<(usize, usize)> {
         .map(|v| v as u8)
         .collect();
 
-    let integers = times(40, next, integers);
+    let integers = times(40, integers, next);
     let p1 = integers.len();
-    let integers = times(10, next, integers);
+    let integers = times(10, integers, next);
     let p2 = integers.len();
     Some((p1, p2))
 }

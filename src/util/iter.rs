@@ -33,16 +33,31 @@ pub trait AOCIter: Iterator {
         true
     }
 
-    fn find_repetition(self) -> Option<(usize, usize, Self::Item)>
+    fn find_duplicate(self) -> Option<(usize, usize, Self::Item)>
     where
         Self: Sized,
-        Self::Item: Eq + Hash + Clone,
+        Self::Item: Eq + Hash,
     {
         let mut seen = HashMap::new();
         for (i, x) in self.enumerate() {
             match seen.get(&x) {
                 None => { seen.insert(x, i); () }
                 Some(&j) => return Some((j, i, x)),
+            }
+        }
+        None
+    }
+
+    fn find_duplicate_on<A,F>(self, f: F) -> Option<(usize, usize, Self::Item)>
+    where
+        Self: Sized,
+        A: Eq + Hash,
+        F: Fn(&Self::Item) -> A
+    {
+        let mut seen = HashMap::new();
+        for (i, x) in self.enumerate() {
+            if let Some(j) = seen.insert(f(&x), i) {
+                return Some((j, i, x));
             }
         }
         None

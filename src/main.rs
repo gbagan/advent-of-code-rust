@@ -32,7 +32,7 @@ macro_rules! solution {
 fn main() {
     let (arg_year, arg_day) = (args().nth(1), args().nth(2));
 
-    let solutions = year2015();
+    let solutions = solutions();
 
     let mut solved = 0;
     let mut duration = Duration::ZERO;
@@ -82,7 +82,7 @@ fn main() {
 }
 
 
-fn year2015() -> Vec<Solution> {
+fn solutions() -> Vec<Solution> {
     vec![
         solution!(year2015, day01),
         solution!(year2015, day02),
@@ -123,5 +123,7 @@ fn year2015() -> Vec<Solution> {
         solution!(year2023, day11),
         solution!(year2023, day12),
         solution!(year2023, day13),
+        solution!(year2023, day14),
+        solution!(year2023, day16),
     ]
 }
