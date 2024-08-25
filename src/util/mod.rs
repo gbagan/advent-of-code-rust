@@ -10,6 +10,7 @@ pub mod grid;
 pub mod heap;
 pub mod iter;
 pub mod knothash;
+pub mod math;
 pub mod number;
 pub mod permutation;
 pub mod range;
