@@ -93,10 +93,7 @@ pub fn part1(input: &Input) -> Option<i32> {
     let width = input.rect_xs.len();
     let size = width * input.rect_ys.len();
 
-    let mut grid = Vec::with_capacity(size);
-    for _ in 0..size {
-        grid.push(false);
-    }
+    let mut grid = vec![false; size];
 
     for instr in &input.instrs {
         let xmin = input.x_index[instr.rectangle.xmin as usize];
@@ -125,10 +122,7 @@ pub fn part2(input: &Input) -> Option<i32> {
     let width = input.rect_xs.len();
     let size = width * input.rect_ys.len();
 
-    let mut grid = Vec::with_capacity(size);
-    for _ in 0..size {
-        grid.push(0);
-    }
+    let mut grid = vec![0; size];
 
     for instr in &input.instrs {
         let xmin = input.x_index[instr.rectangle.xmin as usize];

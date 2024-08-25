@@ -2,14 +2,8 @@ use crate::util::grid::Grid;
 
 fn parse_grid(input: &str) -> Option<(usize, usize)> {
     let grid = Grid::parse(input);
-    let mut rows: Vec<u32> = Vec::with_capacity(grid.height);
-    let mut columns: Vec<u32> = Vec::with_capacity(grid.width);
-    for _ in 0..grid.height {
-        rows.push(0);
-    }
-    for _ in 0..grid.width {
-        columns.push(0);
-    }
+    let mut rows: Vec<u32> = vec![0; grid.height];
+    let mut columns: Vec<u32> = vec![0; grid.width];
     for x in 0..grid.width {
         for y in 0..grid.height {
             let b = if grid[(x, y)] == b'#' {1} else {0};

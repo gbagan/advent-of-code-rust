@@ -8,10 +8,7 @@ pub fn solve1(numbers: &[usize], target: usize) -> u32 {
     let n = numbers.len();
     let m = target+1;
     let size = (n+1)*m;
-    let mut table: Vec<u32> = Vec::with_capacity(size);
-    for _ in 0..size {
-        table.push(0);
-    }
+    let mut table: Vec<u32> = vec![0; size];
 
     table[0] = 1;
     for i in 1..=n {
@@ -31,12 +28,8 @@ pub fn solve2(numbers: &[usize], target: usize) -> Option<u32> {
     let n = numbers.len();
     let m = target+1;
     let size = (n+1)*m;
-    let mut table: Vec<u32> = Vec::with_capacity(size);
-    let mut prev_table: Vec<u32> = Vec::with_capacity(size);
-    for _ in 0..size {
-        table.push(0);
-        prev_table.push(0);
-    }
+    let mut table: Vec<u32> = vec![0; size];
+    let mut prev_table: Vec<u32> = vec![0; size];
 
     for i in 0..=n {
         prev_table[i*m] = 1;

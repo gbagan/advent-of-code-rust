@@ -25,10 +25,7 @@ pub fn parse(input: &str) -> Option<(u32, u32)> {
     }
     let n = dict.len();
 
-    let mut table = Vec::with_capacity(n*n);
-    for _ in 0..n*n {
-        table.push(0)
-    }
+    let mut table = vec![0; n*n];
     for (city1, city2, dist) in &travels {
         let i = dict[city1];
         let j = dict[city2];

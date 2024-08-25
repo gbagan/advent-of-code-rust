@@ -15,10 +15,7 @@ impl<T: Copy> Grid<T> {
     }
 
     pub fn new(width: usize, height: usize, init_value: T) -> Grid<T> {
-        let mut vec = Vec::with_capacity(width * height);
-        for _ in 0..width * height {
-            vec.push(init_value);
-        }
+        let vec = vec![init_value; width * height];
         Grid { width, height, vec }
     }
 

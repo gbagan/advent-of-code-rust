@@ -140,9 +140,9 @@ impl<'a> Sum<&'a Self> for Coord {
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord, Hash)]
 pub struct Coord3 {
-    pub x: i64,
-    pub y: i64,
-    pub z: i64,
+    pub x: i32,
+    pub y: i32,
+    pub z: i32,
 }
 
 impl Coord3 {
@@ -152,11 +152,11 @@ impl Coord3 {
     }
 
     #[inline]
-    pub fn new(x: i64, y: i64, z: i64) -> Self {
+    pub fn new(x: i32, y: i32, z: i32) -> Self {
         Self { x, y, z }
     }
 
-    pub fn manhattan(&self, other: &Self) -> i64 {
+    pub fn manhattan(&self, other: &Self) -> i32 {
         (self.x - other.x).abs() +  (self.y - other.y).abs() +  (self.z - other.z).abs()
     }
 }
@@ -198,11 +198,11 @@ impl Neg for Coord3 {
     }
 }
 
-impl Mul<i64> for Coord3 {
+impl Mul<i32> for Coord3 {
     type Output = Self;
 
     #[inline]
-    fn mul(self, n: i64) -> Self::Output {
+    fn mul(self, n: i32) -> Self::Output {
         Self {
             x: n * self.x,
             y: n * self.y,

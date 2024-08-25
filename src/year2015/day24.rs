@@ -8,10 +8,7 @@ pub fn solve(numbers: &[usize], k: usize) -> Option<u128> {
     let m = numbers.len();
     let n = numbers.iter().sum::<usize>() / k;
     let size = (m+1) * (n+1);
-    let mut table: Vec<Option<u128>> = Vec::with_capacity(size);
-    for _ in 0..size {
-        table.push(None);
-    }
+    let mut table: Vec<Option<u128>> = vec![None; size];
     table[0] = Some(1);
     for i in 1..=m {
         let v = numbers[i-1];

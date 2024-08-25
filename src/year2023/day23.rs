@@ -84,7 +84,6 @@ fn graph_to_grid(graph: &Vec<Vec<(usize, u32)>>) -> GridGraph {
     let start = 0;
     let next_to_start = graph[start][0].0;
     let goal = graph.len()-1;
-    let before_goal = graph[goal][0].0;
     let extremities = graph[0][0].1 + graph[goal][0].1;
 
     let mut nodes = [[0; 6]; 6];
