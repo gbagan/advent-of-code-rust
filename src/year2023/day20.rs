@@ -3,12 +3,6 @@ use std::collections::HashMap;
 fn parse_line(line: &str) -> Option<(&str, (bool, Vec<&str>))> {
     let (key, values) = line.split_once(" -> ")?;
     let first_char = key.chars().nth(0)?;
-    /*let typ = match first_char {
-        '%' => Module::FlipFlop { on: false },
-        '&' => Module::Conjunction { last_pulse: 0, mask: u64::MAX },
-        _ => Module::Broadcaster,
-    };
-    */
     let key = key.trim_start_matches(['%', '&']);
     let values = values.split(", ").collect();
     Some((key, (first_char == '&', values)))
