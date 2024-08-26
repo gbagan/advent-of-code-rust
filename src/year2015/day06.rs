@@ -31,7 +31,7 @@ fn parse_instruction(line: &str) -> Option<Instruction> {
         } else {
             None
         }?;
-    let (w1, _, w2) = s.split(' ').next_tuple()?;
+    let (w1, _, w2) = s.split_ascii_whitespace().next_tuple()?;
     let (xmin, ymin) = w1.split_once(',')?;
     let (xmax, ymax) = w2.split_once(',')?;
     let xmin = xmin.parse().ok()?;

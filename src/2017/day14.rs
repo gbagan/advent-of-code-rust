@@ -18,7 +18,6 @@ fn count_ones(n: u8) -> u32 {
         count += 1;
         n &= n - 1;
     }
-
     count
 }
 

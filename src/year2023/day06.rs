@@ -3,15 +3,13 @@ use itertools::Itertools;
 pub fn parse(input: &str) -> Option<(Vec<u64>, Vec<u64>)> {
     let (line1, line2) = input.lines().next_tuple()?;
     let times = line1
-                .split(' ')
+                .split_ascii_whitespace()
                 .skip(1)
-                .filter(|&s| s.len() != 0)
                 .filter_map(|s| s.parse().ok())
                 .collect();
     let distances = line2
-                .split(' ')
+                .split_ascii_whitespace()
                 .skip(1)
-                .filter(|&s| s.len() != 0)
                 .filter_map(|s| s.parse().ok())
                 .collect();
     Some((times, distances))

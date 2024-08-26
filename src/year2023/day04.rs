@@ -2,12 +2,12 @@ fn card_score(table: &mut [u16; 100], i: usize, line: &str) -> Option<u32> {
     let i = i as u16;
     let mut score = 0;
     let (left, right) = line.split_once('|')?;
-    for v in left.split(' ').filter(|s| s.len() > 0).skip(2) {
+    for v in left.split_ascii_whitespace().skip(2) {
         if let Ok(v) = v.parse::<usize>() {
             table[v] = i;
         }
     }
-    for v in right.split(' ').filter(|s| s.len() > 0) {
+    for v in right.split_ascii_whitespace() {
         if let Ok(v2) = v.parse::<usize>() {
             if table[v2] == i {
                 score += 1;

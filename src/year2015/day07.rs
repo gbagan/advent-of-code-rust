@@ -22,7 +22,7 @@ fn parse_wire(s: &str) -> Wire {
 }
 
 fn parse_gate(s: &str) -> Option<Gate> {
-    let mut words = s.split(' ');
+    let mut words = s.split_ascii_whitespace();
     let first = words.next()?;
     if first == "NOT" {
         let second = words.next()?;
