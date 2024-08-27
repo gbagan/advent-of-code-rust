@@ -1,6 +1,9 @@
 use std::path::Path;
 use std::env::args;
-use std::fs::read_to_string;
+use std::fs::{create_dir, read_to_string};
+use std::process::{Command, Stdio};
+use std::io;
+use std::io::Write;
 use std::time::{Duration, Instant};
 use ansi_term::Color::{Red, Yellow, Green};
 use aoc::*;
@@ -30,8 +33,15 @@ macro_rules! solution {
 }
 
 fn main() {
-    let (arg_year, arg_day) = (args().nth(1), args().nth(2));
+    let (command, arg_year, arg_day) = (args().nth(1), args().nth(2), args().nth(3));
+    match command.as_deref() {
+        Some("solve") => solve(arg_year, arg_day),
+        Some("download") => download(&arg_year, &arg_day),
+        _ => println!("Invalid command."),
+    }
+}
 
+fn solve(arg_year: Option<String>, arg_day: Option<String>) {
     let solutions = solutions();
 
     let mut solved = 0;
@@ -81,6 +91,47 @@ fn main() {
     println!("Duration: {} ms", duration.as_millis());
 }
 
+fn download(arg_year: &Option<String>, arg_day: &Option<String>) {
+    let years_and_days = match (arg_year, arg_day) {
+        (Some(year), Some(day)) => vec!((year.to_string(), day.to_string())),
+        _ => solutions().iter().map(|sol| (sol.year.clone(), sol.day.clone())).collect()
+    };
+    for (year, day) in years_and_days {
+        let dir_path = Path::new("inputs").join(&year);
+        let input_path = format!("inputs/{year}/{day}");
+        let _ = create_dir(dir_path);
+        let args = vec!(
+                "-I".into(),
+                "--overwrite".into(),
+                "--input-file".into(),
+                input_path,
+                "--year".into(),
+                year.to_string(),
+                "--day".into(),
+                day.to_string(),
+                "download".into(),
+        );
+        match Command::new("aoc")
+            .args(args)
+            .stdout(Stdio::null())
+            //.stderr(Stdio::null())
+            .output()
+        {
+            Err(_) => {
+                println!("aoc is not callable. Please install aoc-cli with \"cargo install aoc-cli\"");
+                return
+            }
+            Ok(output) => {
+                if output.status.success() {
+                    println!("Successfully wrote input of year {year} day {day}");
+                } else {
+                    io::stderr().write_all(&output.stderr).unwrap();
+                }
+            }
+        }
+    }
+
+}
 
 fn solutions() -> Vec<Solution> {
     vec![
