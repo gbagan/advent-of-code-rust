@@ -33,13 +33,13 @@ fn parse_workflow(line: &str) -> Option<(&str, Vec<Step>)> {
                 'm' => 1,
                 'a' => 2,
                 's' => 3,
-                _ => panic!("unexcepted character")
+                _ => panic!("unexcepted character {c}")
             };
             let val = first[2..].parse().ok()?;
             let test = match rel {
                 '<' => Test::LT(c, val),
                 '>' => Test::GT(c, val),
-                _ => panic!("unexcepted character")
+                _ => panic!("unexcepted character {rel}")
             };
             Some(Step{test, instr: parse_instr(second)})
         }

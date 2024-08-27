@@ -10,7 +10,7 @@ fn parse_line(line: &str) -> Option<((Coord, i32), (Coord, i32))> {
         "R" => Coord::EAST,
         "U" => Coord::NORTH,
         "D" => Coord::SOUTH,
-        _ => panic!("unexcepted character")
+        _ => panic!("unexcepted character: {dir1}")
     };
     let len1 = len1.parse().ok()?;
     let mut hex = hex.trim_matches(['(', ')', '#']).to_string();
@@ -20,7 +20,7 @@ fn parse_line(line: &str) -> Option<((Coord, i32), (Coord, i32))> {
         '1' => Coord::SOUTH,
         '2' => Coord::WEST,
         '3'   => Coord::NORTH,
-        _ => panic!("unexcepted character")
+        _ => panic!("unexcepted character: {dir2}")
     };
     let len2 = i32::from_str_radix(&hex, 16).ok()?;
     Some(((dir1, len1), (dir2, len2)))
