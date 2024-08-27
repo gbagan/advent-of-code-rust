@@ -25,7 +25,7 @@ pub fn parse(input: &str) -> Option<Vec<Aunt>> {
 }
 
 lazy_static! {
-    static ref clues: HashMap<&'static str,u32> = { 
+    static ref CLUES: HashMap<&'static str,u32> = { 
         let mut m = HashMap::new();
         m.insert("children", 3);
         m.insert("cats", 7);
@@ -45,7 +45,7 @@ fn check(aunt: &Aunt, test: fn(&str, u32, u32) -> bool) -> bool {
     aunt.compounds
         .iter()
         .all(|(compound, nbr)|
-            match clues.get(compound) {
+            match CLUES.get(compound) {
                 None => true,
                 Some(nbr2) => test(*compound, *nbr2, *nbr)
             }

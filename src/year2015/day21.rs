@@ -14,39 +14,37 @@ struct Item {
 }
 
 lazy_static! {
-    static ref items: Vec<Vec<Item>> = {
-        vec!(
-            vec! ( Item {cost: 8,   damage: 4, armor: 0}
-                 , Item {cost: 10,  damage: 5, armor: 0}
-                 , Item {cost: 25,  damage: 6, armor: 0}
-                 , Item {cost: 40,  damage: 7, armor: 0}
-                 , Item {cost: 74,  damage: 8, armor: 0}
-                ),
-            vec! ( Item {cost: 13,  damage: 0, armor: 1}
-                 , Item {cost: 31,  damage: 0, armor: 2}
-                 , Item {cost: 53,  damage: 0, armor: 3}
-                 , Item {cost: 75,  damage: 0, armor: 4}
-                 , Item {cost: 102, damage: 0, armor: 5}
-                 , Item {cost: 0,   damage: 0, armor: 0}
-                 ),
-            vec! ( Item {cost: 25,  damage: 1, armor: 0}
-                 , Item {cost: 50,  damage: 2, armor: 0}
-                 , Item {cost: 100, damage: 3, armor: 0}
-                 , Item {cost: 20,  damage: 0, armor: 1}
-                 , Item {cost: 40,  damage: 0, armor: 2}
-                 , Item {cost: 80,  damage: 0, armor: 3}
-                 , Item {cost: 0,   damage: 0, armor: 0}
-                 ),
-            vec! ( Item {cost: 25,  damage: 1, armor: 0}
-                 , Item {cost: 50,  damage: 2, armor: 0}
-                 , Item {cost: 100, damage: 3, armor: 0}
-                 , Item {cost: 20,  damage: 0, armor: 1}
-                 , Item {cost: 40,  damage: 0, armor: 2}
-                 , Item {cost: 80,  damage: 0, armor: 3}
-                 , Item {cost: 0,   damage: 0, armor: 0}
-                 )
-        )
-    };
+    static ref ITEMS: Vec<Vec<Item>> = vec!(
+        vec! ( Item {cost: 8,   damage: 4, armor: 0}
+             , Item {cost: 10,  damage: 5, armor: 0}
+             , Item {cost: 25,  damage: 6, armor: 0}
+             , Item {cost: 40,  damage: 7, armor: 0}
+             , Item {cost: 74,  damage: 8, armor: 0}
+             ),
+        vec! ( Item {cost: 13,  damage: 0, armor: 1}
+             , Item {cost: 31,  damage: 0, armor: 2}
+             , Item {cost: 53,  damage: 0, armor: 3}
+             , Item {cost: 75,  damage: 0, armor: 4}
+             , Item {cost: 102, damage: 0, armor: 5}
+             , Item {cost: 0,   damage: 0, armor: 0}
+             ),
+        vec! ( Item {cost: 25,  damage: 1, armor: 0}
+             , Item {cost: 50,  damage: 2, armor: 0}
+             , Item {cost: 100, damage: 3, armor: 0}
+             , Item {cost: 20,  damage: 0, armor: 1}
+             , Item {cost: 40,  damage: 0, armor: 2}
+             , Item {cost: 80,  damage: 0, armor: 3}
+             , Item {cost: 0,   damage: 0, armor: 0}
+             ),
+        vec! ( Item {cost: 25,  damage: 1, armor: 0}
+             , Item {cost: 50,  damage: 2, armor: 0}
+             , Item {cost: 100, damage: 3, armor: 0}
+             , Item {cost: 20,  damage: 0, armor: 1}
+             , Item {cost: 40,  damage: 0, armor: 2}
+             , Item {cost: 80,  damage: 0, armor: 3}
+             , Item {cost: 0,   damage: 0, armor: 0}
+             )
+    );
 }
 
 pub fn parse(input: &str) -> Option<Boss> {
@@ -68,7 +66,7 @@ fn is_player_win(gear: &Vec<&Item>, boss: &Boss) -> bool {
 }
 
 fn possible_gears<'a>() -> impl Iterator<Item=Vec<&'a Item>> {    
-    items.iter().multi_cartesian_product()
+    ITEMS.iter().multi_cartesian_product()
 } 
 
 pub fn part1(boss: &Boss) -> Option<i32> {
