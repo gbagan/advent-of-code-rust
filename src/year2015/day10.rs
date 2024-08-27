@@ -1,3 +1,5 @@
+// look-and-say sequence
+
 use crate::util::times;
 
 pub fn parse(input: &str) -> Option<(usize, usize)> {

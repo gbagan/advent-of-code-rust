@@ -1,29 +1,72 @@
 use itertools::iterate;
-use aoc::iter::*;
+use crate::util::iter::*;
 
-pub fn parse(input: &str) -> Option<Vec<u32>> {
-    Some(input.trim().split_ascii_whitespace().map(|x| x.split().ok()).collect())
+const SPREAD: [u64; 16] = [
+    0x0000000000000000,
+    0x1000000000000000,
+    0x1100000000000000,
+    0x1110000000000000,
+    0x1111000000000000,
+    0x1111100000000000,
+    0x1111110000000000,
+    0x1111111000000000,
+    0x1111111100000000,
+    0x1111111110000000,
+    0x1111111111000000,
+    0x1111111111100000,
+    0x1111111111110000,
+    0x1111111111111000,
+    0x1111111111111100,
+    0x1111111111111110,
+];
+
+pub fn parse(input: &str) -> Option<(usize, usize)> {
+    let banks: u64 = input
+        .trim()
+        .split_ascii_whitespace()
+        .filter_map(|x| x.parse().ok())
+        .fold(0, |acc, n: u64| (acc << 4) + n);
+
+    let (i, j, _) = iterate(banks, step).find_duplicate()?;
+    Some((j, j - i))
 }
 
-fn step(banks: &Vec<u32>) -> Vec<u32> {
-    let mut banks = banks.clone();
-    let n = banks.len();
-    let (idx, max) = banks
-            .iter()
-            .enumerate()
-            .max_by(|(i, a), (j, b)| if a==b {j.cmp(i)} else {a.cmp(b)})
-            .unwrap();
-    banks[idx] = 0;
-    for i in 1..=*max {
-        banks[(idx+i as usize) % n] += 1;
+#[inline(always)]
+pub fn find_max(banks: u64) -> (u32, u64) {
+    let mut mask = 0x8888_8888_8888_8888;
+    let mut banks2 = banks;
+    for _ in 0..4 {
+        let mask2 = banks2 & mask;
+        mask = if mask2 == 0 {mask} else {mask2};
+        banks2 <<= 1;
     }
-    banks
+    let offset = 60 - (mask.leading_zeros() & !3);
+    (offset, banks >> offset & 0xf)
 }
 
-fn main() {
-    let input = include_str!("../../inputs/2017/06");
-    aoc_with_parser(input, input_parser, |banks| {
-        let (i, j, _) = iterate(banks.clone(), step).find_repetition().unwrap();
-        (j, j-i)
-    })
+pub fn step(banks: &u64) -> u64 {
+    let banks = *banks;
+    let (offset, max) = find_max(banks);
+    (banks & (0xffff_ffff_ffff_fff0u64).rotate_left(offset)) + SPREAD[max as usize].rotate_left(offset)
+}
+
+pub fn part1(solutions: &(usize, usize)) -> Option<usize> {
+    Some(solutions.0)
+}
+
+pub fn part2(solutions: &(usize, usize)) -> Option<usize> {
+    Some(solutions.1)
+}
+
+#[test]
+fn find_max_test() {
+    let b = 0x347_9DAE_3123_4567;
+    assert_eq!(find_max(b), (32, 14));
+}
+
+#[test]
+fn step_test() {
+    let b = 0x2347_9DAE_3123_4567;
+    let c = 0x3458_AEA0_4234_5678;
+    assert_eq!(step(&b), c);
 }
