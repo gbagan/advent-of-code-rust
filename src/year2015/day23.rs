@@ -13,7 +13,7 @@ fn parse_instr(line: &str) -> Option<Instr> {
         "hlf" => Some(Instr::Hlf(rest == "a")),
         "tpl" => Some(Instr::Tpl(rest == "a")),
         "inc" => Some(Instr::Inc(rest == "a")),
-        "jmp" => rest.parse().ok().and_then(|i| Some(Instr::Jmp(i))),
+        "jmp" => rest.parse().ok().map(Instr::Jmp),
         "jie" | "jio" => {
             let (reg, offset) = rest.split_once(", ")?;
             let reg = reg == "a";

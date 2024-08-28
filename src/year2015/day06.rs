@@ -26,10 +26,8 @@ fn parse_instruction(line: &str) -> Option<Instruction> {
             Some ((Command::Toggle, s))
         } else if let Some(s) = line.strip_prefix("turn on ") { 
             Some ((Command::On, s))
-        } else if let Some(s) = line.strip_prefix("turn off ") { 
-            Some ((Command::Off, s))
         } else {
-            None
+            line.strip_prefix("turn off ").map(|s| (Command::Off, s))
         }?;
     let (w1, _, w2) = s.split_ascii_whitespace().next_tuple()?;
     let (xmin, ymin) = w1.split_once(',')?;

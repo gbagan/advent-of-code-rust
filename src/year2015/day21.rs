@@ -55,7 +55,7 @@ pub fn parse(input: &str) -> Option<Boss> {
     Some(Boss { hp, damage, armor})
 }
 
-fn is_player_win(gear: &Vec<&Item>, boss: &Boss) -> bool {
+fn is_player_win(gear: &[&Item], boss: &Boss) -> bool {
     let player_damage = gear.iter().map(|&item| item.damage).sum::<i32>();
     let player_damage = 1.max(player_damage - boss.armor);
     let player_armor = gear.iter().map(|&item| item.armor).sum::<i32>();

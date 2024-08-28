@@ -9,8 +9,8 @@ pub struct Input<'a>  {
 pub fn parse(input: &str) -> Option<Input> {
     let mut replacements = vec!();
     let mut lines = input.lines ();
-    while let Some(line) = lines.next() {
-        if line.len() == 0 {
+    for line in lines.by_ref() {
+        if line.is_empty() {
             break;
         }
         let (mol1, mol2) = line.split_once(" => ")?;

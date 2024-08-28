@@ -92,7 +92,7 @@ fn eval_circuit(circuit: &Circuit) -> u16 {
         }
     }
     
-    get_val(&circuit, &mut vals, "a".to_string())
+    get_val(circuit, &mut vals, "a".to_string())
 }
 
 pub fn parse(input: &str) -> Option<(u16, u16)> {

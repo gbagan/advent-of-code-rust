@@ -21,8 +21,8 @@ fn next_password(mut pwd: [u8; 8]) -> [u8; 8] {
                 c+=1;
             }
             pwd[i] = c;
-            for j in i+1..2 {
-                pwd[j] = b'a';
+            for c in pwd.iter_mut().take(3).skip(i+1) {
+                *c = b'a';
             }
            return complete(pwd, b'a');
         }

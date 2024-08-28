@@ -14,10 +14,7 @@ fn parse_line(line: &str) -> Option<(&[u8], Vec<u8>)> {
 fn count_arrangements(springs: &[u8], groups: &[u8]) -> u64 {
     let n = springs.len();
 
-    let mut next_operational = Vec::with_capacity(n);
-    for _ in 0..n {
-        next_operational.push(0);
-    }
+    let mut next_operational = vec![0; n];
     for i in (0..n).rev() {
         if springs[i] == b'.' {
             next_operational[i] = i;
@@ -50,15 +47,15 @@ pub fn parse(input: &str) -> Option<(u64, u64)> {
     let p1 = puzzles.iter().map(|(springs, groups)| {
         let mut springs = springs.to_vec();
         springs.push(b'.');
-        count_arrangements(&springs, &groups)
+        count_arrangements(&springs, groups)
     }).sum();
     let p2 = puzzles.par_iter().map(|(springs, groups)| {
         let mut springs2 =springs.to_vec();
         let mut groups2 = groups.to_vec();
         for _ in 0..4 {
             springs2.push(b'?');
-            springs2.extend_from_slice(&springs);
-            groups2.extend_from_slice(&groups);
+            springs2.extend_from_slice(springs);
+            groups2.extend_from_slice(groups);
         }
         springs2.push(b'.');
         count_arrangements(&springs2, &groups2)

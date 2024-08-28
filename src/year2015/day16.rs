@@ -47,7 +47,7 @@ fn check(aunt: &Aunt, test: fn(&str, u32, u32) -> bool) -> bool {
         .all(|(compound, nbr)|
             match CLUES.get(compound) {
                 None => true,
-                Some(nbr2) => test(*compound, *nbr2, *nbr)
+                Some(nbr2) => test(compound, *nbr2, *nbr)
             }
         )
 }

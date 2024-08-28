@@ -32,11 +32,11 @@ fn step(reindeer: &Reindeer, i: u32) -> u32 {
     if i % cycle < duration {speed} else {0}
 }
 
-pub fn part1(reindeers: &Vec<Reindeer>) -> Option<u32> {
-    reindeers.iter().map(|r| distance(&r, 2503)).max()
+pub fn part1(reindeers: &[Reindeer]) -> Option<u32> {
+    reindeers.iter().map(|r| distance(r, 2503)).max()
 }
 
-pub fn part2(reindeers: &Vec<Reindeer>) -> Option<u16> {
+pub fn part2(reindeers: &[Reindeer]) -> Option<u16> {
     let n = reindeers.len();
     let mut distances: Vec<u32> = reindeers.iter().map(|_| 0).collect(); 
     let mut scores: Vec<u16> = reindeers.iter().map(|_| 0).collect();
@@ -51,5 +51,5 @@ pub fn part2(reindeers: &Vec<Reindeer>) -> Option<u16> {
             }
         }
     }
-    scores.iter().max().map(|&x| x)
+    scores.iter().max().copied()
 }

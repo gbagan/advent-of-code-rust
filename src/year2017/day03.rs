@@ -29,7 +29,7 @@ pub fn part2(n: &i32) -> Option<i32> {
     loop {
         for (steps, dir) in [(k, Coord::EAST), (k, Coord::NORTH), (k+1, Coord::WEST), (k+1, Coord::WEST)] {
             for _ in 0..steps {
-                c = c + dir;
+                c += dir;
                 let r = fill(&grid, &c);
                 if r > *n {
                     return Some(r);

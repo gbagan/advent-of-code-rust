@@ -42,9 +42,9 @@ pub fn part2(scores: &[u32]) -> Option<u32> {
     while i < vec.len() {
         let (score, freq) = vec[i];
         total += freq;
-        for j in i+1..=i+score as usize {
-            let (score2, freq2) = vec[j];
-            vec[j] = (score2, freq2+freq);
+        for pair in vec.iter_mut().skip(i+1).take(score as usize) {
+            let (score2, freq2) = *pair;
+            *pair = (score2, freq2+freq);
         }
         i+=1;
     }

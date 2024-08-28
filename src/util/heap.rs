@@ -24,6 +24,12 @@ impl<K: Ord, V> MinHeap<K, V> {
     }
 }
 
+impl<K: Ord, V> Default for MinHeap<K, V> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct MinWrapper<K, V> {
     pub key: K,
     pub value: V,

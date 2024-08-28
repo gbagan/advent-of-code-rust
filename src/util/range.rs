@@ -27,8 +27,8 @@ impl Range {
         Range { lower: self.lower + v, upper: self.upper + v }       
     }
 
-    pub fn disjoint_union(ranges: &Vec<Range>) -> Vec<Range> {
-        let mut ranges = ranges.clone();
+    pub fn disjoint_union(ranges: &[Range]) -> Vec<Range> {
+        let mut ranges = ranges.to_vec();
         ranges.sort_by_key(|r| r.lower);
         let mut it = ranges.iter();
         let mut res = vec!();

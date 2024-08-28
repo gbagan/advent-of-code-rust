@@ -10,7 +10,7 @@ pub fn parse(input: &str) -> Option<(u64, u64)> {
     debug_assert_eq!(grid[start], b'S');
     
     let (even_inside, odd_inside, even_outside, odd_outside) =
-            bfs(&grid, &vec!(start), 65, u64::MAX);
+            bfs(&grid, &[start], 65, u64::MAX);
     let even = even_inside + even_outside;
     let odd = odd_inside + odd_outside;
     let p1 = even_inside;
@@ -66,12 +66,10 @@ fn bfs(grid: &Grid<u8>, starts: &[Coord], inside_limit: u64, limit: u64) -> (u64
             } else {
                 odd_inside += 1;
             }
+        } else if (node.x + node.y) % 2 == 0 {
+             even_outside += 1;
         } else {
-            if (node.x + node.y) % 2 == 0 {
-                even_outside += 1;
-            } else {
-                odd_outside += 1;
-            }
+            odd_outside += 1;
         }
         for nbor in node.adjacent() {
             if grid.contains(nbor) && grid[nbor] == b'.' {

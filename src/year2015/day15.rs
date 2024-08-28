@@ -23,7 +23,7 @@ pub fn parse(input: &str) -> Option<Vec<Ingredient>> {
     Some(input.lines().filter_map(parse_ingredient).collect())
 }
 
-fn score(quantities: & Vec<u32>, ingredients: &Vec<Ingredient>) -> Option<i32> {
+fn score(quantities: & Vec<u32>, ingredients: &[Ingredient]) -> Option<i32> {
     let capacity: i32 = ingredients
         .iter()
         .zip(quantities)
@@ -55,7 +55,7 @@ fn score(quantities: & Vec<u32>, ingredients: &Vec<Ingredient>) -> Option<i32> {
     }
 }
 
-fn calories(quantities: & Vec<u32>, ingredients: &Vec<Ingredient>) -> i32 {
+fn calories(quantities: & Vec<u32>, ingredients: &[Ingredient]) -> i32 {
     ingredients
         .iter()
         .zip(quantities)
@@ -63,13 +63,13 @@ fn calories(quantities: & Vec<u32>, ingredients: &Vec<Ingredient>) -> i32 {
         .sum()
 }
 
-pub fn part1(ingredients: &Vec<Ingredient>) -> Option<i32> {
+pub fn part1(ingredients: &[Ingredient]) -> Option<i32> {
     (0..100).into_par_iter().filter_map(|i| {
         let mut best_score = 0;
         for j in 0..=100-i {
             for k in 0..=100-i-j {
                 let quantities = vec!(i, j, k, 100 - i - j - k);
-                match score(&quantities, &ingredients) {
+                match score(&quantities, ingredients) {
                     Some(s) if s > best_score => {
                         best_score = s;
                     }
@@ -81,16 +81,16 @@ pub fn part1(ingredients: &Vec<Ingredient>) -> Option<i32> {
     }).max()
 }
 
-pub fn part2(ingredients: &Vec<Ingredient>) -> Option<i32> {
+pub fn part2(ingredients: &[Ingredient]) -> Option<i32> {
     let mut best_score = 0;
     for i in 0..=100 {
         for j in 0..=100-i {
             for k in 0..=100-i-j {
                 let quantities = vec!(i, j, k, 100 - i - j - k);
-                if calories(&quantities, &ingredients) != 500 {
+                if calories(&quantities, ingredients) != 500 {
                     break;
                 }
-                match score(&quantities, &ingredients) {
+                match score(&quantities, ingredients) {
                     Some(s) if s > best_score => {
                         best_score = s;
                     }

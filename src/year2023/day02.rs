@@ -11,7 +11,7 @@ pub fn parse(input: &str) -> Option<(usize, u32)> {
 
         for (n, color) in line.split(' ').skip(2).tuples() {
             let n = n.parse().unwrap_or(0); 
-            let color = color.trim_end_matches(&[',', ';']);
+            let color = color.trim_end_matches([',', ';']);
             match color {
                 "red" => {
                     valid = valid && n <= 12;

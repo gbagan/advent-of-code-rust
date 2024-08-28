@@ -4,7 +4,7 @@ use itertools::Itertools;
 use std::str;
 
 fn is_symbol(c: u8) -> bool {
-    c != b'.' && (c < b'0' || c > b'9')
+    c != b'.' && !c.is_ascii_digit()
 }
 
 fn part_member(grid: &Grid<u8>, y: i64, x1: i64, x2: i64, i: usize) -> Option<u32> {
@@ -32,7 +32,7 @@ pub fn parse(input: &str) -> Option<(u32, u32)> {
     for y in 0..(grid.width as i64) {
         for x in 0..(grid.height as i64) {
             let c = grid.vec[i];
-            if b'0' <= c && c <= b'9' {
+            if c.is_ascii_digit() {
                 if first_digit.is_none() {
                     first_digit = Some(x)
                 }

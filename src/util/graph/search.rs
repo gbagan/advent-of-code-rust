@@ -58,13 +58,13 @@ where
 {
     let mut queue = MinHeap::new();
     let mut visited = HashSet::new();
-    queue.push(Zero::zero(), start.clone());
+    queue.push(Zero::zero(), *start);
 
     while let Some((cost, node)) = queue.pop() {
         if is_target(&node) {
             return Some(cost)
         }
-        if !visited.insert(node.clone()) {
+        if !visited.insert(node) {
             continue;
         }
         for (nbor, cost2) in neighbors(&node) {
@@ -79,7 +79,7 @@ where
 pub fn postorder_dfs(graph: &[Vec<usize>], source: usize) -> Vec<usize> {
     let mut output = vec!();
     let mut visited = vec![false; graph.len()];
-    postorder_dfs_aux(&graph, &mut visited, &mut output, source); 
+    postorder_dfs_aux(graph, &mut visited, &mut output, source); 
     output
 }
 

@@ -1,7 +1,6 @@
 use crate::util::coord::Coord;
 use crate::util::grid::Grid;
-use rayon::prelude::*;
-use std::collections::{HashSet, HashMap, VecDeque};
+use std::collections::{HashSet, HashMap};
 
 pub struct GridGraph {
     extremities: u32,
@@ -27,7 +26,7 @@ fn follow_path(grid: &Grid<u8>, pos: Coord, pred: Coord, goal: Coord) -> Option<
     let mut pos = pos;
     let mut len = 1;
     loop {
-        let nbors = neighbors2(&grid, pos);
+        let nbors = neighbors2(grid, pos);
         match nbors.len() {
             1 => {
                 let next = nbors[0];
@@ -63,11 +62,14 @@ fn compress_grid(grid: &Grid<u8>) -> Vec<Vec<(usize, u32)>>
     let mut junctions = vec!();
     let mut n = 0;
     let grid2 = grid.map_with_indices(|c, _| {
-        let nbors = neighbors2(&grid, c);
+        let nbors = neighbors2(grid, c);
         if c == start || c == goal || nbors.len() > 2 {
             let m = n;
             n += 1;
-            let nbors2 = nbors.iter().map(|&next| follow_path(&grid, next, c, goal)).flatten().collect();
+            let nbors2 = nbors
+                .iter()
+                .filter_map(|&next| follow_path(grid, next, c, goal))
+                .collect();
             junctions.push(c);
             (m, nbors2)
         } else {
@@ -80,7 +82,7 @@ fn compress_grid(grid: &Grid<u8>) -> Vec<Vec<(usize, u32)>>
     }).collect()
 }
 
-fn graph_to_grid(graph: &Vec<Vec<(usize, u32)>>) -> GridGraph {
+fn graph_to_grid(graph: &[Vec<(usize, u32)>]) -> GridGraph {
     let start = 0;
     let next_to_start = graph[start][0].0;
     let goal = graph.len()-1;
@@ -147,47 +149,6 @@ fn graph_to_grid(graph: &Vec<Vec<(usize, u32)>>) -> GridGraph {
 
 }
 
-pub fn longest_path_heuristic(graph: &Vec<Vec<(usize, u32)>>, prev_border: &Vec<usize>) -> Option<u32> {
-    let mut todo = VecDeque::new();
-    todo.push_front((0, 1 as usize, 0));
-
-    while todo.len() < 64 {
-        if let Some((current, visited, len)) = todo.pop_front() {
-            for (nbor, len2) in graph[current].iter() {
-                let mask = 1 << nbor;
-                if visited & mask == 0 && visited & (1 << prev_border[*nbor]) != 0 {
-                    todo.push_back((*nbor, visited | mask, len+len2));
-                }
-            }
-        }
-    }
-    todo
-    .into_par_iter()
-    .map(|tuple| longest_path_heuristic_aux(graph, prev_border, tuple))
-    .max()
-}
-
-pub fn longest_path_heuristic_aux(graph: &Vec<Vec<(usize, u32)>>, prev_border: &Vec<usize>, tuple: (usize, usize, u32)) -> u32 {
-    let goal = graph.len()-1;
-    let mut todo = Vec::new();
-    todo.push(tuple);
-    let mut best_score = 0;
-
-    while let Some((current, visited, len)) = todo.pop() {
-        if current == goal {
-            best_score = best_score.max(len);
-        } else {
-            for (nbor, len2) in graph[current].iter() {
-                let mask = 1 << nbor;
-                if visited & mask == 0 && visited & (1 << prev_border[*nbor]) != 0 {
-                    todo.push((*nbor, visited | mask, len+len2));
-                }
-            }
-        }
-    };
-    best_score
-}
-
 pub fn parse(input: &str) -> Option<GridGraph> {
     let grid = Grid::parse(input);
     let graph = compress_grid(&grid);
@@ -232,16 +193,13 @@ pub fn part2(grid: &GridGraph) -> Option<u32> {
         }
     }
     Some(state[&vec!(35)] + grid.extremities)
-    //let grid = graph_to_grid(&graph);
-    //let prev_border = previous_border(&graph);
-    //longest_path_heuristic(&graph, &prev_border)
 }
 
 
 type State = HashMap<Vec<usize>, u32>;
 
 fn remove_isolated_path(paths: &[usize]) -> Vec<usize> {
-    if paths.len() == 0 {
+    if paths.is_empty() {
         return vec!();
     }
     let mut i = 0;
@@ -262,7 +220,7 @@ fn remove_isolated_path(paths: &[usize]) -> Vec<usize> {
 fn filter_isolated_paths(state: &State) -> State {
     let mut res = HashMap::new();
     for (paths, &weight) in state {
-        let paths = remove_isolated_path(&paths);
+        let paths = remove_isolated_path(paths);
         if res.get(&paths).copied() < Some(weight) {
             res.insert(paths, weight);
         }

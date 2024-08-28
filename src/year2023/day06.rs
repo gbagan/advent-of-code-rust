@@ -21,7 +21,7 @@ fn solve_race(time: u64, distance: u64) -> u64 {
     let delta = (t*t - 4.0*d).max(0.0).sqrt();
     let root1 = (t - delta) / 2.0;
     let root2 = (t + delta) / 2.0;
-    0.max((root2.ceil() as u64) - (root1 as u64) - 1)
+    root2.ceil() as u64 - root1 as u64 - 1
 }
 
 pub fn part1((times, distances): &(Vec<u64>, Vec<u64>)) -> Option<u64> {

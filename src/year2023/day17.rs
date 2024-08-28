@@ -8,11 +8,11 @@ const VERTICAL: usize = 0;
 const HORIZONTAL: usize = 1;
 
 pub fn part1(grid: &Grid<u8>) -> Option<u16> {
-    astar(&grid, 1, 3)
+    astar(grid, 1, 3)
 }
 
 pub fn part2(grid: &Grid<u8>) -> Option<u16> {
-    astar(&grid, 4, 10)
+    astar(grid, 4, 10)
 }
 
 fn astar(grid: &Grid<u8>, min_dist: u16, max_dist: u16) -> Option<u16> {
@@ -25,7 +25,7 @@ fn astar(grid: &Grid<u8>, min_dist: u16, max_dist: u16) -> Option<u16> {
         dist as usize + penalty as usize
     });
     let max_heuristic = heuristic.vec.iter().max()?;
-    let mut queue = BucketQueue::new(*max_heuristic as usize + 100);
+    let mut queue = BucketQueue::new(*max_heuristic + 100);
     let mut costs = Grid::new(grid.width, grid.height, [u16::MAX; 2]);
     queue.insert(heuristic[start], (start, HORIZONTAL, 0));
     queue.insert(heuristic[start], (start, VERTICAL, 0));
@@ -37,7 +37,6 @@ fn astar(grid: &Grid<u8>, min_dist: u16, max_dist: u16) -> Option<u16> {
             continue;
         }
 
-        
         let dirs = if direction == VERTICAL {
             [Coord::NORTH, Coord::SOUTH]}
         else {
@@ -85,7 +84,7 @@ impl <A> BucketQueue<A> {
     pub fn insert(&mut self, key: usize, val: A) {
         if key >= self.buckets.len() {
             self.buckets
-                .resize_with(key + 1, || vec!());
+                .resize_with(key + 1, || Vec::new());
         }
         
         self.buckets[key].push(val);
@@ -97,7 +96,7 @@ impl <A> BucketQueue<A> {
     pub fn pop(&mut self) -> Option<(usize, A)> {
         if let Some(min) = self.min {
             let v = self.buckets[min].pop()?;
-            self.min = (min..self.buckets.len()).find(|&i| self.buckets[i].len() > 0);
+            self.min = (min..self.buckets.len()).find(|&i| !self.buckets[i].is_empty());
             Some((min, v))
         } else {
             None

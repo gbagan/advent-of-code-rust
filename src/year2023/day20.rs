@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 fn parse_line(line: &str) -> Option<(&str, (bool, Vec<&str>))> {
     let (key, values) = line.split_once(" -> ")?;
-    let first_char = key.chars().nth(0)?;
+    let first_char = key.chars().next()?;
     let key = key.trim_start_matches(['%', '&']);
     let values = values.split(", ").collect();
     Some((key, (first_char == '&', values)))

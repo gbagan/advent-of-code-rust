@@ -36,8 +36,8 @@ pub fn solve2(numbers: &[usize], target: usize) -> Option<u32> {
     }
     
     for _ in 0..n {
-        for i in 0..=m {
-            table[i] = 0;
+        for v in table.iter_mut().take(m + 1) {
+            *v = 0;
         }
 
         for i in 1..=n {

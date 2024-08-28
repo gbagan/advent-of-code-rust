@@ -152,5 +152,5 @@ pub fn part2(input: &Input) -> Option<usize> {
         starts.push((Coord::new(grid.width as i32 -1, y), WEST));
     }
 
-    starts.par_iter().map(|(pos, dir)| count_energized(&input, *pos, *dir)).max()
+    starts.par_iter().map(|(pos, dir)| count_energized(input, *pos, *dir)).max()
 }

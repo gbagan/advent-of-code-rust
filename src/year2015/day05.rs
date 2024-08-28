@@ -57,11 +57,11 @@ fn is_nice_string2 (line: &[u8], line_idx: usize, pairs: &mut [usize; 729]) -> b
     two_pairs && split_pair
 }
 
-pub fn part1(input: &Vec<&[u8]>) -> Option<u32> {
+pub fn part1(input: &[&[u8]]) -> Option<u32> {
     Some(input.iter().count_by(|&line| is_nice_string(line)) as u32)
 }
 
-pub fn part2(input: &Vec<&[u8]>) -> Option<usize> {
+pub fn part2(input: &[&[u8]]) -> Option<usize> {
     let mut pairs = [0; 729];
     Some(input.iter().enumerate().count_by(|(idx, line)| is_nice_string2(line, idx, &mut pairs)))
 }

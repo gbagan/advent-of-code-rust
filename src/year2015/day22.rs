@@ -52,14 +52,14 @@ fn dijkstra(config: &Config, state: &State) -> Option<i16>{
         if hp <= 0 {
             continue;
         }
-        let mut state = state.clone();
+        let mut state = state;
         state.player_hp = hp;
         if apply_effects(&mut state) {
             return Some(consumed_mana);
         }
     
         if state.current_mana >= 53 {
-            let mut next = state.clone();
+            let mut next = state;
             next.current_mana -= 53;
             next.boss_hp -= 4;
             if next.boss_hp <= 0 || apply_effects(&mut next) {
@@ -71,7 +71,7 @@ fn dijkstra(config: &Config, state: &State) -> Option<i16>{
         }
 
         if state.current_mana >= 73 {
-            let mut next = state.clone();
+            let mut next = state;
             next.current_mana -= 73;
             next.boss_hp -= 2;
             next.player_hp += 2;
@@ -82,7 +82,7 @@ fn dijkstra(config: &Config, state: &State) -> Option<i16>{
         }
 
         if state.current_mana >= 113 && state.shield <= 1 {
-            let mut next = state.clone();
+            let mut next = state;
             next.current_mana -= 113;
             next.shield = 6;
             apply_effects(&mut next);
@@ -92,7 +92,7 @@ fn dijkstra(config: &Config, state: &State) -> Option<i16>{
         }
 
         if state.current_mana >= 173  && state.poison <= 1 {
-            let mut next = state.clone();
+            let mut next = state;
             next.current_mana -= 173;
             next.poison = 6;
             apply_effects(&mut next);
@@ -102,7 +102,7 @@ fn dijkstra(config: &Config, state: &State) -> Option<i16>{
         }
 
         if state.current_mana >= 229  && state.recharge <= 1 {
-            let mut next = state.clone();
+            let mut next = state;
             next.current_mana -= 229;
             next.recharge = 5;
             apply_effects(&mut next);

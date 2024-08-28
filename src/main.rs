@@ -35,13 +35,14 @@ macro_rules! solution {
 fn main() {
     let (command, arg_year, arg_day) = (args().nth(1), args().nth(2), args().nth(3));
     match command.as_deref() {
-        Some("solve") => solve(arg_year, arg_day),
+        Some("solve") => solve(arg_year, arg_day, true),
+        Some("time") => solve(arg_year, arg_day, false),
         Some("download") => download(&arg_year, &arg_day),
         _ => println!("Invalid command."),
     }
 }
 
-fn solve(arg_year: Option<String>, arg_day: Option<String>) {
+fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bool) {
     let solutions = solutions();
 
     let mut solved = 0;
@@ -61,24 +62,24 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>) {
 
             solved += 1;
             duration += elapsed;
-            println!("{year} Day {day}");
+            let microseconds = elapsed.as_micros();
+            let text = format!("{microseconds} μs");
+            let text =
+                if microseconds < 1000 {
+                    Green.paint(text)
+                } else if microseconds < 100_000 {
+                    Yellow.bold().paint(text)
+                } else {
+                Red.bold().paint(text)
+                };
+            println!("{year} Day {day} in {text} μs");
             match res  {
                 Err(str) => println!("  {}", str),
                 Ok((part1, part2)) => {
-                    println!("    Part 1: {part1}");
-                    println!("    Part 2: {part2}");
-                    let microseconds = elapsed.as_micros();
-                    let text = format!("    Elapsed: {} μs", microseconds);
-                    let text =
-                        if microseconds < 1000 {
-                            Green.paint(text)
-                        } else if microseconds < 100_000 {
-                            Yellow.bold().paint(text)
-                        } else {
-                        Red.bold().paint(text)
-                        };
-
-                    println!("{text}");
+                    if display_solution {
+                        println!("    Part 1: {part1}");
+                        println!("    Part 2: {part2}");
+                    }
                 }
             }
         } else {
@@ -160,6 +161,8 @@ fn solutions() -> Vec<Solution> {
         solution!(year2015, day23),
         solution!(year2015, day24),
         solution!(year2015, day25),
+
+        solution!(year2016, day20),
 
         solution!(year2017, day01),
         solution!(year2017, day02),

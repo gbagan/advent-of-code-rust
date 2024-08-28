@@ -7,7 +7,7 @@ fn hash(string: &[u8]) -> usize {
     string.iter().fold(0, |n, &c| (n + c as usize) * 17 % 256)
 }
 
-fn focusing_power(boxes: &Vec<Vec<Item>>) -> usize {
+fn focusing_power(boxes: &[Vec<Item>]) -> usize {
     boxes
         .iter()
         .enumerate()

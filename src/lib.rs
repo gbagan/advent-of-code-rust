@@ -30,6 +30,10 @@ pub mod year2015 {
     pub mod day25;
 }
 
+pub mod year2016 {
+    pub mod day20;
+}
+
 pub mod year2017 {
     pub mod day01;
     pub mod day02;

@@ -219,7 +219,7 @@ impl Sub for Coord3 {
         Self {
             x: self.x - other.x,
             y: self.y - other.y,
-            z: self.z - self.z,
+            z: self.z - other.z,
         }
     }
 }

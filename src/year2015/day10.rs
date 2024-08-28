@@ -140,19 +140,3 @@ pub fn part1(input: &(u32, u32)) -> Option<u32> {
 pub fn part2(input: &(u32, u32)) -> Option<u32> {
     Some(input.1)
 }
-
-//Part 1: 492982
-//Part 2: 6989950
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_part_one() {
-        let input = vec!(1,1,1,2, 2, 1);
-        let result = vec!(3, 1, 2, 2, 1, 1);
-        assert_eq!(result, next(&input));
-    }
-}

@@ -19,8 +19,8 @@ pub fn parse(input: &str) -> Option<Input> {
     let mut maps = vec!();
     while lines.next().is_some() {
         let mut map = vec!();
-        while let Some(line) = lines.next() {
-            if line.len() == 0 { break }
+        for line in lines.by_ref() {
+            if line.is_empty() { break }
             let (destination, source, length) = line.split(' ').next_tuple()?;
             let destination: i64 = destination.parse().ok()?;
             let source: i64 = source.parse().ok()?;
@@ -33,7 +33,7 @@ pub fn parse(input: &str) -> Option<Input> {
     Some(Input {seeds, maps})
 }
 
-fn step(seeds: &mut Vec<i64>, ranges: &Vec<ShiftRange>) {
+fn step(seeds: &mut [i64], ranges: &[ShiftRange]) {
     seeds.iter_mut().for_each(|seed| *seed =
         ranges
             .iter()

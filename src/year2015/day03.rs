@@ -15,7 +15,7 @@ pub fn part1(input: &str) -> Option<usize> {
             'v' => acc.1 += 1,
             _ => panic!("invalid direction: {dir}"),
         }
-        Some (acc.clone())
+        Some(*acc)
     });
     let mut visited: HashSet<(i32, i32)> = HashSet::from_iter(positions);
     visited.insert(origin);

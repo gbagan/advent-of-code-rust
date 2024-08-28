@@ -33,10 +33,10 @@ fn ribbon (Box {l, h, w}: &Box) -> u32 {
     l * h * w + 2 * (l+w).min(l+h).min(w+h)
 }
 
-pub fn part1(boxes: &Vec<Box>) -> Option<u32> {
+pub fn part1(boxes: &[Box]) -> Option<u32> {
     Some(boxes.iter().map(paper).sum())
 }
 
-pub fn part2(boxes: &Vec<Box>) -> Option<u32> {
+pub fn part2(boxes: &[Box]) -> Option<u32> {
     Some(boxes.iter().map(ribbon).sum())
 }

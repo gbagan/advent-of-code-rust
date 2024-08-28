@@ -41,7 +41,7 @@ pub trait AOCIter: Iterator {
         let mut seen = HashMap::new();
         for (i, x) in self.enumerate() {
             match seen.get(&x) {
-                None => { seen.insert(x, i); () }
+                None => { let _ = seen.insert(x, i); }
                 Some(&j) => return Some((j, i, x)),
             }
         }

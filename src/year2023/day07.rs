@@ -25,8 +25,8 @@ pub fn parse(input: &str) -> Option<Vec<Hand>> {
     Some(input.lines().filter_map(parse_hand).collect())
 }
 
-fn card_freq(cards: &Vec<char>) -> Vec<u64> {
-    let mut cards = cards.clone();
+fn card_freq(cards: &[char]) -> Vec<u64> {
+    let mut cards = cards.to_vec();
     cards.sort_unstable();
     let mut freqs = vec!();
     let mut counter = 0;
@@ -61,21 +61,21 @@ fn encode_score(cards: &[char], freq: &[u64]) -> u64 {
     score
 }
 
-fn hand_score(cards: &Vec<char>) -> u64 {
+fn hand_score(cards: &[char]) -> u64 {
     let freq = card_freq(cards);
     encode_score(cards, &freq)
 }
 
-fn hand_score2(cards: &Vec<char>) -> u64 {
-    let mut cards = cards.clone();
+fn hand_score2(cards: &[char]) -> u64 {
+    let mut cards = cards.to_vec();
     let nb_jokers = cards.iter().count_by(|&c| c == 'J');
-    for i in 0..5 {
-        if cards[i] == 'J' {
-            cards[i] = '1';
+    for card in cards.iter_mut() {
+        if *card == 'J' {
+            *card = '1';
         }
     }
     let mut freq = card_freq(&cards);
-    if freq.len() == 0 {
+    if freq.is_empty() {
         freq.push(nb_jokers as u64);
     } else {
         freq[0] += nb_jokers as u64;
@@ -85,13 +85,13 @@ fn hand_score2(cards: &Vec<char>) -> u64 {
 
 
 
-pub fn part1(hands: &Vec<Hand>) -> Option<usize> {
+pub fn part1(hands: &[Hand]) -> Option<usize> {
     let mut hands: Vec<_> = hands.iter().map(|(hand, bid)| (hand_score(hand), bid)).collect();
     hands.sort_unstable();
     Some(hands.iter().enumerate().map(|(i, c)| (i+1) * c.1).sum())
 }
 
-pub fn part2(hands: &Vec<Hand>) -> Option<usize> {
+pub fn part2(hands: &[Hand]) -> Option<usize> {
     let mut hands: Vec<_> = hands.iter().map(|(hand, bid)| (hand_score2(hand), bid)).collect();
     hands.sort_unstable();
     Some(hands.iter().enumerate().map(|(i, c)| (i+1) * c.1).sum())

@@ -72,7 +72,7 @@ fn build_equations(h: &Hailstone) -> Vec<Vec<i64>> {
         )
 }
 
-fn diff_equations(e1: &Vec<Vec<i64>>, e2: &Vec<Vec<i64>>) -> Vec<Vec<OrderedFloat<f64>>> {
+fn diff_equations(e1: &[Vec<i64>], e2: &[Vec<i64>]) -> Vec<Vec<OrderedFloat<f64>>> {
     let n = e1.len();
     let mut res = vec!();
     for i in 0..n {
@@ -85,7 +85,7 @@ fn diff_equations(e1: &Vec<Vec<i64>>, e2: &Vec<Vec<i64>>) -> Vec<Vec<OrderedFloa
     res
 }
 
-pub fn part2(hs: &Vec<Hailstone>) -> Option<i64> {
+pub fn part2(hs: &[Hailstone]) -> Option<i64> {
     let e1 = build_equations(&hs[0]);
     let e2 = build_equations(&hs[1]);
     let e3 = build_equations(&hs[2]);

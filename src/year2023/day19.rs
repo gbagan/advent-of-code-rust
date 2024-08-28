@@ -13,11 +13,11 @@ pub struct Step<'a> {
     pub instr: Instr<'a>,
 }
 
-fn parse_instr<'a>(s: &'a str) -> Instr<'a> {
+fn parse_instr(s: &str) -> Instr {
     match s {
         "A" => Instr::Accept,
         "R" => Instr::Reject,
-        _ => Instr::Goto(&s),
+        _ => Instr::Goto(s),
     }
 }
 
@@ -58,7 +58,7 @@ fn parse_rating(line: &str) -> Option<[u16; 4]> {
 pub fn parse(input: &str) -> Option<Input> {
     let mut workflows = HashMap::new();
     let mut lines = input.lines();
-    while let Some(line) = lines.next() {
+    for line in lines.by_ref() {
         if line.is_empty() {
             break
         } else if let Some((name, workflow)) = parse_workflow(line) {

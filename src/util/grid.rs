@@ -77,7 +77,7 @@ impl<T> Index<(usize, usize)> for Grid<T> {
 
     #[inline]
     fn index(&self, p: (usize, usize)) -> &Self::Output {
-        &self.vec[self.width * p.1 as usize + p.0]
+        &self.vec[self.width * p.1 + p.0]
     }
 }
 
