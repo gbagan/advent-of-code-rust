@@ -72,7 +72,7 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
                 } else {
                 Red.bold().paint(text)
                 };
-            println!("{year} Day {day} in {text} μs");
+            println!("{year} Day {day} in {text}.");
             match res  {
                 Err(str) => println!("  {}", str),
                 Ok((part1, part2)) => {

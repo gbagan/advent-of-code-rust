@@ -44,22 +44,14 @@ fn parse_sequence(text: &[u8], i: usize) -> Result {
     while j < n && text[j] != b')' {
         let res = parse_term(text, j+1);
         match text[j] {
-            b'*' => {
-                value *= res.value;
-            }
-            b'+' => {
-                value += res.value;
-            }
+            b'*' => value *= res.value,
+            b'+' => value += res.value,
             _ => panic!("unexcepted character: '{}'", text[i])
         }
         j = skip_spaces(text, res.next);
     }
     Result {value, next: j}
 }
-
-
-
-
 
 fn parse_term2(text: &[u8], i: usize) -> Result {
     let i = skip_spaces(text, i);
@@ -77,10 +69,9 @@ fn parse_term2(text: &[u8], i: usize) -> Result {
 fn parse_sequence2(text: &[u8], i: usize) -> Result {
     let n = text.len();
     let mut value = 1;
-    let mut value2;
     let res = parse_term2(text, i);
     let mut j = skip_spaces(text, res.next);
-    value2 = res.value;
+    let mut value2 = res.value;
     while j < n && text[j] != b')' {
         let res = parse_term2(text, j+1);
         match text[j] {
@@ -105,7 +96,7 @@ pub fn parse(input: &str) -> Option<Vec<&str>> {
 
 pub fn part1(lines: &[&str]) -> Option<u64> {
     Some(lines
-            .into_iter()
+            .iter()
             .map(|line| parse_sequence(line.as_bytes(), 0).value)
             .sum::<u64>()
         )
@@ -113,7 +104,7 @@ pub fn part1(lines: &[&str]) -> Option<u64> {
 
 pub fn part2(lines: &[&str]) -> Option<u64> {
     Some(lines
-            .into_iter()
+            .iter()
             .map(|line| parse_sequence2(line.as_bytes(), 0).value)
             .sum::<u64>()
         )
