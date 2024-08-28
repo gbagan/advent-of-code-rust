@@ -20,7 +20,7 @@ pub fn part1(input: &str) -> Option<i32> {
 
 struct Parsed {
     value: i32,
-    end: usize,
+    next: usize,
     ignore: bool
 }
 
@@ -48,7 +48,7 @@ fn parse_number(text: &[u8], i: usize) -> Parsed {
         j+=1;
     }
     value *= sign;
-    Parsed { value, end: j, ignore: false } 
+    Parsed { value, next: j, ignore: false } 
 }
 
 fn parse_string(text: &[u8], i: usize) -> Parsed {
@@ -56,7 +56,7 @@ fn parse_string(text: &[u8], i: usize) -> Parsed {
     while text[j] != b'"' {
         j+=1;
     }
-    Parsed {value: 0, end:j+1, ignore: &text[i+1..j] == RED}
+    Parsed {value: 0, next:j+1, ignore: &text[i+1..j] == RED}
 }
 
 
@@ -66,9 +66,9 @@ fn parse_array(text: &[u8], i: usize) -> Parsed {
     while text[j] != b']' {
         let parsed = parse_json(text, j+1);
         value += parsed.value;
-        j = parsed.end;
+        j = parsed.next;
     }
-    Parsed {value, end: j+1, ignore: false}
+    Parsed {value, next: j+1, ignore: false}
 }
 
 fn parse_object(text: &[u8], i: usize) -> Parsed {
@@ -82,12 +82,12 @@ fn parse_object(text: &[u8], i: usize) -> Parsed {
         let parsed = parse_json(text, j+1);
         value += parsed.value;
         ignored = ignored || parsed.ignore;
-        j = parsed.end;
+        j = parsed.next;
     }
     if ignored {
         value = 0;
     }
-    Parsed {value, end: j+1, ignore: false}
+    Parsed {value, next: j+1, ignore: false}
 }
 
 
