@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use std::collections::HashSet;
-use crate::util::heap::MinHeap;
+use crate::util::{heap::MinHeap, parser::*};
 
 struct Config {
     boss_damage: i16,
@@ -18,9 +18,7 @@ struct State {
 }
 
 pub fn solve(input: &str) -> Option<(i16, i16)> {
-    let (line1, line2) = input.lines().next_tuple()?;
-    let boss_hp = line1.split(' ').nth(2).and_then(|s| s.parse().ok())?;
-    let boss_damage = line2.split(' ').nth(1).and_then(|s| s.parse().ok())?;
+    let (boss_hp, boss_damage) = input.iter_unsigned().next_tuple()?;
 
     let p1 = simulate(boss_hp, boss_damage, false)?;
     let p2 = simulate(boss_hp, boss_damage, false)?;

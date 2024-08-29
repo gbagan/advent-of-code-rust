@@ -1,4 +1,4 @@
-    use crate::util::iter::AOCIter;
+use crate::util::iter::*;
 
 type Hand<'a> = (&'a [u8], usize);
 

@@ -1,10 +1,8 @@
 use itertools::Itertools;
-use crate::util::power;
+use crate::util::{parser::*, power};
 
 pub fn solve(input: &str) -> Option<(u64, u64)> {
-    let (row, _, col) = input.trim().split(' ').skip(16).next_tuple()?;
-    let row: u64 = row.trim_end_matches(',').parse().ok()?;
-    let col: u64 = col.trim_end_matches('.').parse().ok()?;
+    let (row, col) = input.iter_unsigned().next_tuple()?;
     let p1 = part1(row, col);
     Some((p1, 0))
 }

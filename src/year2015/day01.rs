@@ -5,20 +5,20 @@ pub fn solve(input: &str) -> Option<(i32, usize)> {
 }
 
 pub fn part1(input: &str) -> i32 {
-    input.chars().fold(0, |acc, chr|
+    input.bytes().fold(0, |acc, chr|
         match chr {
-            '(' => acc + 1,
-            ')' => acc - 1,
+            b'(' => acc + 1,
+            b')' => acc - 1,
             _ => acc
         }
     )
 }
 
 pub fn part2(input: &str) -> Option<usize> {
-    input.chars().scan(0, |acc, chr| {
+    input.bytes().scan(0, |acc, chr| {
         match chr {
-            '(' => *acc += 1,
-            ')' => *acc -= 1,
+            b'(' => *acc += 1,
+            b')' => *acc -= 1,
             _ => ()
         };
         Some(*acc)

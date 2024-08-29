@@ -1,7 +1,9 @@
 // dynamic programming
 
+use crate::util::parser::*;
+
 pub fn solve(input: &str) -> Option<(u32, u32)> {
-    let numbers: Vec<_> = input.lines().filter_map(|line| line.parse().ok()).collect();
+    let numbers: Vec<_> = input.iter_unsigned().collect();
     let p1 = solve1(&numbers, 150);
     let p2 = solve2(&numbers, 150)?;
     Some((p1, p2))

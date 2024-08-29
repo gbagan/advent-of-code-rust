@@ -1,5 +1,6 @@
 use rayon::prelude::*;
 use itertools::Itertools;
+use crate::util::parser::*;
 
 pub struct Ingredient {
     capacity: i32,
@@ -9,18 +10,11 @@ pub struct Ingredient {
     calories: i32,
 }
 
-fn parse_ingredient(line: &str) -> Option<Ingredient> {
-    let (capacity, _, durability, _, flavor, _, texture, _, calories) = line.split(' ').skip(2).next_tuple()?;
-    let capacity = capacity.trim_end_matches(',').parse().ok()?;
-    let durability = durability.trim_end_matches(',').parse().ok()?;
-    let flavor = flavor.trim_end_matches(',').parse().ok()?;
-    let texture = texture.trim_end_matches(',').parse().ok()?;
-    let calories = calories.parse().ok()?;
-    Some(Ingredient { capacity, durability, flavor, texture, calories})
-}
-
 pub fn solve(input: &str) -> Option<(i32, i32)> {
-    let ingredients: Vec<_> = input.lines().filter_map(parse_ingredient).collect();
+    let mut ingredients = vec!();
+    for (capacity, durability, flavor, texture, calories) in input.iter_unsigned().tuples() {
+        ingredients.push(Ingredient { capacity, durability, flavor, texture, calories });
+    }
     let p1 = part1(&ingredients)?;
     let p2 = part2(&ingredients);
     Some((p1, p2))

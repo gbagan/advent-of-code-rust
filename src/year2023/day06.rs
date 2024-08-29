@@ -1,19 +1,11 @@
-use itertools::Itertools;
+use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Option<(u64, u64)> {
-    let (line1, line2) = input.lines().next_tuple()?;
-    let times: Vec<_> = line1
-                .split_ascii_whitespace()
-                .skip(1)
-                .filter_map(|s| s.parse().ok())
-                .collect();
-    let distances: Vec<_> = line2
-                .split_ascii_whitespace()
-                .skip(1)
-                .filter_map(|s| s.parse().ok())
-                .collect();
+    let (line1, line2) = input.split_once('\n')?;
+    let times: Vec<_> = line1.iter_unsigned().collect();
+    let distances: Vec<_> = line2.iter_unsigned().collect();
     let p1 = part1(&times, &distances);
-    let p2 = part2(&times, &distances);
+    let p2 = part2(line1, line2);
     Some((p1, p2))
 }
 
@@ -33,8 +25,8 @@ pub fn part1(times: &[u64], distances: &[u64]) -> u64 {
         .map(|(t, d)| solve_race(*t, *d)).product()
 }
 
-pub fn part2(times: &[u64], distances: &[u64]) -> u64 {
-    let time = times.iter().map(|t| t.to_string()).join("").parse().unwrap();
-    let distance = distances.iter().map(|t| t.to_string()).join("").parse().unwrap();
+pub fn part2(line1: &str, line2: &str) -> u64 {
+    let time = line1.chars().filter(char::is_ascii_digit).collect::<String>().parse().unwrap();
+    let distance = line2.chars().filter(char::is_ascii_digit).collect::<String>().parse().unwrap();
     solve_race(time, distance)
 }

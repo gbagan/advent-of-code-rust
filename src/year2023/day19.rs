@@ -3,12 +3,6 @@ use itertools::Itertools;
 
 type Workflows<'a> = HashMap<&'a str, Vec<Step<'a>>>;
 
-/*pub struct Input<'a> {
-    pub workflows: ,
-    pub ratings: Vec<[u16; 4]>
-}
-*/
-
 pub enum Instr<'a> { Accept, Reject, Goto(&'a str) }
 pub enum Test { LT(usize, u16), GT(usize, u16), Otherwise }
 pub struct Step<'a> {

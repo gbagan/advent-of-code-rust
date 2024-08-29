@@ -1,5 +1,6 @@
 use std::cmp::min;
 use itertools::Itertools;
+use crate::util::parser::*;
 
 pub struct Reindeer {
     speed: u32,
@@ -7,16 +8,12 @@ pub struct Reindeer {
     cycle: u32,
 }
 
-fn parse_reindeer(input: &str) -> Option<Reindeer> {
-    let (speed, _, _, duration, _, _, _, _, _, _, rest) = input.split(' ').skip(3).next_tuple()?;
-    let speed = speed.parse().ok()?;
-    let duration = duration.parse().ok()?;
-    let rest: u32 = rest.parse().ok()?;
-    Some(Reindeer { speed, duration, cycle: duration + rest})
-}
-
 pub fn solve(input: &str) -> Option<(u32, u16)> {
-    let reindeers: Vec<_> = input.lines().filter_map(parse_reindeer).collect();
+    let reindeers: Vec<_> = input
+                            .iter_unsigned()
+                            .tuples()
+                            .map(|(speed, duration, rest)| Reindeer{speed, duration, cycle: duration + rest})
+                            .collect();
     let p1 = reindeers.iter().map(|r| distance(r, 2503)).max()?;
     let p2 = part2(&reindeers)?;
     Some((p1, p2))
@@ -38,8 +35,8 @@ fn step(reindeer: &Reindeer, i: u32) -> u32 {
 
 pub fn part2(reindeers: &[Reindeer]) -> Option<u16> {
     let n = reindeers.len();
-    let mut distances: Vec<u32> = reindeers.iter().map(|_| 0).collect(); 
-    let mut scores: Vec<u16> = reindeers.iter().map(|_| 0).collect();
+    let mut distances: Vec<u32> = vec![0; n]; 
+    let mut scores: Vec<u16> = vec![0; n];
     for i in 0..2503 {
         for j in 0..n {
             distances[j] += step(&reindeers[j], i);

@@ -15,11 +15,12 @@ fn line_parser(input: &str) -> IResult<&str, u64> {
     u64(input)
 }
 
-fn input_parser(input: &str) -> IResult<&str, (u64, u64)> {
-    let (input, a) = line_parser(input)?;
-    let (input, _) = line_ending(input)?;
-    let (input, b) = line_parser(input)?;
-    Ok((input, (a, b)))
+fn solve(input: &str) -> Option<(usize, usize)> {
+    let (line1, line2) = input.lines().next_tuple()?;
+    let a = line1.split_ascii_whitespace().nth(4).and_then(|s| s.parse().ok())?;
+    let b = line2.split_ascii_whitespace().nth(4).and_then(|s| s.parse().ok())?;
+    
+    Some((0, 0))
 }
 
 #[inline]

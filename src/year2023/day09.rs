@@ -1,3 +1,5 @@
+use crate::util::parser::*;
+
 fn pascal_triangle(n: usize) -> Vec<i64> {
     let mut c = 1;
     let mut triangle = Vec::with_capacity(n+1);
@@ -17,7 +19,7 @@ pub fn solve(input: &str) -> Option<(i64, i64)> {
     let mut prev_n = 0;
     let mut triangle = vec!();
     for line in input.lines() {
-        let values: Vec<i64> = line.split(' ').filter_map(|x| x.parse().ok()).collect();
+        let values: Vec<i64> = line.iter_unsigned().collect();
         let n = values.len();
         if n != prev_n {
             triangle = pascal_triangle(n);

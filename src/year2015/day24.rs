@@ -1,8 +1,10 @@
 // dynamic programming
 // subset sum
 
+use crate::util::parser::*;
+
 pub fn solve(input: &str) -> Option<(u64, u64)> {
-    let numbers: Vec<_> = input.lines().filter_map(|line| line.parse().ok()).collect();
+    let numbers: Vec<_> = input.iter_unsigned().collect();
     let p1 = subset_sum(&numbers,  numbers.iter().sum::<u64>() / 3)?;
     let p2 = subset_sum(&numbers,  numbers.iter().sum::<u64>() / 4)?;
     Some((p1, p2))

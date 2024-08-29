@@ -2,12 +2,12 @@
 
 use rayon::prelude::*;
 
-use crate::util::grid::Grid;
+use crate::util::{grid::Grid, parser::*};
 
 fn parse_line(line: &str) -> Option<(&[u8], Vec<u8>)> {
     let (springs, groups) = line.split_once(' ')?;
     let springs = springs.as_bytes();
-    let groups = groups.split(',').filter_map(|x| x.parse().ok()).collect();
+    let groups = groups.iter_unsigned().collect();
     Some((springs, groups))
 }
 

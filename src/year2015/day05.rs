@@ -1,12 +1,17 @@
-use crate::util::iter::AOCIter;
-
 pub fn solve(input: &str) -> Option<(u32, usize)> {
-    let lines: Vec<_> = input.lines().map(str::as_bytes).collect();
-
-    let p1 = lines.iter().count_by(|&line| is_nice_string(line)) as u32;
-    
+    let mut p1 = 0;
+    let mut p2 = 0;
     let mut pairs = [0; 729];
-    let p2 = lines.iter().enumerate().count_by(|(idx, line)| is_nice_string2(line, idx, &mut pairs));
+    
+    for (i, line) in input.lines().enumerate() {
+        let line = line.as_bytes();
+        if is_nice_string(line) {
+            p1 += 1;
+        }
+        if is_nice_string2(line, i, &mut pairs) {
+            p2 += 1;
+        }
+    }
     Some((p1, p2))
 
 }

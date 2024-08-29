@@ -43,7 +43,21 @@ impl<T: Copy> Grid<T> {
             vec,
         }
     }
+
+    pub fn generate<F>(width: usize, height: usize, mut f: F) -> Grid<T> 
+        where F: FnMut(usize, usize) -> T
+    {
+        let mut vec = Vec::with_capacity(width * height);
+        for y in 0..height {
+            for x in 0..width {
+                vec.push(f(x, y));
+            }
+        }
+
+        Grid { width, height: width, vec }
+    }
 }
+
 
 impl<T> Index<Coord> for Grid<T> {
     type Output = T;

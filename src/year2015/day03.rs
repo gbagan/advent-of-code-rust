@@ -1,18 +1,19 @@
 use std::collections::HashSet;
 
 pub fn solve(input: &str) -> Option<(usize, usize)> {
-    Some((part1(input), part2(input)))
+    let bytes = input.trim().as_bytes();
+    Some((part1(bytes), part2(bytes)))
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(bytes: &[u8]) -> usize {
     let origin: (i32, i32) = (0, 0);
 
-    let positions = input.chars().scan(origin, |acc, dir| {
+    let positions = bytes.iter().scan(origin, |acc, dir| {
         match dir {
-            '<' => acc.0 -= 1,
-            '>' => acc.0 += 1,
-            '^' => acc.1 -= 1,
-            'v' => acc.1 += 1,
+            b'<' => acc.0 -= 1,
+            b'>' => acc.0 += 1,
+            b'^' => acc.1 -= 1,
+            b'v' => acc.1 += 1,
             _ => panic!("invalid direction: {dir}"),
         }
         Some(*acc)
@@ -22,25 +23,25 @@ pub fn part1(input: &str) -> usize {
     visited.len()
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(bytes: &[u8]) -> usize {
     let origin: (isize, isize) = (0, 0);
 
-    let positions = input.chars().enumerate().scan((origin, origin), |(acc1, acc2), (i, dir)| {
+    let positions = bytes.iter().enumerate().scan((origin, origin), |(acc1, acc2), (i, dir)| {
         if i % 2 == 0 {
             match dir {
-                '<' => acc1.0 -= 1,
-                '>' => acc1.0 += 1,
-                '^' => acc1.1 -= 1,
-                'v' => acc1.1 += 1,
+                b'<' => acc1.0 -= 1,
+                b'>' => acc1.0 += 1,
+                b'^' => acc1.1 -= 1,
+                b'v' => acc1.1 += 1,
                 _ => panic!("invalid direction: {dir}"),
             }
             Some (*acc1)
         } else {
             match dir {
-                '<' => acc2.0 -= 1,
-                '>' => acc2.0 += 1,
-                '^' => acc2.1 -= 1,
-                'v' => acc2.1 += 1,
+                b'<' => acc2.0 -= 1,
+                b'>' => acc2.0 += 1,
+                b'^' => acc2.1 -= 1,
+                b'v' => acc2.1 += 1,
                 _ => panic!("invalid direction: {dir}"),
             }
             Some (*acc2)

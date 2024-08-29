@@ -1,3 +1,5 @@
+// connected components
+
 fn parse_node(line: &str) -> Option<Vec<usize>> {
     let (_, nbors) = line.split_once("<-> ")?;
     Some(nbors.split(", ").filter_map(|v| v.parse().ok()).collect())

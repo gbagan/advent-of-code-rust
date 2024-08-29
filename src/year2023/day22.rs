@@ -4,20 +4,12 @@
 use std::collections::HashMap;
 
 use itertools::Itertools;
-use crate::util::{coord::Coord3, grid::Grid, iter::AOCIter};
+use crate::util::{coord::Coord3, grid::Grid, iter::*, parser::*};
 
 type Dominators = Vec<(usize, u32)>;
 
-fn parse_line(input: &str) -> Option<(Coord3, Coord3)> {
-    let (left, right) = input.split_once('~')?;
-    let (x1, y1, z1) = left.split(',').next_tuple()?;
-    let (x2, y2, z2) = right.split(',').next_tuple()?;
-    let x1 = x1.parse().ok()?;
-    let y1 = y1.parse().ok()?;
-    let z1 = z1.parse().ok()?;
-    let x2 = x2.parse().ok()?;
-    let y2 = y2.parse().ok()?;
-    let z2 = z2.parse().ok()?;
+fn parse_line(line: &str) -> Option<(Coord3, Coord3)> {
+    let (x1, y1, z1, x2, y2, z2) = line.iter_unsigned().next_tuple()?;
     let p1 = Coord3::new(x1, y1, z1);
     let p2 = Coord3::new(x2, y2, z2);
     Some((p1.min(p2), p1.max(p2)))

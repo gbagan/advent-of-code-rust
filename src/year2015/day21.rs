@@ -1,6 +1,8 @@
 use itertools::Itertools;
 use lazy_static::lazy_static;
 
+use crate::util::parser::ParseIter;
+
 struct Boss {
     hp: i32,
     damage: i32,
@@ -48,10 +50,7 @@ lazy_static! {
 }
 
 pub fn solve(input: &str) -> Option<(i32, i32)> {
-    let (line1, line2, line3) = input.lines().next_tuple()?;
-    let hp = line1.split(' ').nth(2).and_then(|w| w.parse().ok())?;
-    let damage = line2.split(' ').nth(1).and_then(|w| w.parse().ok())?;
-    let armor = line3.split(' ').nth(1).and_then(|w| w.parse().ok())?;
+    let (hp, damage, armor) = input.iter_unsigned().next_tuple()?;
     let boss = Boss { hp, damage, armor};
 
     let p1 = part1(&boss)?;

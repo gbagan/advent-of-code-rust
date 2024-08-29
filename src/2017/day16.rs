@@ -55,7 +55,7 @@ fn compose_dance(d1: &Dance, d2: &Dance) -> Dance {
 fn main() {
     let input = include_str!("../../inputs/2017/16");
     aoc_with_parser(input, input_parser, |moves| {
-        let programs: Vec<_> = "abcdefghijklmnop".chars().collect();
+        let programs = b"abcdefghijklmnop";
         let dance = perform_dance(&moves);
     
         let p1 = (&dance.1 >> &dance.0).apply(&programs);

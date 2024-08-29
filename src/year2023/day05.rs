@@ -1,4 +1,4 @@
-use crate::util::range::Range;
+use crate::util::{parser::*, range::Range};
 use itertools::Itertools;
 
 struct ShiftRange {
@@ -8,18 +8,15 @@ struct ShiftRange {
 
 pub fn solve(input: &str) -> Option<(i64, i64)> {
     let mut lines = input.lines();
-    let (seeds, _) = lines.next_tuple()?;
-    let seeds: Vec<i64> = seeds.split(' ').skip(1).filter_map(|s| s.parse().ok()).collect();
+    let (line, _) = lines.next_tuple()?;
+    let seeds: Vec<i64> = line.iter_unsigned().collect();
     
     let mut maps = vec!();
     while lines.next().is_some() {
         let mut map = vec!();
         for line in lines.by_ref() {
             if line.is_empty() { break }
-            let (destination, source, length) = line.split(' ').next_tuple()?;
-            let destination: i64 = destination.parse().ok()?;
-            let source: i64 = source.parse().ok()?;
-            let length: i64 = length.parse().ok()?;
+            let (destination, source, length) = line.iter_unsigned().next_tuple()?;
             let range = Range{lower: source, upper: source+length-1};
             map.push(ShiftRange {range, shift: destination - source});
         }

@@ -56,7 +56,6 @@ fn reflect2(encoding: &[u32]) -> Option<usize> {
     })
 }
 
-
 pub fn solve(input: &str) -> Option<(usize, usize)> {
     let mut p1 = 0;
     let mut p2 = 0;

@@ -1,12 +1,12 @@
 use crate::util::iter::AOCIter;
 
 fn diff1(s: &str) -> u32 {
-    let mut chars = s.chars();
+    let mut chars = s.bytes();
     let mut count = 0;
     while let Some(c) = chars.next() {
-        if c=='\\' {
+        if c==b'\\' {
             match chars.next() {
-                Some('x') => {
+                Some(b'x') => {
                     chars.next();
                     chars.next();
                     count += 3;
@@ -20,7 +20,7 @@ fn diff1(s: &str) -> u32 {
 }
 
 fn diff2(s: &str) -> u32 {
-    2 + s.chars().count_by(|c| c == '\\' || c == '"') as u32
+    2 + s.bytes().count_by(|c| c == b'\\' || c == b'"') as u32
 }
 
 pub fn solve(input: &str) -> Option<(u32, u32)> {

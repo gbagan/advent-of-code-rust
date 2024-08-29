@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
-use crate::util::math::solve_linear_system;
+use crate::util::{math::solve_linear_system, parser::*};
 
 pub struct Hailstone {
     pub px: i64,
@@ -12,15 +12,7 @@ pub struct Hailstone {
 } 
 
 fn parse_line(line: &str) -> Option<Hailstone>{
-    let (position, velocity) = line.split_once(" @ ")?;
-    let (px, py, pz) = position.split(", ").next_tuple()?;
-    let px = px.parse().ok()?;
-    let py = py.parse().ok()?;
-    let pz = pz.parse().ok()?;
-    let (vx, vy, vz) = velocity.split(", ").next_tuple()?;
-    let vx = vx.parse().ok()?;
-    let vy = vy.parse().ok()?;
-    let vz = vz.parse().ok()?;
+    let (px, py, pz, vx, vy, vz) = line.iter_unsigned().next_tuple()?;
     Some(Hailstone {px, py, pz, vx, vy, vz})
 }
 
