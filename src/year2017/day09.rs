@@ -1,4 +1,4 @@
-pub fn parse(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Option<(u32, u32)> {
     let mut p1 = 0;
     let mut p2 = 0;
     let mut it = input.chars();
@@ -25,19 +25,10 @@ pub fn parse(input: &str) -> Option<(u32, u32)> {
     Some((p1, p2))
 }
 
-pub fn part1(solutions: &(u32, u32)) -> Option<u32> {
-    Some(solutions.0)
-}
-
-pub fn part2(solutions: &(u32, u32)) -> Option<u32> {
-    Some(solutions.1)
-}
-
-
 #[test]
 fn part1_test() {
     let input = "{{{},{},{{}}}}";
-    assert_eq!(parse(input), Some((16, 0))); 
+    assert_eq!(solve(input), Some((16, 0))); 
     let input = "{{<a!>},{<a!>},{<a!>},{<ab>}}";
-    assert_eq!(parse(input), Some((3, 17))); 
+    assert_eq!(solve(input), Some((3, 17))); 
 }

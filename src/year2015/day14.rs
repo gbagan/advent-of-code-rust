@@ -15,8 +15,11 @@ fn parse_reindeer(input: &str) -> Option<Reindeer> {
     Some(Reindeer { speed, duration, cycle: duration + rest})
 }
 
-pub fn parse(input: &str) -> Option<Vec<Reindeer>> {
-    Some(input.lines().filter_map(parse_reindeer).collect())
+pub fn solve(input: &str) -> Option<(u32, u16)> {
+    let reindeers: Vec<_> = input.lines().filter_map(parse_reindeer).collect();
+    let p1 = reindeers.iter().map(|r| distance(r, 2503)).max()?;
+    let p2 = part2(&reindeers)?;
+    Some((p1, p2))
 }
 
 
@@ -32,9 +35,6 @@ fn step(reindeer: &Reindeer, i: u32) -> u32 {
     if i % cycle < duration {speed} else {0}
 }
 
-pub fn part1(reindeers: &[Reindeer]) -> Option<u32> {
-    reindeers.iter().map(|r| distance(r, 2503)).max()
-}
 
 pub fn part2(reindeers: &[Reindeer]) -> Option<u16> {
     let n = reindeers.len();

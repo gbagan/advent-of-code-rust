@@ -1,10 +1,10 @@
 use std::collections::HashSet;
 
-pub fn parse(input: &str) -> Option<&str> {
-    Some(input)
+pub fn solve(input: &str) -> Option<(usize, usize)> {
+    Some((part1(input), part2(input)))
 }
 
-pub fn part1(input: &str) -> Option<usize> {
+pub fn part1(input: &str) -> usize {
     let origin: (i32, i32) = (0, 0);
 
     let positions = input.chars().scan(origin, |acc, dir| {
@@ -19,10 +19,10 @@ pub fn part1(input: &str) -> Option<usize> {
     });
     let mut visited: HashSet<(i32, i32)> = HashSet::from_iter(positions);
     visited.insert(origin);
-    Some(visited.len())
+    visited.len()
 }
 
-pub fn part2(input: &str) -> Option<usize> {
+pub fn part2(input: &str) -> usize {
     let origin: (isize, isize) = (0, 0);
 
     let positions = input.chars().enumerate().scan((origin, origin), |(acc1, acc2), (i, dir)| {
@@ -48,5 +48,5 @@ pub fn part2(input: &str) -> Option<usize> {
     });
     let mut visited: HashSet<(isize, isize)> = HashSet::from_iter(positions);
     visited.insert(origin);
-    Some(visited.len())
+    visited.len()
 }

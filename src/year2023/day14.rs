@@ -16,7 +16,7 @@ pub struct Input {
     next_cube_east: Vec::<i16>,
 }
 
-pub fn parse(input: &str) -> Option<Input> {
+pub fn solve(input: &str) -> Option<(usize, usize)> {
     let parsed = Grid::parse(input);
     let mut grid = Grid::new(parsed.width+2, parsed.height+2, b'#');
     let mut rounded = vec!();
@@ -77,10 +77,15 @@ pub fn parse(input: &str) -> Option<Input> {
     let next_cube_west = next_cube_west.vec;
     let next_cube_east = next_cube_east.vec;
 
-    Some(Input {rounded, north_cubes, south_cubes, west_cubes, east_cubes,
+    let input = Input {rounded, north_cubes, south_cubes, west_cubes, east_cubes,
         next_cube_north, next_cube_south, next_cube_west,  next_cube_east,
         width: grid.width, height: grid.height,
-    })
+    };
+
+    let p1 = part1(&input);
+    let p2 = part2(&input);
+    Some((p1, p2))
+
 }
 
 fn tilt(rounded: &mut [i16], cubes: &[i16], next_cube: &[i16], direction: i16) -> Vec<i16> {
@@ -96,10 +101,10 @@ fn tilt(rounded: &mut [i16], cubes: &[i16], next_cube: &[i16], direction: i16) -
 }
 
 
-pub fn part1(input: &Input) -> Option<usize> {
+pub fn part1(input: &Input) -> usize {
     let mut rounded = input.rounded.clone();
     tilt(&mut rounded, &input.north_cubes, &input.next_cube_north, input.width as i16);
-    Some(rounded.iter().map(|&i| input.height - 1 - (i as usize / input.width)).sum())
+    rounded.iter().map(|&i| input.height - 1 - (i as usize / input.width)).sum()
 }
 
 pub fn step(rounded: &[i16], input: &Input) -> (Vec<i16>, Vec<i16>) {
@@ -111,8 +116,8 @@ pub fn step(rounded: &[i16], input: &Input) -> (Vec<i16>, Vec<i16>) {
     (rounded, state)
 }
 
-pub fn part2(input: &Input) -> Option<usize> {
+pub fn part2(input: &Input) -> usize {
     let (rounded, _) =  many_times_on(1_000_000_000, (input.rounded.clone(), vec!()), |p| p.1.clone(),
                                 |p| step(&p.0, input));
-    Some(rounded.iter().map(|&i| input.height - 1 - (i as usize / input.width)).sum())
+    rounded.iter().map(|&i| input.height - 1 - (i as usize / input.width)).sum()
 }

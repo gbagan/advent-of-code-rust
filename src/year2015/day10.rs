@@ -109,7 +109,7 @@ fn freqs_size(freqs: &[u32]) -> u32 {
     .sum()
 }
 
-pub fn parse(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Option<(u32, u32)> {
     let sequence = input.trim();
     let init = CONWAY_TABLE.iter().position(|(seq, _)| *seq == sequence)?;
 
@@ -131,12 +131,4 @@ fn next(freqs: &[u32]) -> [u32; 92] {
         }
     }
     output
-}
-
-pub fn part1(input: &(u32, u32)) -> Option<u32> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(u32, u32)) -> Option<u32> {
-    Some(input.1)
 }

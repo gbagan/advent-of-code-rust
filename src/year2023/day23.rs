@@ -149,13 +149,16 @@ fn graph_to_grid(graph: &[Vec<(usize, u32)>]) -> GridGraph {
 
 }
 
-pub fn parse(input: &str) -> Option<GridGraph> {
+pub fn solve(input: &str) -> Option<(u32, u32)> {
     let grid = Grid::parse(input);
     let graph = compress_grid(&grid);
-    Some(graph_to_grid(&graph))
+    let grid = graph_to_grid(&graph);
+    let p1 = part1(&grid);
+    let p2 = part2(&grid);
+    Some((p1, p2))
 }
 
-pub fn part1(grid: &GridGraph) -> Option<u32> {
+fn part1(grid: &GridGraph) -> u32 {
     let mut dist = [[0; 6]; 6];
     for x in 0..6 {
         for y in 0..6 {
@@ -167,12 +170,11 @@ pub fn part1(grid: &GridGraph) -> Option<u32> {
             }
         }
     }
-    Some(dist[5][5] + grid.extremities)
-    //Some(longest_path(&graph))
+    dist[5][5] + grid.extremities
 }
 
 
-pub fn part2(grid: &GridGraph) -> Option<u32> {
+fn part2(grid: &GridGraph) -> u32 {
     let mut state = HashMap::new();
     state.insert(vec!(0), 0);
     for y in 0..6 {
@@ -192,7 +194,7 @@ pub fn part2(grid: &GridGraph) -> Option<u32> {
             state = filter_isolated_paths(&state);
         }
     }
-    Some(state[&vec!(35)] + grid.extremities)
+    state[&vec!(35)] + grid.extremities
 }
 
 

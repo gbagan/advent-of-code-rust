@@ -42,7 +42,7 @@ fn count_arrangements(springs: &[u8], groups: &[u8]) -> u64 {
     table[(0, 0)]
 }
 
-pub fn parse(input: &str) -> Option<(u64, u64)> {
+pub fn solve(input: &str) -> Option<(u64, u64)> {
     let puzzles: Vec<_> = input.lines().filter_map(parse_line).collect();
     let p1 = puzzles.iter().map(|(springs, groups)| {
         let mut springs = springs.to_vec();
@@ -62,12 +62,4 @@ pub fn parse(input: &str) -> Option<(u64, u64)> {
     }).sum();
 
     Some((p1, p2))
-}
-
-pub fn part1(input: &(u64, u64)) -> Option<u64> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(u64, u64)) -> Option<u64> {
-    Some(input.1)
 }

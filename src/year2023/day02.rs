@@ -1,6 +1,6 @@
 use itertools::Itertools;
 
-pub fn parse(input: &str) -> Option<(usize, u32)> {
+pub fn solve(input: &str) -> Option<(usize, u32)> {
     let mut p1 = 0;
     let mut p2 = 0;
     for (i, line) in input.lines().enumerate() {
@@ -37,12 +37,4 @@ pub fn parse(input: &str) -> Option<(usize, u32)> {
 
     }
     Some((p1, p2))
-}
-
-pub fn part1(input: &(usize, u32)) -> Option<usize> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(usize, u32)) -> Option<u32> {
-    Some(input.1)
 }

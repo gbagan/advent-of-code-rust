@@ -1,8 +1,8 @@
-// use Shoelace formula and Pick theorem for Part 2
+// Shoelace formula and Pick theorem for Part 2
 
 use crate::util::{coord::Coord, grid::Grid};
 
-pub fn parse(input: &str) -> Option<(i32,i32)> {
+pub fn solve(input: &str) -> Option<(i32,i32)> {
     let grid = Grid::parse(input);
     let mut start = None;
     for y in 0..grid.height {
@@ -34,12 +34,4 @@ pub fn parse(input: &str) -> Option<(i32,i32)> {
     let p1 = length / 2;
     let p2 = (area.abs() - length) / 2 + 1;
     Some((p1, p2))
-}
-
-pub fn part1(input: &(i32, i32)) -> Option<i32> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(i32, i32)) -> Option<i32> {
-    Some(input.1)
 }

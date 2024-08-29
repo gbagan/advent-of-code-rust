@@ -20,7 +20,7 @@ fn parse_line(line: &str) -> Option<(&str, u32, Vec<&str>)> {
     Some((id, weight, children))
 }
 
-pub fn parse(input: &str) -> Option<(String, u32)> {
+pub fn solve(input: &str) -> Option<(String, u32)> {
     let raw_nodes: Vec<_> = input.lines().filter_map(parse_line).collect();
     let mut tree = Vec::with_capacity(raw_nodes.len());
     let mut has_parent = vec![false; raw_nodes.len()];
@@ -61,14 +61,6 @@ pub fn parse(input: &str) -> Option<(String, u32)> {
         }
     }
     Some((p1, p2))
-}
-
-pub fn part1(solution: &(String, u32)) -> Option<String> {
-    Some(solution.0.clone())
-}
-
-pub fn part2(solution: &(String, u32)) -> Option<u32> {
-    Some(solution.1)
 }
 
 fn dfs(tree: &[Node], root: usize) -> Vec<usize> {

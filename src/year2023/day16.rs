@@ -25,7 +25,7 @@ fn next_directions (c: u8, dir: u8) -> Vec<u8> {
     }
 }
 
-pub fn parse(input: &str) -> Option<Input>{
+pub fn solve(input: &str) -> Option<(usize, usize)>{
     let grid = Grid::parse(input);
     let mut north = grid.map(|_| 0);
     let mut south = grid.map(|_| 0);
@@ -75,7 +75,10 @@ pub fn parse(input: &str) -> Option<Input>{
         }
     }
 
-    Some(Input { grid, north, south, west, east})
+    let input = Input { grid, north, south, west, east};
+    let p1 = count_energized(&input, Coord::ORIGIN, EAST);
+    let p2 = part2(&input)?;
+    Some((p1, p2))
 }
 
 fn count_energized(input: &Input, start_pos: Coord, start_dir: u8) -> usize {
@@ -133,11 +136,6 @@ fn count_energized(input: &Input, start_pos: Coord, start_dir: u8) -> usize {
         }
     }
     energized.vec.iter().count_by(|&x| x)
-}
-
-
-pub fn part1(input: &Input) -> Option<usize> {
-    Some(count_energized(input, Coord::ORIGIN, EAST))
 }
 
 pub fn part2(input: &Input) -> Option<usize> {

@@ -8,7 +8,7 @@ fn parse_line(line: &str) -> Option<(&str, (bool, Vec<&str>))> {
     Some((key, (first_char == '&', values)))
 }
 
-pub fn parse(input: &str) -> Option<Vec<u32>> {
+pub fn solve(input: &str) -> Option<(u64, u64)> {
     let network: HashMap<_, _> = HashMap::from_iter(input.lines().filter_map(parse_line));
 
     let numbers: Vec<u32> = network["broadcaster"].1.iter().map(|&node| {
@@ -28,10 +28,12 @@ pub fn parse(input: &str) -> Option<Vec<u32>> {
             }
         }
     }).collect();
-    Some(numbers)
+    let p1 = part1(&numbers);
+    let p2 = part2(&numbers);
+    Some((p1, p2))
 }
 
-pub fn part1(numbers: &[u32]) -> Option<u64> {
+pub fn part1(numbers: &[u32]) -> u64 {
     let n = numbers.len() as u32;
     let mut nb_low = 1000 * (1 + n); // received and sent by the broadcaster
     let mut nb_high = 1000 * n; // (unique) bit changed to one in each component
@@ -53,9 +55,9 @@ pub fn part1(numbers: &[u32]) -> Option<u64> {
             nb_low += 2 * low_sent_to_conj;
         }
     }
-    Some(nb_low as u64 * nb_high as u64)
+    nb_low as u64 * nb_high as u64
 }
 
-pub fn part2(numbers: &[u32]) -> Option<u64> {
-    Some(numbers.iter().map(|&v| v as u64).product())
+pub fn part2(numbers: &[u32]) -> u64 {
+    numbers.iter().map(|&v| v as u64).product()
 }

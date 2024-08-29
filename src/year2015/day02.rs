@@ -15,12 +15,15 @@ fn parse_box(s: &str) -> Option<Box> {
     Some(Box { l, h, w })
 }
 
-pub fn parse(input: &str) -> Option<Vec<Box>> {
-    Some(input
+pub fn solve(input: &str) -> Option<(u32, u32)> {
+    let boxes: Vec<_> =
+        input
         .lines()
         .filter_map(parse_box)
-        .collect()
-    )
+        .collect();
+    let p1 = boxes.iter().map(paper).sum();
+    let p2 = boxes.iter().map(ribbon).sum();
+    Some((p1, p2))
 }
 
 fn paper (Box {l, h, w}: &Box) -> u32 {
@@ -31,12 +34,4 @@ fn paper (Box {l, h, w}: &Box) -> u32 {
 
 fn ribbon (Box {l, h, w}: &Box) -> u32 {
     l * h * w + 2 * (l+w).min(l+h).min(w+h)
-}
-
-pub fn part1(boxes: &[Box]) -> Option<u32> {
-    Some(boxes.iter().map(paper).sum())
-}
-
-pub fn part2(boxes: &[Box]) -> Option<u32> {
-    Some(boxes.iter().map(ribbon).sum())
 }

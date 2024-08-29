@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 
 const NB_STEPS: u64 = 26_501_365;
 
-pub fn parse(input: &str) -> Option<(u64, u64)> {
+pub fn solve(input: &str) -> Option<(u64, u64)> {
     let grid = Grid::parse(input);
     debug_assert!(grid.height == grid.width); 
     let start = Coord::new(grid.width as i32 / 2, grid.height as i32 / 2);
@@ -32,14 +32,6 @@ pub fn parse(input: &str) -> Option<(u64, u64)> {
     let p2 = (n+1) * (n+1) * odd + n * n * even + n * even_corner - (n+1) * odd_corner;
 
     Some((p1, p2))
-}
-
-pub fn part1(input: &(u64, u64)) -> Option<u64> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(u64, u64)) -> Option<u64> {
-    Some(input.1)
 }
 
 fn bfs(grid: &Grid<u8>, starts: &[Coord], inside_limit: u64, limit: u64) -> (u64, u64, u64, u64) {

@@ -3,8 +3,6 @@
 use itertools::Itertools;
 use crate::util::coord::Coord;
 
-type Input = (Vec<(Coord, i32)>, Vec<(Coord, i32)>);
-
 fn parse_line(line: &str) -> Option<((Coord, i32), (Coord, i32))> {
     let (dir1, len1, hex) = line.split_ascii_whitespace().next_tuple()?;
     let dir1 = match dir1 {
@@ -28,13 +26,15 @@ fn parse_line(line: &str) -> Option<((Coord, i32), (Coord, i32))> {
     Some(((dir1, len1), (dir2, len2)))
 }
 
-pub fn parse(input: &str) -> Option<Input> {
-    let mut p1 = vec!();
-    let mut p2 = vec!();
+pub fn solve(input: &str) -> Option<(i64, i64)> {
+    let mut instrs1 = vec!();
+    let mut instrs2 = vec!();
     for (t1, t2) in input.lines().filter_map(parse_line) {
-        p1.push(t1);
-        p2.push(t2);
+        instrs1.push(t1);
+        instrs2.push(t2);
     }
+    let p1 = lava(&instrs1);
+    let p2 = lava(&instrs2);
     Some((p1, p2))
 }
 
@@ -52,12 +52,4 @@ fn lava(instrs: &Vec<(Coord, i32)>) -> i64 {
     }
 
     (area.abs() + boundary as i64) / 2 + 1
-}
-
-pub fn part1(input: &Input) -> Option<i64> {
-    Some(lava(&input.0))
-}
-
-pub fn part2(input: &Input) -> Option<i64> {
-    Some(lava(&input.1))
 }

@@ -1,38 +1,36 @@
 // dynamic programming
+// subset sum
 
-pub fn parse(input: &str) -> Option<Vec<usize>> {
-    Some(input.lines().filter_map(|line| line.parse().ok()).collect())
+pub fn solve(input: &str) -> Option<(u64, u64)> {
+    let numbers: Vec<_> = input.lines().filter_map(|line| line.parse().ok()).collect();
+    let p1 = subset_sum(&numbers,  numbers.iter().sum::<u64>() / 3)?;
+    let p2 = subset_sum(&numbers,  numbers.iter().sum::<u64>() / 4)?;
+    Some((p1, p2))
 }
 
-pub fn solve(numbers: &[usize], k: usize) -> Option<u128> {
+fn subset_sum(numbers: &[u64], n: u64) -> Option<u64> {
+    let n = n as usize;
+    // to avoid integer overflow
+    let limit = u64::MAX / numbers.iter().max().unwrap();
     let m = numbers.len();
-    let n = numbers.iter().sum::<usize>() / k;
     let size = (m+1) * (n+1);
-    let mut table: Vec<Option<u128>> = vec![None; size];
+    let mut table: Vec<Option<u64>> = vec![None; size];
     table[0] = Some(1);
     for i in 1..=m {
         let v = numbers[i-1];
         for j in 0..=n {
             let index = i * (n+1) + j;
             table[index] =
-                if v > j {
+                if v > j as u64 {
                     table[index - (n+1)]
                 } else {
-                    match (table[index - (n+1)], table[index - (n+1) - v]) {
+                    match (table[index - (n+1)], table[index - (n+1) - v as usize]) {
                         (x, None) => x,
-                        (None, Some(x)) => Some(v as u128 *x),
-                        (Some(x), Some(y)) => Some(x.min(v as u128 *y))
+                        (None, Some(x)) => Some(limit.min(v * x)),
+                        (Some(x), Some(y)) => Some(x.min(v * y).min(limit))
                     }
                 }
         }
     }
     table[size-1]
-}
-
-pub fn part1(numbers: &[usize]) -> Option<u128> {
-    solve(numbers, 3)
-}
-
-pub fn part2(numbers: &[usize]) -> Option<u128> {
-    solve(numbers, 4)
 }

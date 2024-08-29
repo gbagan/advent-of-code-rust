@@ -1,8 +1,10 @@
-pub fn parse(input: &str) -> Option<&str> {
-    Some(input)
+pub fn solve(input: &str) -> Option<(i32, i32)> {
+    let p1 = part1(input);
+    let p2 = parse_json(input.as_bytes(), 0).value;
+    Some((p1, p2))
 }
 
-pub fn part1(input: &str) -> Option<i32> {
+pub fn part1(input: &str) -> i32 {
     let mut total = 0;
     let mut first_position = None;
     for (i,c) in input.chars().enumerate() {
@@ -15,7 +17,7 @@ pub fn part1(input: &str) -> Option<i32> {
             first_position = None;
         }
     }
-    Some(total)
+    total
 }
 
 struct Parsed {
@@ -88,9 +90,4 @@ fn parse_object(text: &[u8], i: usize) -> Parsed {
         value = 0;
     }
     Parsed {value, next: j+1, ignore: false}
-}
-
-
-pub fn part2(input: &str) -> Option<i32> {
-    Some(parse_json(input.as_bytes(), 0).value)
 }

@@ -57,7 +57,7 @@ fn reflect2(encoding: &[u32]) -> Option<usize> {
 }
 
 
-pub fn parse(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Option<(usize, usize)> {
     let mut p1 = 0;
     let mut p2 = 0;
     for (a, b) in input.split("\n\n").filter_map(parse_grid) {
@@ -65,12 +65,4 @@ pub fn parse(input: &str) -> Option<(usize, usize)> {
         p2 += b;
     };
     Some((p1, p2))
-}
-
-pub fn part1(input: &(usize, usize)) -> Option<usize> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(usize, usize)) -> Option<usize> {
-    Some(input.1)
 }

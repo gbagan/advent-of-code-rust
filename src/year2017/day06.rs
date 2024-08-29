@@ -20,7 +20,7 @@ const SPREAD: [u64; 16] = [
     0x1111111111111110,
 ];
 
-pub fn parse(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Option<(usize, usize)> {
     let banks: u64 = input
         .trim()
         .split_ascii_whitespace()
@@ -50,13 +50,6 @@ pub fn step(banks: &u64) -> u64 {
     (banks & (0xffff_ffff_ffff_fff0u64).rotate_left(offset)) + SPREAD[max as usize].rotate_left(offset)
 }
 
-pub fn part1(solutions: &(usize, usize)) -> Option<usize> {
-    Some(solutions.0)
-}
-
-pub fn part2(solutions: &(usize, usize)) -> Option<usize> {
-    Some(solutions.1)
-}
 
 #[test]
 fn find_max_test() {

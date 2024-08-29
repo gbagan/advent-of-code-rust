@@ -9,7 +9,7 @@ fn parse_line(s: &str) -> Option<(&str, i32, &str)> {
     Some((name1, gain, name2))
 }
 
-pub fn parse(input: &str) -> Option<(i32, i32)> {
+pub fn solve(input: &str) -> Option<(i32, i32)> {
     let entries: Vec<_> = input.lines().filter_map(parse_line).collect();
     let mut i = 0;
     let mut dict: HashMap<&str, usize> = HashMap::new();
@@ -26,7 +26,7 @@ pub fn parse(input: &str) -> Option<(i32, i32)> {
     let n = i;
 
     let mut table = vec![0; n*n];
-    
+
     for (city1, gain, city2) in &entries {
         let i = dict[city1];
         let j = dict[city2];
@@ -54,10 +54,3 @@ pub fn parse(input: &str) -> Option<(i32, i32)> {
     Some((p1, p2))
 }
 
-pub fn part1(input: &(i32, i32)) -> Option<i32> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(i32, i32)) -> Option<i32> {
-    Some(input.1)
-}

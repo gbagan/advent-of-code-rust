@@ -1,12 +1,7 @@
 use crate::util::iter::AOCIter;
 use std::collections::HashSet;
 
-pub struct Input<'a>  {
-    replacements: Vec<(&'a str, &'a str)>,
-    molecule: &'a str
-}
-
-pub fn parse(input: &str) -> Option<Input> {
+pub fn solve(input: &str) -> Option<(usize, usize)> {
     let mut replacements = vec!();
     let mut lines = input.lines ();
     for line in lines.by_ref() {
@@ -17,10 +12,13 @@ pub fn parse(input: &str) -> Option<Input> {
             replacements.push((mol1, mol2));
     }
     let molecule = lines.next()?;
-    Some(Input { replacements, molecule })
+
+    let p1 = part1(molecule, &replacements);
+    let p2 = part2(molecule);
+    Some((p1, p2))
 }
 
-fn replacements<'a>(
+fn do_replacements<'a>(
     molecule: &'a str,
     from: &'a str,
     to: &'a str,
@@ -35,24 +33,24 @@ fn replacements<'a>(
 }
 
 
-pub fn part1(input: &Input) -> Option<usize> {
+pub fn part1(molecule: &str, replacements: &[(&str, &str)]) -> usize {
     let mut molecules = HashSet::new();
-    for (from, to) in &input.replacements {
-        for molecule in replacements(input.molecule, from, to) {
+    for (from, to) in replacements {
+        for molecule in do_replacements(molecule, from, to) {
             molecules.insert(molecule);
         }
     }
-    Some(molecules.len())
+    molecules.len()
 }
 
 fn nb_atoms(mol: &str) -> usize {
     mol.chars().count_by(|c| c.is_ascii_uppercase())
 }
 
-pub fn part2(input: &Input) -> Option<usize> {
-    let atoms = nb_atoms(input.molecule); //.chars().filter(|&c| c.is_ascii_uppercase()).count();
-    let rn = input.molecule.matches("Rn").count();
-    let y = input.molecule.matches('Y').count();
-    let ar = input.molecule.matches("Ar").count();
-    Some(atoms - rn - ar - y * 2 - 1)
+pub fn part2(molecule: &str) -> usize {
+    let atoms = nb_atoms(molecule); //.chars().filter(|&c| c.is_ascii_uppercase()).count();
+    let rn = molecule.matches("Rn").count();
+    let y = molecule.matches('Y').count();
+    let ar = molecule.matches("Ar").count();
+    atoms - rn - ar - y * 2 - 1
 }

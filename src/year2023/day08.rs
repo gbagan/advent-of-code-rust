@@ -9,7 +9,7 @@ fn parse_line(line: &str) -> Option<(&str, (&str, &str))> {
     Some((node, (succ1, succ2)))
 }
 
-pub fn parse(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Option<(usize, usize)> {
     let mut lines = input.lines();
     let (directions, _) = lines.next_tuple()?;
     let directions = directions.as_bytes();
@@ -36,12 +36,4 @@ pub fn parse(input: &str) -> Option<(usize, usize)> {
     }
 
     Some((p1, p2))
-}
-
-pub fn part1(input: &(usize, usize)) -> Option<usize> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(usize, usize)) -> Option<usize> {
-    Some(input.1)
 }

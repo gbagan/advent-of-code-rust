@@ -1,7 +1,14 @@
 use crate::util::iter::AOCIter;
 
-pub fn parse(input: &str) -> Option<Vec<&[u8]>> {
-    Some(input.lines().map(str::as_bytes).collect())
+pub fn solve(input: &str) -> Option<(u32, usize)> {
+    let lines: Vec<_> = input.lines().map(str::as_bytes).collect();
+
+    let p1 = lines.iter().count_by(|&line| is_nice_string(line)) as u32;
+    
+    let mut pairs = [0; 729];
+    let p2 = lines.iter().enumerate().count_by(|(idx, line)| is_nice_string2(line, idx, &mut pairs));
+    Some((p1, p2))
+
 }
 
 fn is_nice_string (line: &[u8]) -> bool {
@@ -55,13 +62,4 @@ fn is_nice_string2 (line: &[u8], line_idx: usize, pairs: &mut [usize; 729]) -> b
         previous1 = current;
     }
     two_pairs && split_pair
-}
-
-pub fn part1(input: &[&[u8]]) -> Option<u32> {
-    Some(input.iter().count_by(|&line| is_nice_string(line)) as u32)
-}
-
-pub fn part2(input: &[&[u8]]) -> Option<usize> {
-    let mut pairs = [0; 729];
-    Some(input.iter().enumerate().count_by(|(idx, line)| is_nice_string2(line, idx, &mut pairs)))
 }

@@ -19,8 +19,14 @@ const PATTERNS: [(&str, u32); 18] = [
     ("nine", 9),
 ];
 
-pub fn parse(input: &str) -> Option<Vec<&str>> {
-    Some(input.lines().collect())
+pub fn solve(input: &str) -> Option<(u32, u32)> {
+    let mut p1 = 0;
+    let mut p2 = 0;
+    for line in input.lines() {
+        p1 += solve_one(line)?;
+        p2 += solve_two(line)?;
+    }
+    Some((p1, p2))
 }
 
 fn solve_one(line: &str) -> Option<u32> {
@@ -38,15 +44,6 @@ fn solve_two(line: &str) -> Option<u32> {
     let m: u32 = (0..line.len()).rev().find_map(|i| matches_pattern(&line[i..]))?;
     Some(n*10+m)
 }
-
-pub fn part1(input: &[&str]) -> Option<u32> {
-    Some(input.iter().filter_map(|&line| solve_one(line)).sum())
-}
-
-pub fn part2(input: &[&str]) -> Option<u32> {
-    Some(input.iter().filter_map(|&line| solve_two(line)).sum())
-}
-
 
 #[cfg(test)]
 mod tests {

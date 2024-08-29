@@ -90,24 +90,15 @@ fn parse_sequence2(text: &[u8], i: usize) -> Result {
     Result {value, next: j}
 }
 
-pub fn parse(input: &str) -> Option<Vec<&str>> {
-    Some(input.lines().collect())
-}
-
-pub fn part1(lines: &[&str]) -> Option<u64> {
-    Some(lines
-            .iter()
-            .map(|line| parse_sequence(line.as_bytes(), 0).value)
-            .sum::<u64>()
-        )
-}
-
-pub fn part2(lines: &[&str]) -> Option<u64> {
-    Some(lines
-            .iter()
-            .map(|line| parse_sequence2(line.as_bytes(), 0).value)
-            .sum::<u64>()
-        )
+pub fn solve(input: &str) -> Option<(u64, u64)> {
+    let mut p1 = 0;
+    let mut p2 = 0;
+    for line in input.lines() {
+        let line = line.as_bytes();
+        p1 += parse_sequence(line, 0).value;
+        p2 += parse_sequence2(line, 0).value;
+    }
+    Some((p1, p2))
 }
 
 #[test]

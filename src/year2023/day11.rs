@@ -4,7 +4,7 @@
 
 use crate::util::grid::Grid;
 
-pub fn parse(input: &str) -> Option<(i64, i64)>{
+pub fn solve(input: &str) -> Option<(i64, i64)>{
     let grid = Grid::parse(input);
     let mut galaxy_xs: Vec<i64> = Vec::new();
     let mut galaxy_ys: Vec<i64> = Vec::new();
@@ -56,13 +56,4 @@ pub fn parse(input: &str) -> Option<(i64, i64)>{
     }
 
     Some((p1, p2))
-}
-
-
-pub fn part1(input: &(i64, i64)) -> Option<i64> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(i64, i64)) -> Option<i64> {
-    Some(input.1)
 }

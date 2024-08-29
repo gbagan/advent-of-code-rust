@@ -11,7 +11,7 @@ fn parse_line(line: &str) -> Option<(&str, Vec<&str>)> {
     Some((node, neighbors))
 }
 
-pub fn parse (input: &str) -> Option<Graph> {
+pub fn solve(input: &str) -> Option<(usize, usize)> {
     let nodes: Vec<_> = input.lines().filter_map(parse_line).collect();
     let mut graph: Vec<Vec<_>> = Vec::with_capacity(nodes.len());
     let mut i = 0;
@@ -40,10 +40,12 @@ pub fn parse (input: &str) -> Option<Graph> {
             graph[j].push(i);
         }
     }
-    Some(graph)
+
+    let p1 = part1(&graph);
+    Some((p1, 0))
 }
 
-pub fn part1(graph: &Graph) -> Option<usize> {
+pub fn part1(graph: &Graph) -> usize {
     let n = graph.len();
     let mut saturated = HashSet::new(); //Grid::new(n, n, false);
     let mut visited: Vec<_> = graph.iter().map(|_| 0).collect();
@@ -98,11 +100,7 @@ pub fn part1(graph: &Graph) -> Option<usize> {
             }
         } else {
             let m = visited.iter().count_by(|&node| node == i);
-            return Some(m * (n - m));
+            return m * (n - m);
         }
     }
-}
-
-pub fn part2(_: &Graph) -> Option<u32> {
-    Some(0)
 }

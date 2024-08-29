@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use lazy_static::lazy_static;
 
-pub struct Boss {
+struct Boss {
     hp: i32,
     damage: i32,
     armor: i32,
@@ -47,12 +47,16 @@ lazy_static! {
     );
 }
 
-pub fn parse(input: &str) -> Option<Boss> {
+pub fn solve(input: &str) -> Option<(i32, i32)> {
     let (line1, line2, line3) = input.lines().next_tuple()?;
     let hp = line1.split(' ').nth(2).and_then(|w| w.parse().ok())?;
     let damage = line2.split(' ').nth(1).and_then(|w| w.parse().ok())?;
     let armor = line3.split(' ').nth(1).and_then(|w| w.parse().ok())?;
-    Some(Boss { hp, damage, armor})
+    let boss = Boss { hp, damage, armor};
+
+    let p1 = part1(&boss)?;
+    let p2 = part2(&boss)?;
+    Some((p1, p2))
 }
 
 fn is_player_win(gear: &[&Item], boss: &Boss) -> bool {
@@ -69,14 +73,14 @@ fn possible_gears<'a>() -> impl Iterator<Item=Vec<&'a Item>> {
     ITEMS.iter().multi_cartesian_product()
 } 
 
-pub fn part1(boss: &Boss) -> Option<i32> {
+fn part1(boss: &Boss) -> Option<i32> {
     possible_gears()
         .filter(|gear| is_player_win(gear, boss))
         .map(|gear| gear.iter().map(|&item| item.cost).sum::<i32>())
         .min()
 }
 
-pub fn part2(boss: &Boss) -> Option<i32> {
+fn part2(boss: &Boss) -> Option<i32> {
     possible_gears()
         .filter(|gear| !is_player_win(gear, boss))
         .map(|gear| gear.iter().map(|&item| item.cost).sum::<i32>())

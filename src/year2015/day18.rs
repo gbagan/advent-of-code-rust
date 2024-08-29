@@ -2,7 +2,7 @@ use std::simd::{u64x8, Simd};
 
 type Lights = [u64x8; 100];
 
-pub fn parse(input: &str) -> Option<Lights> {
+pub fn solve(input: &str) -> Option<(u32, u32)> {
     let mut grid: Lights = [Simd::splat(0); 100];
  
     for (y, row) in input.lines().enumerate() {
@@ -14,7 +14,10 @@ pub fn parse(input: &str) -> Option<Lights> {
         }
         grid[y] = Simd::from_array(t);
     }
-    Some(grid)
+    
+    let p1 = game_of_life(&grid, false);
+    let p2 = game_of_life(&grid, true);
+    Some((p1, p2))
 }
 
 fn game_of_life(input: &Lights, part_two: bool) -> u32 {
@@ -96,12 +99,4 @@ fn game_of_life(input: &Lights, part_two: bool) -> u32 {
         (grid, next) = (next, grid);
     }
     grid.iter().map(|n| n.to_array().iter().map(|x| x.count_ones()).sum::<u32>()).sum()
-}
-
-pub fn part1(input: &Lights) -> Option<u32> {
-    Some(game_of_life(input, false))
-}
-
-pub fn part2(input: &Lights) -> Option<u32> {
-    Some(game_of_life(input, true))
 }

@@ -39,19 +39,11 @@ fn complete(mut pwd: [u8;8], c: u8) -> [u8; 8] {
     pwd
 }
 
-pub fn parse(input: &str) -> Option<(String, String)> {
+pub fn solve(input: &str) -> Option<(String, String)> {
     let pwd = input.trim().as_bytes().try_into().unwrap();
     let pwd = next_password(pwd);
     let p1 =  from_utf8(&pwd).map(|p| p.to_string()).unwrap();
     let pwd = next_password(pwd);
     let p2 =  from_utf8(&pwd).map(|p| p.to_string()).unwrap();
     Some((p1, p2))
-}
-
-pub fn part1(input: &(String, String)) -> Option<String> {
-    Some(input.0.to_string())
-}
-
-pub fn part2(input: &(String, String)) -> Option<String> {
-    Some(input.1.to_string())
 }

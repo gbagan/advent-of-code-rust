@@ -9,7 +9,7 @@ pub struct Shared {
     p2: AtomicU32,
 }
 
-pub fn parse(input: &str) -> Option<Shared> {
+pub fn solve(input: &str) -> Option<(u32, u32)> {
     let input = input.trim();
     let shared = Shared {
         done: AtomicBool::new(false),
@@ -24,7 +24,9 @@ pub fn parse(input: &str) -> Option<Shared> {
         }
     });
 
-    Some(shared)
+    let p1 = shared.p1.load(Ordering::Relaxed);
+    let p2 = shared.p2.load(Ordering::Relaxed);
+    Some((p1, p2))
 }
 
 fn worker(input: &str, shared: &Shared) {
@@ -43,12 +45,4 @@ fn worker(input: &str, shared: &Shared) {
             }
         }
     }
-}
-
-pub fn part1(shared: &Shared) -> Option<u32> {
-    Some(shared.p1.load(Ordering::Relaxed))
-}
-
-pub fn part2(shared: &Shared) -> Option<u32> {
-    Some(shared.p2.load(Ordering::Relaxed))
 }

@@ -1,10 +1,13 @@
 // dynamic programming
 
-pub fn parse(input: &str) -> Option<Vec<usize>> {
-    Some(input.lines().filter_map(|line| line.parse().ok()).collect())
+pub fn solve(input: &str) -> Option<(u32, u32)> {
+    let numbers: Vec<_> = input.lines().filter_map(|line| line.parse().ok()).collect();
+    let p1 = solve1(&numbers, 150);
+    let p2 = solve2(&numbers, 150)?;
+    Some((p1, p2))
 }
 
-pub fn solve1(numbers: &[usize], target: usize) -> u32 {
+fn solve1(numbers: &[usize], target: usize) -> u32 {
     let n = numbers.len();
     let m = target+1;
     let size = (n+1)*m;
@@ -24,7 +27,7 @@ pub fn solve1(numbers: &[usize], target: usize) -> u32 {
     table[size-1]
 }
 
-pub fn solve2(numbers: &[usize], target: usize) -> Option<u32> {
+fn solve2(numbers: &[usize], target: usize) -> Option<u32> {
     let n = numbers.len();
     let m = target+1;
     let size = (n+1)*m;
@@ -56,14 +59,6 @@ pub fn solve2(numbers: &[usize], target: usize) -> Option<u32> {
         std::mem::swap(&mut table, &mut prev_table);
     }
     None
-}
-
-pub fn part1(numbers: &[usize]) -> Option<u32> {
-    Some(solve1(numbers, 150))
-}
-
-pub fn part2(numbers: &[usize]) -> Option<u32> {
-    solve2(numbers, 150)
 }
 
 #[cfg(test)]

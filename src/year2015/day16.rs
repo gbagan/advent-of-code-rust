@@ -20,8 +20,11 @@ fn parse_aunt(line: &str) -> Option<Aunt> {
     Some(Aunt {number, compounds})
 }
 
-pub fn parse(input: &str) -> Option<Vec<Aunt>> {
-    Some(input.lines().filter_map(parse_aunt).collect())
+pub fn solve(input: &str) -> Option<(u32, u32)> {
+    let aunts: Vec<_> = input.lines().filter_map(parse_aunt).collect();
+    let p1 = solve_for(&aunts, test1)?;
+    let p2 = solve_for(&aunts, test2)?;
+    Some((p1, p2))
 }
 
 lazy_static! {
@@ -64,17 +67,9 @@ fn test2(compound: &str, n: u32, m: u32) -> bool {
     }
 }
 
-pub fn solve(aunts: &[Aunt], test: fn(&str, u32, u32) -> bool) -> Option<u32> {
+fn solve_for(aunts: &[Aunt], test: fn(&str, u32, u32) -> bool) -> Option<u32> {
     aunts
         .iter()
         .find(|aunt| check(aunt, test))
         .map(|aunt| aunt.number)
-}
-
-pub fn part1(aunts: &[Aunt]) -> Option<u32> {
-    solve(aunts, test1)
-}
-
-pub fn part2(aunts: &[Aunt]) -> Option<u32> {
-    solve(aunts, test2)
 }

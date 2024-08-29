@@ -19,8 +19,11 @@ fn parse_ingredient(line: &str) -> Option<Ingredient> {
     Some(Ingredient { capacity, durability, flavor, texture, calories})
 }
 
-pub fn parse(input: &str) -> Option<Vec<Ingredient>> {
-    Some(input.lines().filter_map(parse_ingredient).collect())
+pub fn solve(input: &str) -> Option<(i32, i32)> {
+    let ingredients: Vec<_> = input.lines().filter_map(parse_ingredient).collect();
+    let p1 = part1(&ingredients)?;
+    let p2 = part2(&ingredients);
+    Some((p1, p2))
 }
 
 fn score(quantities: & Vec<u32>, ingredients: &[Ingredient]) -> Option<i32> {
@@ -81,7 +84,7 @@ pub fn part1(ingredients: &[Ingredient]) -> Option<i32> {
     }).max()
 }
 
-pub fn part2(ingredients: &[Ingredient]) -> Option<i32> {
+pub fn part2(ingredients: &[Ingredient]) -> i32 {
     let mut best_score = 0;
     for i in 0..=100 {
         for j in 0..=100-i {
@@ -99,5 +102,5 @@ pub fn part2(ingredients: &[Ingredient]) -> Option<i32> {
             }
         }
     }
-    Some(best_score)
+    best_score
 }

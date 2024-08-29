@@ -1,19 +1,14 @@
 use crate::util::{coord::Coord, grid::Grid};
 
-pub fn parse(input: &str) -> Option<Grid<u8>> {
-    Some(Grid::parse(input))
+pub fn solve(input: &str) -> Option<(u16, u16)> {
+    let grid= Grid::parse(input);
+    let p1 = astar(&grid, 1, 3)?;
+    let p2 = astar(&grid, 4, 10)?;
+    Some((p1, p2))
 }
 
 const VERTICAL: usize = 0;
 const HORIZONTAL: usize = 1;
-
-pub fn part1(grid: &Grid<u8>) -> Option<u16> {
-    astar(grid, 1, 3)
-}
-
-pub fn part2(grid: &Grid<u8>) -> Option<u16> {
-    astar(grid, 4, 10)
-}
 
 fn astar(grid: &Grid<u8>, min_dist: u16, max_dist: u16) -> Option<u16> {
     let start= Coord::ORIGIN;

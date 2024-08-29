@@ -20,7 +20,7 @@ fn focusing_power(boxes: &[Vec<Item>]) -> usize {
         .sum()
 }
 
-pub fn parse(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Option<(usize, usize)> {
     let mut p1 = 0;
     let mut boxes: Vec<Vec<Item>> = (0..256).map(|_| vec!()).collect();
 
@@ -50,12 +50,4 @@ pub fn parse(input: &str) -> Option<(usize, usize)> {
     let p2 = focusing_power(&boxes);
 
     Some((p1, p2))
-}
-
-pub fn part1(input: &(usize, usize)) -> Option<usize> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(usize, usize)) -> Option<usize> {
-    Some(input.1)
 }

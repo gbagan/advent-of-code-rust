@@ -1,10 +1,13 @@
 use std::collections::HashMap;
 use itertools::Itertools;
 
-pub struct Input<'a> {
-    pub workflows: HashMap<&'a str, Vec<Step<'a>>>,
+type Workflows<'a> = HashMap<&'a str, Vec<Step<'a>>>;
+
+/*pub struct Input<'a> {
+    pub workflows: ,
     pub ratings: Vec<[u16; 4]>
 }
+*/
 
 pub enum Instr<'a> { Accept, Reject, Goto(&'a str) }
 pub enum Test { LT(usize, u16), GT(usize, u16), Otherwise }
@@ -12,6 +15,23 @@ pub struct Step<'a> {
     pub test: Test,
     pub instr: Instr<'a>,
 }
+
+pub fn solve(input: &str) -> Option<(u32, u64)> {
+    let mut workflows = HashMap::new();
+    let mut lines = input.lines();
+    for line in lines.by_ref() {
+        if line.is_empty() {
+            break
+        } else if let Some((name, workflow)) = parse_workflow(line) {
+            workflows.insert(name, workflow);
+        }
+    }
+    let ratings: Vec<_> = lines.filter_map(parse_rating).collect();
+    let p1 = part1(&workflows, &ratings);
+    let p2 = part2(&workflows);
+    Some((p1, p2))
+}
+
 
 fn parse_instr(s: &str) -> Instr {
     match s {
@@ -55,20 +75,6 @@ fn parse_rating(line: &str) -> Option<[u16; 4]> {
     Some([x, m, a, s])
 }
 
-pub fn parse(input: &str) -> Option<Input> {
-    let mut workflows = HashMap::new();
-    let mut lines = input.lines();
-    for line in lines.by_ref() {
-        if line.is_empty() {
-            break
-        } else if let Some((name, workflow)) = parse_workflow(line) {
-            workflows.insert(name, workflow);
-        }
-    }
-    let ratings = lines.filter_map(parse_rating).collect();
-    Some(Input {workflows, ratings})
-}
-
 fn accepts(rating: &[u16; 4], workflows: &HashMap<&str, Vec<Step>>) -> bool {
     let mut current = "in";
     loop {
@@ -90,14 +96,14 @@ fn accepts(rating: &[u16; 4], workflows: &HashMap<&str, Vec<Step>>) -> bool {
     }
 }
 
-pub fn part1(input: &Input) -> Option<u32> {
-    Some(input.ratings.iter().map(|rating|
-        if accepts(rating, &input.workflows) {
+fn part1(workflows: &Workflows, ratings: &[[u16;4]]) -> u32 {
+    ratings.iter().map(|rating|
+        if accepts(rating, workflows) {
             rating.iter().sum::<u16>() as u32
         } else {
             0
         }
-    ).sum())
+    ).sum()
 }
 
 type Box = [(u16, u16); 4];
@@ -144,12 +150,12 @@ fn box_size(bx: &Box)  -> u64 {
     bx.iter().map(|r| (r.1 - r.0) as u64).product()
 }
 
-pub fn part2(input: &Input) -> Option<u64> {
+fn part2(workflows: &Workflows) -> u64 {
     let mut total = 0;
     let init = [(1, 4001); 4];
     let mut stack = vec!(("in", init));
     while let Some((name, mut bx)) = stack.pop() {
-        let workflow = &input.workflows[name];
+        let workflow = &workflows[name];
         for step in workflow {
             let (accepted, rejected) = partition(&bx, &step.test);
             if let Some(bx) = accepted {
@@ -166,5 +172,5 @@ pub fn part2(input: &Input) -> Option<u64> {
             }
         }
     }
-    Some(total)
+    total
 }

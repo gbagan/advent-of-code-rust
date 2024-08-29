@@ -7,7 +7,7 @@ fn parse_line(s: &str) -> Option<(&str, &str, u32)> {
     Some((city1, city2, dist))
 }
 
-pub fn parse(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Option<(u32, u32)> {
     let travels: Vec<(&str, &str, u32)> = input.lines().filter_map(parse_line).collect();
     let mut dict = HashMap::new();
 
@@ -57,12 +57,4 @@ pub fn parse(input: &str) -> Option<(u32, u32)> {
         max_travel = max_travel.max(sum - min);
     }
     Some((min_travel, max_travel))
-}
-
-pub fn part1(input: &(u32, u32)) -> Option<u32> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(u32, u32)) -> Option<u32> {
-    Some(input.1)
 }

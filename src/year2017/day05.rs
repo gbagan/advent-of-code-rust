@@ -1,8 +1,9 @@
-pub fn parse(input: &str) -> Option<Vec<i32>> {
-    Some(input.lines().filter_map(|line| line.parse().ok()).collect())
+pub fn solve(input: &str) -> Option<(u32, u32)> {
+    let jumps: Vec<_> = input.lines().filter_map(|line| line.parse().ok()).collect();
+    Some((part1(&jumps), part2(&jumps)))
 }
 
-pub fn part1(jumps: &[i32]) -> Option<u32> {
+pub fn part1(jumps: &[i32]) -> u32 {
     let mut jumps = jumps.to_vec();
     let n = jumps.len() as i32;
 
@@ -14,10 +15,10 @@ pub fn part1(jumps: &[i32]) -> Option<u32> {
         offset = tmp;
         steps += 1;
     }
-    Some(steps)
+    steps
 }
 
-pub fn part2(jumps: &[i32]) -> Option<u32> {
+pub fn part2(jumps: &[i32]) -> u32 {
     let mut jumps = jumps.to_vec();
     let n = jumps.len() as i32;
 
@@ -33,5 +34,5 @@ pub fn part2(jumps: &[i32]) -> Option<u32> {
         offset += offset2;
         steps += 1;
     }
-    Some(steps)
+    steps
 }

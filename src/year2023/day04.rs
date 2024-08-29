@@ -17,25 +17,28 @@ fn card_score(table: &mut [u16; 100], i: usize, line: &str) -> Option<u32> {
     Some(score)
 }
 
-pub fn parse(input: &str) -> Option<Vec<u32>> {
+pub fn solve(input: &str) -> Option<(u32, u32)> {
     let mut table = [0; 100];
 
-    Some(input
+    let scores: Vec<_> =
+        input
         .lines()
         .enumerate()
         .filter_map(|(i, line)| card_score(&mut table, i+1, line))
-        .collect()
-    )
+        .collect();
+    
+    let p1 = part1(&scores);
+    let p2 = part2(&scores);
+    Some((p1, p2))
 }
 
-pub fn part1(scores: &[u32]) -> Option<u32> {
-    Some(scores.iter()
+pub fn part1(scores: &[u32]) -> u32 {
+    scores.iter()
         .map(|&s| if s == 0 {0} else {2_u32.pow(s-1)} )
         .sum()
-    )
 }
 
-pub fn part2(scores: &[u32]) -> Option<u32> {
+pub fn part2(scores: &[u32]) -> u32 {
     let mut vec: Vec<_> = scores.iter().map(|&s| (s, 1)).collect();
     let mut total = 0;
     let mut i = 0;
@@ -48,5 +51,5 @@ pub fn part2(scores: &[u32]) -> Option<u32> {
         }
         i+=1;
     }
-    Some(total)
+    total
 }

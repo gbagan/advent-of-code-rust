@@ -17,11 +17,14 @@ struct State {
     shield: u8,
 }
 
-pub fn parse(input: &str) -> Option<(i16, i16)> {
+pub fn solve(input: &str) -> Option<(i16, i16)> {
     let (line1, line2) = input.lines().next_tuple()?;
     let boss_hp = line1.split(' ').nth(2).and_then(|s| s.parse().ok())?;
     let boss_damage = line2.split(' ').nth(1).and_then(|s| s.parse().ok())?;
-    Some((boss_hp, boss_damage))
+
+    let p1 = simulate(boss_hp, boss_damage, false)?;
+    let p2 = simulate(boss_hp, boss_damage, false)?;
+    Some((p1, p2))
 }
 
 fn apply_effects(state: &mut State) -> bool {
@@ -123,8 +126,7 @@ fn boss_turn(config: &Config, state: &mut State) -> bool {
     state.player_hp >= 0 || state.current_mana >= 53
 }
 
-pub fn solve(input: &(i16, i16), hard_mode: bool) -> Option<i16> {
-    let (boss_hp, boss_damage) = *input;
+pub fn simulate(boss_hp: i16, boss_damage: i16, hard_mode: bool) -> Option<i16> {
     let config = Config { boss_damage, hard_mode };
     
     let state = State {
@@ -136,12 +138,4 @@ pub fn solve(input: &(i16, i16), hard_mode: bool) -> Option<i16> {
         shield: 0,
     };
     dijkstra(&config, &state)
-}
-
-pub fn part1(input: &(i16, i16)) -> Option<i16> {
-    solve(input, false)
-}
-
-pub fn part2(input: &(i16, i16)) -> Option<i16> {
-    solve(input, true)
 }

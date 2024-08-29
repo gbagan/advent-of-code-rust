@@ -29,12 +29,12 @@ fn compare(a: i32, cmp: &str, b: i32) -> bool {
     }
 }
 
-pub fn parse(input: &str) -> Option<(i32, i32)> {
+pub fn solve(input: &str) -> Option<(i32, i32)> {
     let mut vars: HashMap<&str, i32> = HashMap::new();
     let mut max_value = 0;
     for instr in input.lines().filter_map(parse_line) {
         let var2 = *vars.get(instr.var2).unwrap_or(&0);
-        if compare(var2, &instr.cmp, instr.val2) {
+        if compare(var2, instr.cmp, instr.val2) {
             let var1 = *vars.get(instr.var1).unwrap_or(&0);
             let var1 = match instr.cmd {
                 "inc" => var1 + instr.val1,
@@ -47,12 +47,4 @@ pub fn parse(input: &str) -> Option<(i32, i32)> {
     }
     let max_final_value = *vars.values().max().unwrap();
     Some((max_final_value, max_value))
-}
-
-pub fn part1(solutions: &(i32, i32)) -> Option<i32> {
-    Some(solutions.0)
-}
-
-pub fn part2(solutions: &(i32, i32)) -> Option<i32> {
-    Some(solutions.1)
 }

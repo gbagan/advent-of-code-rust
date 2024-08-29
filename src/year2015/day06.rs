@@ -56,7 +56,7 @@ fn do_cmd2(cmd: Command, v: &mut i32) {
     }
 }
 
-pub fn parse(input: &str) -> Option<Input>
+pub fn solve(input: &str) -> Option<(i32, i32)>
 {
     let instrs: Vec<_> = input.lines().filter_map(parse_instruction).collect();
     
@@ -84,10 +84,15 @@ pub fn parse(input: &str) -> Option<Input>
         y_index[y as usize] = i;
     }
 
-    Some(Input {instrs, rect_xs, rect_ys, x_index, y_index })
+    let input = Input {instrs, rect_xs, rect_ys, x_index, y_index };
+
+    let p1 = part1(&input);
+    let p2 = part2(&input);
+    Some((p1, p2))
+
 }
 
-pub fn part1(input: &Input) -> Option<i32> {
+pub fn part1(input: &Input) -> i32 {
     let width = input.rect_xs.len();
     let size = width * input.rect_ys.len();
 
@@ -113,10 +118,10 @@ pub fn part1(input: &Input) -> Option<i32> {
             }
         }
     }
-    Some(total)
+    total
 }
 
-pub fn part2(input: &Input) -> Option<i32> {
+pub fn part2(input: &Input) -> i32 {
     let width = input.rect_xs.len();
     let size = width * input.rect_ys.len();
 
@@ -143,5 +148,5 @@ pub fn part2(input: &Input) -> Option<i32> {
             }
         }
     }
-    Some(total)
+    total
 }

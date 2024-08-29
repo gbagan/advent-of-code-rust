@@ -23,7 +23,7 @@ fn parse_line(input: &str) -> Option<(Coord3, Coord3)> {
     Some((p1.min(p2), p1.max(p2)))
 }
 
-pub fn parse(input: &str) -> Option<Dominators> {
+pub fn solve(input: &str) -> Option<(usize, u32)> {
     let mut bricks: Vec<_> = input.lines().filter_map(parse_line).collect();
     bricks.sort_unstable_by_key(|b| b.0.z);
     
@@ -58,7 +58,10 @@ pub fn parse(input: &str) -> Option<Dominators> {
             _ => lowest_common_ancestor(&dominator, &supported_by)
         }
     }
-    Some(dominator)
+
+    let p1 = part1(&dominator);
+    let p2 = dominator.iter().map(|(_, h)| *h).sum();
+    Some((p1, p2))
 }   
 
 fn cubes_of((pmin, pmax): &(Coord3, Coord3)) -> Vec<Coord3> {
@@ -95,15 +98,10 @@ fn lowest_common_ancestor(ancestor: &[(usize, u32)], nodes: &[usize]) -> (usize,
     }).unwrap()
 }
 
-
-pub fn part1(dominator: &Dominators) -> Option<usize> {
+pub fn part1(dominator: &Dominators) -> usize {
     let mut safe = vec![true; dominator.len()];
     for (v, _) in dominator {
         safe[*v] = false;
     }
-    Some(safe.iter().count_by(|&n| n))
-}
-
-pub fn part2(dominator: &Dominators) -> Option<u32> {
-    Some(dominator.iter().map(|(_, h)| *h).sum())
+    safe.iter().count_by(|&n| n)
 }

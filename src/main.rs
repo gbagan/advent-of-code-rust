@@ -11,24 +11,21 @@ use aoc::*;
 struct Solution {
     year: String,
     day: String,
-    wrapper: fn(String) -> Result<(String, String), String>,
+    func: fn(String) -> Option<(String, String)>,
 }
 
 macro_rules! solution {
     ($year:tt, $day:tt) => {{
         let year = stringify!($year).trim_matches(char::is_alphabetic).to_string(); 
         let day = stringify!($day).trim_matches(char::is_alphabetic).to_string();
-        let wrapper = |input: String| {
+        let func = |input: String| {
             use $year::$day::*;
 
-            let parsed = parse(&input).ok_or("Parsing has failed")?;
-            let p1 = part1(&parsed).ok_or("Part 1 has failed")?;
-            let p2 = part2(&parsed).ok_or("Part 2 has failed")?;
-
-            Ok((p1.to_string(), p2.to_string()))
+            let (p1, p2) = solve(&input)?;
+            Some((p1.to_string(), p2.to_string()))
         };
 
-        Solution { year, day, wrapper }
+        Solution { year, day, func }
     }};
 }
 
@@ -48,7 +45,7 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
     let mut solved = 0;
     let mut duration = Duration::ZERO;
 
-    for Solution { year, day, wrapper } in &solutions {
+    for Solution { year, day, func } in &solutions {
         if arg_year.as_ref().map(|x| x != year).unwrap_or(false)
             || arg_day.as_ref().map(|x| x != day).unwrap_or(false) {
             continue
@@ -57,7 +54,7 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
         let path = Path::new("inputs").join(year).join(day);
         if let Ok(data) = read_to_string(&path) {
             let instant = Instant::now();
-            let res = wrapper(data);
+            let res = func(data);
             let elapsed = instant.elapsed();
 
             solved += 1;
@@ -74,8 +71,8 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
                 };
             println!("{year} Day {day} in {text}.");
             match res  {
-                Err(str) => println!("  {}", str),
-                Ok((part1, part2)) => {
+                None => println!("  has failed"),
+                Some((part1, part2)) => {
                     if display_solution {
                         println!("    Part 1: {part1}");
                         println!("    Part 2: {part2}");
@@ -162,7 +159,7 @@ fn solutions() -> Vec<Solution> {
         solution!(year2015, day24),
         solution!(year2015, day25),
 
-        solution!(year2016, day20),
+//        solution!(year2016, day20),
 
         solution!(year2017, day01),
         solution!(year2017, day02),

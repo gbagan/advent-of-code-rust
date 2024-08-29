@@ -9,7 +9,6 @@ pub struct Hailstone {
     pub vx: i64,
     pub vy: i64,
     pub vz: i64,
-
 } 
 
 fn parse_line(line: &str) -> Option<Hailstone>{
@@ -25,8 +24,11 @@ fn parse_line(line: &str) -> Option<Hailstone>{
     Some(Hailstone {px, py, pz, vx, vy, vz})
 }
 
-pub fn parse(input: &str) -> Option<Vec<Hailstone>> {
-    Some(input.lines().filter_map(parse_line).collect())
+pub fn solve(input: &str) -> Option<(u32, i64)> {
+    let hailstones: Vec<_> = input.lines().filter_map(parse_line).collect();
+    let p1 = part1(&hailstones);
+    let p2 = part2(&hailstones)?;
+    Some((p1, p2))
 }
 
 fn crosses_inside_test_area(start: i64, end: i64, h1: &Hailstone, h2: &Hailstone) -> bool {
@@ -50,7 +52,7 @@ fn crosses_inside_test_area(start: i64, end: i64, h1: &Hailstone, h2: &Hailstone
     x >= start && y >= start && x <= end && y <= end
 }
 
-pub fn part1(hailstones: &[Hailstone]) -> Option<u32> {
+pub fn part1(hailstones: &[Hailstone]) -> u32 {
     let start = 200_000_000_000_000i64;
     let end = 400_000_000_000_000i64;
     let mut counter = 0;
@@ -61,7 +63,7 @@ pub fn part1(hailstones: &[Hailstone]) -> Option<u32> {
             }
         }
     }
-    Some(counter)
+    counter
 }
 
 fn build_equations(h: &Hailstone) -> Vec<Vec<i64>> {

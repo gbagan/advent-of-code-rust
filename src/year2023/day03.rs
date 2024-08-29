@@ -20,7 +20,7 @@ fn part_member(grid: &Grid<u8>, y: i64, x1: i64, x2: i64, i: usize) -> Option<u3
     }
 }
 
-pub fn parse(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Option<(u32, u32)> {
     let grid = Grid::parse(input);
     let mut number_grid = grid.map::<Option<u32>>(|_| None);
     let mut i = 0;
@@ -58,6 +58,7 @@ pub fn parse(input: &str) -> Option<(u32, u32)> {
         }
     }
 
+    // part 2
     for y in 0..(grid.width as i32) {
         for x in 0..(grid.height as i32) {
             if grid[(x, y)] == b'*' {
@@ -75,12 +76,4 @@ pub fn parse(input: &str) -> Option<(u32, u32)> {
         }
     }
     Some((p1, p2))
-}
-
-pub fn part1(input: &(u32, u32)) -> Option<u32> {
-    Some(input.0)
-}
-
-pub fn part2(input: &(u32, u32)) -> Option<u32> {
-    Some(input.1)
 }

@@ -28,8 +28,11 @@ fn parse_instr(line: &str) -> Option<Instr> {
     }
 }
 
-pub fn parse(input: &str) -> Option<Vec<Instr>> {
-    Some(input.lines().filter_map(parse_instr).collect())
+pub fn solve(input: &str) -> Option<(u32, u32)> {
+    let program: Vec<_> = input.lines().filter_map(parse_instr).collect();
+    let p1 = run_program(&program, 0);
+    let p2 = run_program(&program, 1);
+    Some((p1, p2))
 }
 
 fn run_program(program: &[Instr], a: u32) -> u32 {
@@ -49,12 +52,4 @@ fn run_program(program: &[Instr], a: u32) -> u32 {
         offset += 1;
     }
     b
-}
-
-pub fn part1(program: &[Instr]) -> Option<u32> {
-    Some(run_program(program, 0))
-}
-
-pub fn part2(program: &[Instr]) -> Option<u32> {
-    Some(run_program(program, 1))
 }
