@@ -40,16 +40,15 @@ pub fn find_max(banks: u64) -> (u32, u64) {
         mask = if mask2 == 0 {mask} else {mask2};
         banks2 <<= 1;
     }
-    let offset = 60 - (mask.leading_zeros() & !3);
+    let offset = 60 - mask.leading_zeros();
     (offset, banks >> offset & 0xf)
 }
 
 pub fn step(banks: &u64) -> u64 {
     let banks = *banks;
     let (offset, max) = find_max(banks);
-    (banks & (0xffff_ffff_ffff_fff0u64).rotate_left(offset)) + SPREAD[max as usize].rotate_left(offset)
+    (banks & 0xffff_ffff_ffff_fff0u64.rotate_left(offset)) + SPREAD[max as usize].rotate_left(offset)
 }
-
 
 #[test]
 fn find_max_test() {

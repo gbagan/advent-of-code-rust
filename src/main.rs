@@ -159,7 +159,7 @@ fn solutions() -> Vec<Solution> {
         solution!(year2015, day24),
         solution!(year2015, day25),
 
-//        solution!(year2016, day20),
+        solution!(year2016, day20),
 
         solution!(year2017, day01),
         solution!(year2017, day02),
@@ -170,6 +170,9 @@ fn solutions() -> Vec<Solution> {
         solution!(year2017, day07),
         solution!(year2017, day08),
         solution!(year2017, day09),
+        solution!(year2017, day10),
+        solution!(year2017, day11),
+        solution!(year2017, day12),
 
         solution!(year2020, day18),
 
