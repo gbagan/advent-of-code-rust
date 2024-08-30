@@ -1,7 +1,6 @@
 use itertools::Itertools;
 use lazy_static::lazy_static;
-
-use crate::util::parser::ParseIter;
+use crate::util::parser::*;
 
 struct Boss {
     hp: i32,

@@ -1,16 +1,10 @@
 use std::mem;
+use itertools::Itertools;
 use num_integer::Integer;
+use crate::util::parser::*;
 
-fn parse_line(line: &str) -> Option<(i64, i64)> {
-    let (depth, range) = line.split_once(": ")?;
-    let depth = depth.parse().ok()?;
-    let range = range.parse().ok()?;
-    Some((depth, range))
-}
-
-
-pub fn solve(input: &str) -> Option<(i64, i64)> {
-    let mut pairs: Vec<_> = input.lines().filter_map(parse_line).collect();
+pub fn solve(input: &str) -> Option<(i32, i32)> {
+    let mut pairs: Vec<(i32, i32)> = input.iter_unsigned().tuples().collect();
     pairs.sort_unstable_by_key(|p| p.1);
     let p1 = part1(&pairs);
     let p2 = part2(&pairs)?;
@@ -18,11 +12,11 @@ pub fn solve(input: &str) -> Option<(i64, i64)> {
 }
 
 #[inline]
-fn caught(depth: i64, range: i64) -> bool {
+fn caught(depth: i32, range: i32) -> bool {
     depth % ((range-1)*2) == 0
 }
 
-fn part1(pairs: &[(i64, i64)]) -> i64 {
+fn part1(pairs: &[(i32, i32)]) -> i32 {
     pairs
         .iter()
         .filter(|(depth, range)| caught(*depth, *range))
@@ -30,8 +24,8 @@ fn part1(pairs: &[(i64, i64)]) -> i64 {
         .sum() 
 }
 
-fn part2(pairs: &[(i64, i64)]) -> Option<i64> {
-    let mut forbiddens: Vec<(i64, Vec<i64>)> = vec!();
+fn part2(pairs: &[(i32, i32)]) -> Option<i32> {
+    let mut forbiddens: Vec<(i32, Vec<i32>)> = vec!();
     let mut prev_range = 0;
     for &(depth, range) in pairs {
         let period = 2 * (range - 1);

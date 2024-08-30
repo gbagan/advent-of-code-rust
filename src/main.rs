@@ -11,17 +11,17 @@ use aoc::*;
 struct Solution {
     year: String,
     day: String,
-    func: fn(String) -> Option<(String, String)>,
+    func: fn(&String) -> Option<(String, String)>,
 }
 
 macro_rules! solution {
     ($year:tt, $day:tt) => {{
         let year = stringify!($year).trim_matches(char::is_alphabetic).to_string(); 
         let day = stringify!($day).trim_matches(char::is_alphabetic).to_string();
-        let func = |input: String| {
+        let func = |input: &String| {
             use $year::$day::*;
 
-            let (p1, p2) = solve(&input)?;
+            let (p1, p2) = solve(input)?;
             Some((p1.to_string(), p2.to_string()))
         };
 
@@ -54,12 +54,27 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
         let path = Path::new("inputs").join(year).join(day);
         if let Ok(data) = read_to_string(&path) {
             let instant = Instant::now();
-            let res = func(data);
-            let elapsed = instant.elapsed();
+            let res = func(&data);
+            let mut elapsed = instant.elapsed();
+            let microseconds = elapsed.as_micros();
+
+            let mut iterations = 0;
+
+            if !display_solution {
+                elapsed = Duration::ZERO;
+                iterations = if microseconds < 1000 {100} else {10};
+                for _ in 0..iterations {
+                    let data = data.clone();
+                    let instant = Instant::now();
+                    func(&data);
+                    elapsed += instant.elapsed();
+                }
+                elapsed /= iterations;
+            }
 
             solved += 1;
             duration += elapsed;
-            let microseconds = elapsed.as_micros();
+            
             let text = format!("{microseconds} μs");
             let text =
                 if microseconds < 1000 {
@@ -69,7 +84,11 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
                 } else {
                 Red.bold().paint(text)
                 };
-            println!("{year} Day {day} in {text}.");
+            if display_solution {
+                println!("{year} Day {day} in {text}.");
+            } else {
+                println!("{year} Day {day} in {text} on average over {iterations} iterations.");
+            }
             match res  {
                 None => println!("  has failed"),
                 Some((part1, part2)) => {
@@ -177,8 +196,12 @@ fn solutions() -> Vec<Solution> {
         solution!(year2017, day14),
         solution!(year2017, day15),
         solution!(year2017, day16),
-
+        solution!(year2017, day17),
         solution!(year2020, day18),
+        // todo
+        solution!(year2017, day19),
+        solution!(year2017, day20),
+        solution!(year2017, day21),
 
         solution!(year2023, day01),
         solution!(year2023, day02),

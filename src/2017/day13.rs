@@ -30,10 +30,3 @@ fn part2(pairs: &Vec<(u64, u64)>) -> u64 {
     .find(|i| ! pairs.iter().any(|(depth, range)| caught(i+depth, *range)))
     .unwrap()
 }
-
-fn main() {
-    let input = include_str!("../../inputs/2017/13");
-    aoc_with_parser(input, input_parser, |pairs| {
-        (part1(&pairs), part2(&pairs))
-    })
-}

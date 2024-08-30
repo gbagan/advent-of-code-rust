@@ -1,6 +1,6 @@
 use itertools::Itertools;
 
-use crate::util::parser::ParseIter;
+use crate::util::parser::*;
 use crate::util::permutation::Permutation;
 use crate::util::power;
 
