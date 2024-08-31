@@ -32,7 +32,7 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
 }
 
 #[inline(always)]
-pub fn find_max(banks: u64) -> (u32, u64) {
+fn find_max(banks: u64) -> (u32, u64) {
     let mut mask = 0x8888_8888_8888_8888;
     let mut banks2 = banks;
     for _ in 0..4 {
@@ -44,7 +44,7 @@ pub fn find_max(banks: u64) -> (u32, u64) {
     (offset, banks >> offset & 0xf)
 }
 
-pub fn step(banks: &u64) -> u64 {
+fn step(banks: &u64) -> u64 {
     let banks = *banks;
     let (offset, max) = find_max(banks);
     (banks & 0xffff_ffff_ffff_fff0u64.rotate_left(offset)) + SPREAD[max as usize].rotate_left(offset)

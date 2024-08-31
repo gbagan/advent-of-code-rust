@@ -2,13 +2,13 @@ use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use crate::util::{math::solve_linear_system, parser::*};
 
-pub struct Hailstone {
-    pub px: i64,
-    pub py: i64,
-    pub pz: i64,
-    pub vx: i64,
-    pub vy: i64,
-    pub vz: i64,
+struct Hailstone {
+    px: i64,
+    py: i64,
+    pz: i64,
+    vx: i64,
+    vy: i64,
+    vz: i64,
 } 
 
 fn parse_line(line: &str) -> Option<Hailstone>{
@@ -44,7 +44,7 @@ fn crosses_inside_test_area(start: i64, end: i64, h1: &Hailstone, h2: &Hailstone
     x >= start && y >= start && x <= end && y <= end
 }
 
-pub fn part1(hailstones: &[Hailstone]) -> u32 {
+fn part1(hailstones: &[Hailstone]) -> u32 {
     let start = 200_000_000_000_000i64;
     let end = 400_000_000_000_000i64;
     let mut counter = 0;
@@ -79,7 +79,7 @@ fn diff_equations(e1: &[Vec<i64>], e2: &[Vec<i64>]) -> Vec<Vec<OrderedFloat<f64>
     res
 }
 
-pub fn part2(hs: &[Hailstone]) -> Option<i64> {
+fn part2(hs: &[Hailstone]) -> Option<i64> {
     let e1 = build_equations(&hs[0]);
     let e2 = build_equations(&hs[1]);
     let e3 = build_equations(&hs[2]);

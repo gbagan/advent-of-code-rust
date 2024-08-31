@@ -1,7 +1,7 @@
 use rayon::prelude::*;
 use crate::util::{coord::Coord, grid::Grid, iter::AOCIter};
 
-pub struct Input {
+struct Input {
     grid: Grid<u8>,
     north: Grid<i32>,
     south: Grid<i32>,
@@ -138,7 +138,7 @@ fn count_energized(input: &Input, start_pos: Coord, start_dir: u8) -> usize {
     energized.vec.iter().count_by(|&x| x)
 }
 
-pub fn part2(input: &Input) -> Option<usize> {
+fn part2(input: &Input) -> Option<usize> {
     let Input {grid, ..} = input;
     let mut starts = vec!();
     for x in 0..grid.width as i32 {

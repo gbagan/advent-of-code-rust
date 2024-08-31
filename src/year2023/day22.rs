@@ -90,7 +90,7 @@ fn lowest_common_ancestor(ancestor: &[(usize, u32)], nodes: &[usize]) -> (usize,
     }).unwrap()
 }
 
-pub fn part1(dominator: &Dominators) -> usize {
+fn part1(dominator: &Dominators) -> usize {
     let mut safe = vec![true; dominator.len()];
     for (v, _) in dominator {
         safe[*v] = false;

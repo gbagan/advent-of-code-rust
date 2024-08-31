@@ -45,7 +45,7 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
     Some((p1, 0))
 }
 
-pub fn part1(graph: &Graph) -> usize {
+fn part1(graph: &Graph) -> usize {
     let n = graph.len();
     let mut saturated = HashSet::new(); //Grid::new(n, n, false);
     let mut visited: Vec<_> = graph.iter().map(|_| 0).collect();

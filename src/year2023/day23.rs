@@ -2,7 +2,7 @@ use crate::util::coord::Coord;
 use crate::util::grid::Grid;
 use std::collections::{HashSet, HashMap};
 
-pub struct GridGraph {
+struct GridGraph {
     extremities: u32,
     horizontal: [[u32; 5]; 6],
     vertical: [[u32; 6]; 5],

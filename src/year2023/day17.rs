@@ -71,12 +71,12 @@ struct BucketQueue<A> {
 }
 
 impl <A> BucketQueue<A> {
-    pub fn new(n: usize) -> BucketQueue<A> {
+    fn new(n: usize) -> BucketQueue<A> {
         let buckets = (0..n).map(|_| vec!()).collect();
         BucketQueue { buckets, min: None }
     }
 
-    pub fn insert(&mut self, key: usize, val: A) {
+    fn insert(&mut self, key: usize, val: A) {
         if key >= self.buckets.len() {
             self.buckets
                 .resize_with(key + 1, || Vec::new());
@@ -88,7 +88,7 @@ impl <A> BucketQueue<A> {
         }
     }
 
-    pub fn pop(&mut self) -> Option<(usize, A)> {
+    fn pop(&mut self) -> Option<(usize, A)> {
         if let Some(min) = self.min {
             let v = self.buckets[min].pop()?;
             self.min = (min..self.buckets.len()).find(|&i| !self.buckets[i].is_empty());

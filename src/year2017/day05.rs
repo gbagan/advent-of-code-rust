@@ -3,7 +3,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
     Some((part1(&jumps), part2(&jumps)))
 }
 
-pub fn part1(jumps: &[i32]) -> u32 {
+fn part1(jumps: &[i32]) -> u32 {
     let mut jumps = jumps.to_vec();
     let n = jumps.len() as i32;
 
@@ -18,7 +18,7 @@ pub fn part1(jumps: &[i32]) -> u32 {
     steps
 }
 
-pub fn part2(jumps: &[i32]) -> u32 {
+fn part2(jumps: &[i32]) -> u32 {
     let mut jumps = jumps.to_vec();
     let n = jumps.len() as i32;
 

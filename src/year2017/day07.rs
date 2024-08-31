@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use itertools::{Itertools, MinMaxResult};
 
-pub struct Node<'a> {
+struct Node<'a> {
     id: &'a str,
     weight:u32,
     total_weight: u32,

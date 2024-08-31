@@ -6,8 +6,7 @@ pub fn solve(input: &str) -> Option<(i32, i32)> {
     Some((part1(n), part2(n)))
 }
 
-// todo: can be simplified
-pub fn part1(n: i32) -> i32 {
+fn part1(n: i32) -> i32 {
     let n = n - 1;
     if n <= 0 {
         return 0;
@@ -22,7 +21,7 @@ fn fill(grid: &HashMap<Coord,i32>, c: &Coord) -> i32 {
     c.surrounding().iter().filter_map(|a| grid.get(a)).sum()
 }
 
-pub fn part2(n: i32) -> i32 {
+fn part2(n: i32) -> i32 {
     let mut grid = HashMap::new();
     let mut c = Coord::ORIGIN;
     grid.insert(c, 1);

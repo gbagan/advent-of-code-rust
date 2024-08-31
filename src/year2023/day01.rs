@@ -1,22 +1,13 @@
-const PATTERNS: [(&str, u32); 18] = [
-    ("1", 1),
-    ("2", 2),
-    ("3", 3),
-    ("4", 4),
-    ("5", 5),
-    ("6", 6), 
-    ("7", 7),
-    ("8", 8),
-    ("9", 9),
-    ("one", 1),
-    ("two", 2),
-    ("three", 3),
-    ("four", 4),
-    ("five", 5),
-    ("six", 6), 
-    ("seven", 7),
-    ("eight", 8),
-    ("nine", 9),
+const PATTERNS: [(&[u8], u32); 9] = [
+    (b"one", 1),
+    (b"two", 2),
+    (b"three", 3),
+    (b"four", 4),
+    (b"five", 5),
+    (b"six", 6), 
+    (b"seven", 7),
+    (b"eight", 8),
+    (b"nine", 9),
 ];
 
 pub fn solve(input: &str) -> Option<(u32, u32)> {
@@ -29,19 +20,32 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
     Some((p1, p2))
 }
 
+fn matches_pattern1(c: u8) -> Option<u32> {
+    if c.is_ascii_digit() {
+        Some((c - b'0') as u32)
+    } else {
+        None
+    }
+}
+
 fn solve_one(line: &str) -> Option<u32> {
-    let n: u32 = line.chars().find_map(|c| c.to_digit(10))?;
-    let m: u32 = line.chars().rev().find_map(|c| c.to_digit(10))?;
+    let n: u32 = line.bytes().find_map(matches_pattern1)?;
+    let m: u32 = line.bytes().rev().find_map(matches_pattern1)?;
     Some(n*10+m)
 }
 
-fn matches_pattern(s: &str) -> Option<u32> {
-    PATTERNS.iter().find_map(|&(pat, n)| s.starts_with(pat).then_some(n))
+fn matches_pattern2(s: &[u8]) -> Option<u32> {
+    if s[0].is_ascii_digit() {
+        Some((s[0] - b'0') as u32)
+    } else {
+        PATTERNS.iter().find_map(|&(pat, n)| s.starts_with(pat).then_some(n))
+    }
 }
 
 fn solve_two(line: &str) -> Option<u32> {
-    let n: u32 = (0..line.len()).find_map(|i| matches_pattern(&line[i..]))?;
-    let m: u32 = (0..line.len()).rev().find_map(|i| matches_pattern(&line[i..]))?;
+    let line = line.as_bytes();
+    let n: u32 = (0..line.len()).find_map(|i| matches_pattern2(&line[i..]))?;
+    let m: u32 = (0..line.len()).rev().find_map(|i| matches_pattern2(&line[i..]))?;
     Some(n*10+m)
 }
 

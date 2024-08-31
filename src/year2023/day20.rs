@@ -33,7 +33,7 @@ pub fn solve(input: &str) -> Option<(u64, u64)> {
     Some((p1, p2))
 }
 
-pub fn part1(numbers: &[u32]) -> u64 {
+fn part1(numbers: &[u32]) -> u64 {
     let n = numbers.len() as u32;
     let mut nb_low = 1000 * (1 + n); // received and sent by the broadcaster
     let mut nb_high = 1000 * n; // (unique) bit changed to one in each component
@@ -58,6 +58,6 @@ pub fn part1(numbers: &[u32]) -> u64 {
     nb_low as u64 * nb_high as u64
 }
 
-pub fn part2(numbers: &[u32]) -> u64 {
+fn part2(numbers: &[u32]) -> u64 {
     numbers.iter().map(|&v| v as u64).product()
 }

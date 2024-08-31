@@ -2,7 +2,7 @@ use crate::util::grid::Grid;
 use crate::util::many_times_on;
 
 // north_cubes[next_north_cubre[p]] is the position of the next cube rock at the north of the position p
-pub struct Input {
+struct Input {
     width: usize,
     height: usize,
     rounded: Vec::<i16>,
@@ -101,13 +101,13 @@ fn tilt(rounded: &mut [i16], cubes: &[i16], next_cube: &[i16], direction: i16) -
 }
 
 
-pub fn part1(input: &Input) -> usize {
+fn part1(input: &Input) -> usize {
     let mut rounded = input.rounded.clone();
     tilt(&mut rounded, &input.north_cubes, &input.next_cube_north, input.width as i16);
     rounded.iter().map(|&i| input.height - 1 - (i as usize / input.width)).sum()
 }
 
-pub fn step(rounded: &[i16], input: &Input) -> (Vec<i16>, Vec<i16>) {
+fn step(rounded: &[i16], input: &Input) -> (Vec<i16>, Vec<i16>) {
     let mut rounded = rounded.to_vec();
     tilt(&mut rounded, &input.north_cubes, &input.next_cube_north, input.width as i16);
     tilt(&mut rounded, &input.west_cubes, &input.next_cube_west, 1);
@@ -116,7 +116,7 @@ pub fn step(rounded: &[i16], input: &Input) -> (Vec<i16>, Vec<i16>) {
     (rounded, state)
 }
 
-pub fn part2(input: &Input) -> usize {
+fn part2(input: &Input) -> usize {
     let (rounded, _) =  many_times_on(1_000_000_000, (input.rounded.clone(), vec!()), |p| p.1.clone(),
                                 |p| step(&p.0, input));
     rounded.iter().map(|&i| input.height - 1 - (i as usize / input.width)).sum()

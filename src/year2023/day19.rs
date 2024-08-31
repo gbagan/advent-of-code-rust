@@ -3,11 +3,11 @@ use itertools::Itertools;
 
 type Workflows<'a> = HashMap<&'a str, Vec<Step<'a>>>;
 
-pub enum Instr<'a> { Accept, Reject, Goto(&'a str) }
-pub enum Test { LT(usize, u16), GT(usize, u16), Otherwise }
-pub struct Step<'a> {
-    pub test: Test,
-    pub instr: Instr<'a>,
+enum Instr<'a> { Accept, Reject, Goto(&'a str) }
+enum Test { LT(usize, u16), GT(usize, u16), Otherwise }
+struct Step<'a> {
+    test: Test,
+    instr: Instr<'a>,
 }
 
 pub fn solve(input: &str) -> Option<(u32, u64)> {

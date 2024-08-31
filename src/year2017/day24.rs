@@ -3,7 +3,7 @@ use itertools::Itertools;
 
 #[derive(Clone, Copy)]
 struct Edge {
-    id: usize,
+    id: u64,
     left: usize,
     right: usize,
     weight: usize,
@@ -12,7 +12,7 @@ struct Edge {
 
 struct State {
     end: usize,
-    edges: usize,
+    edges: u64,
     length: u32,
     weight: usize,
 }
@@ -29,7 +29,6 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
 
     let mut graph = vec![vec!();n];
     for e in edges {
-        println!("{}", e.weight);
         graph[e.left].push(e);
         graph[e.right].push(Edge {left: e.right, right: e.left, ..e});
     }
@@ -52,17 +51,20 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
             *e = Edge { left: v2, right: v1, ..new_edge };
         }
     }
+
+    for nbor in graph.iter_mut() {
+        nbor.sort_unstable_by_key(|e| e.left.abs_diff(e.right)); 
+    }
+
     let mut stack = vec!();
     let mut p1 = 0;
-    
-    for v in 0..n {
-        if graph[v].len() != 2 {
-            stack.push(State { end: v, edges: 0, length: 0, weight: 0 });
-        }
-    }
+    let mut p2 = (0, 0);
+
+    stack.push(State { end: 0, edges: 0, length: 0, weight: 0 });
 
     while let Some(state) = stack.pop() {
         p1 = p1.max(state.weight);
+        p2 = p2.max((state.length, state.weight));
         for edge in &graph[state.end] {
             if edge.id & state.edges != 0 {
                 continue;
@@ -73,7 +75,10 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
                                           edges: state.edges | edge.id
                                         };
             stack.push(new_state);
+            if edge.left == edge.right {
+                break;
+            }
         }
     }
-    Some((p1, p1))
+    Some((p1, p2.1))
 }
