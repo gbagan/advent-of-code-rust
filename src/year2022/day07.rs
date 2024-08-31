@@ -26,6 +26,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
     }
 
     let p1 = sizes.iter().filter(|&&size| size <= 100_000).sum();
+
     let total_size = sizes.last().unwrap();
     let min_size = total_size - 40_000_000;
     let p2 = sizes.iter().filter(|&&size| size >= min_size).min().copied()?;

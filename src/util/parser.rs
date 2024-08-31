@@ -96,12 +96,23 @@ fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(bytes: &mut Bytes<'_>) -
 }
 
 pub trait UnsignedIter {
+    fn next_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> Option<T>;
+    fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> Option<T>;
     fn iter_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> ParseUnsigned<'_, T>;
     fn iter_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> ParseSigned<'_, T>;
 
 }
 
 impl UnsignedIter for &str {
+    fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> Option<T> {
+        next_signed(&mut self.bytes())  
+    }
+    
+    fn next_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> Option<T> {
+        next_unsigned(&mut self.bytes())  
+    }
+
+
     fn iter_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> ParseUnsigned<'_, T> {
         ParseUnsigned { bytes: self.bytes(), phantom: PhantomData }
     }

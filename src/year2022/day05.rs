@@ -18,8 +18,8 @@ pub fn solve(input: &str) -> Option<(String, String)> {
     for (amount, from, to) in input2.iter_unsigned::<usize>().tuples() {
         let from = from - 1;
         let to = to - 1;
-        move_crates(&mut stacks, amount, from, to, true);
-        move_crates(&mut stacks2, amount, from, to, false);
+        move_crates::<true>(&mut stacks, amount, from, to);
+        move_crates::<false>(&mut stacks2, amount, from, to);
     }
 
     let p1 = stacks.iter().filter_map(|stack| stack.last()).collect();
@@ -28,11 +28,11 @@ pub fn solve(input: &str) -> Option<(String, String)> {
     Some((p1, p2))
 }
 
-fn move_crates(stacks: &mut [Vec<char>], amount: usize, from: usize, to: usize, reverse: bool) {
+fn move_crates<const REVERSE: bool>(stacks: &mut [Vec<char>], amount: usize, from: usize, to: usize) {
     let n = stacks[from].len() - amount;
     let [rfrom, rto] = stacks.get_many_mut([from, to]).unwrap();
     let moved = rfrom.drain(n..);
-    if reverse {
+    if REVERSE {
         rto.extend(moved.rev());  
     } else {    
         rto.extend(moved);
