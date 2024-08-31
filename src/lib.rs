@@ -1,5 +1,6 @@
 #![feature(portable_simd)]
 #![feature(int_roundings)]
+#![feature(get_many_mut)]
 pub mod util;
 
 pub mod year2015 {
@@ -69,6 +70,10 @@ pub mod year2022 {
     pub mod day01;
     pub mod day02;
     pub mod day03;
+    pub mod day04;
+    pub mod day05;
+    pub mod day06;
+    pub mod day07;
 }
 
 pub mod year2023 {

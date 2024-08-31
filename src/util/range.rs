@@ -1,33 +1,46 @@
 use std::ops::{BitAnd, BitOr};
 
+use num_integer::Integer;
+use num_traits::ConstOne;
+
 #[derive (PartialEq, Eq, Copy, Clone, Debug)]
-pub struct Range {
-    pub lower: i64,
-    pub upper: i64,
+pub struct Range<A> {
+    pub lower: A,
+    pub upper: A,
 }
 
-impl Range {
+impl<A: Integer + Copy + Ord + ConstOne> Range<A> {
     #[inline]
-    pub fn new(lower: i64, upper: i64) -> Self {
+    pub fn new(lower: A, upper: A) -> Self {
         Range { lower, upper }
     }
     
     #[inline]
-    pub fn contains(&self, v: i64) -> bool {
+    pub fn contains(&self, v: A) -> bool {
         v >= self.lower && v <= self.upper
     }
 
     #[inline]
-    pub fn length(&self) -> i64 {
-        self.upper + 1 -  self.lower
+    pub fn fully_contains(&self, other: &Self) -> bool {
+        self.lower <= other.lower && other.upper <= self.upper
     }
 
     #[inline]
-    pub fn shift(&self, v: i64) -> Self {
+    pub fn length(&self) -> A {
+        self.upper - self.lower + A::ONE
+    }
+
+    #[inline]
+    pub fn overlaps(&self, other: &Self) -> bool {
+        self.upper >= other.lower && other.upper >= self.lower
+    }
+
+    #[inline]
+    pub fn shift(&self, v: A) -> Self {
         Range { lower: self.lower + v, upper: self.upper + v }       
     }
 
-    pub fn disjoint_union(ranges: &[Range]) -> Vec<Range> {
+    pub fn disjoint_union(ranges: &[Range<A>]) -> Vec<Range<A>> {
         let mut ranges = ranges.to_vec();
         ranges.sort_by_key(|r| r.lower);
         let mut it = ranges.iter();
@@ -48,7 +61,7 @@ impl Range {
     }
 }
 
-impl BitAnd for Range {
+impl<A: Integer + Ord + Copy + ConstOne> BitAnd for Range<A> {
     type Output = Option<Self>;
     fn bitand(self, other: Self) -> Self::Output {
         if self.upper < other.lower || other.upper < self.lower {
@@ -59,8 +72,8 @@ impl BitAnd for Range {
     }
 }
 
-impl BitAnd for &Range {
-    type Output = Option<Range>;
+impl<A: Integer + Ord + Copy + ConstOne> BitAnd for &Range<A> {
+    type Output = Option<Range<A>>;
     fn bitand(self, other: Self) -> Self::Output {
         if self.upper < other.lower || other.upper < self.lower {
             None
@@ -70,10 +83,10 @@ impl BitAnd for &Range {
     }
 }
 
-impl BitOr for Range {
-    type Output = Option<Range>;
+impl<A: Integer + Ord + Copy + ConstOne> BitOr for Range<A> {
+    type Output = Option<Range<A>>;
     fn bitor(self, other: Self) -> Self::Output {
-        if self.lower.max(other.lower) <= self.upper.min(other.upper) + 1 {
+        if self.lower.max(other.lower) <= self.upper.min(other.upper) + A::ONE {
             Some(Range::new(self.lower.min(other.lower), self.upper.max(other.upper)))
         } else {
             None

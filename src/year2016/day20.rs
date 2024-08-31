@@ -1,17 +1,15 @@
-use crate::util::range::Range;
+use itertools::Itertools;
+use crate::util::{parser::*, range::Range};
 
-fn parse_range(line: &str) -> Option<Range> {
-    let (lower, upper) = line.split_once('-')?;
-    let lower = lower.parse().ok()?;
-    let upper = upper.parse().ok()?;
-    Some(Range::new(lower, upper))
-}
-
-pub fn solve(input: &str) -> Option<(i64, i64)> {
-    let ranges: Vec<_> = input.lines().filter_map(parse_range).collect();
+pub fn solve(input: &str) -> Option<(u32, u32)> {
+    let ranges: Vec<_> = input
+                            .iter_unsigned::<u32>()
+                            .tuples()
+                            .map(|(x, y)| Range::new(x, y))
+                            .collect();
     let ranges = Range::disjoint_union(&ranges);
-    let p1 = ranges[0].upper + 1;
-    let p2 = (1 << 32) - ranges.iter().map(|r| r.length()).sum::<i64>();
+    let p1 = ranges[0].upper as u32 + 1;
+    let p2 = 0u32.wrapping_sub(ranges.iter().map(|r| r.length()).sum::<u32>());
     Some((p1, p2))
 
 }

@@ -2,7 +2,7 @@ use crate::util::{parser::*, range::Range};
 use itertools::Itertools;
 
 struct ShiftRange {
-    range: Range,
+    range: Range<i64>,
     shift: i64,
 }
 
@@ -45,7 +45,7 @@ fn part1(seeds: &[i64], maps: &[Vec<ShiftRange>]) -> Option<i64> {
     seeds.iter().min().copied()
 }
 
-fn step2(seeds: &Vec<Range>, ranges: &Vec<ShiftRange>) -> Vec<Range> {
+fn step2(seeds: &Vec<Range<i64>>, ranges: &Vec<ShiftRange>) -> Vec<Range<i64>> {
     let mut result = vec!(); 
     for &seed_range in seeds {
         for range in ranges {
