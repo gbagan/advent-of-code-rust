@@ -2,13 +2,16 @@
 
 use crate::util::{coord::Coord, grid::Grid};
 
+type Point = Coord::<i32>;
+
+
 pub fn solve(input: &str) -> Option<(i32,i32)> {
     let grid = Grid::parse(input);
     let mut start = None;
     for y in 0..grid.height {
         for x in 0..grid.width {
             if grid[(x, y)] == b'S' {
-                start = Some(Coord::new(x as i32, y as i32))
+                start = Some(Point::new(x as i32, y as i32))
             }
         }
     }
@@ -20,10 +23,10 @@ pub fn solve(input: &str) -> Option<(i32,i32)> {
     let mut area = current.y * prev.x - current.x * prev.y;
     while current != start {
         dir = match grid[current] {
-            b'L' => if dir == Coord::SOUTH {Coord::EAST} else {Coord::NORTH} 
-            b'J' => if dir == Coord::SOUTH {Coord::WEST} else {Coord::NORTH}
-            b'7' => if dir == Coord::NORTH {Coord::WEST} else {Coord::SOUTH}
-            b'F' => if dir == Coord::NORTH {Coord::EAST} else {Coord::SOUTH}
+            b'L' => if dir == Point::SOUTH {Point::EAST} else {Point::NORTH} 
+            b'J' => if dir == Point::SOUTH {Point::WEST} else {Point::NORTH}
+            b'7' => if dir == Point::NORTH {Point::WEST} else {Point::SOUTH}
+            b'F' => if dir == Point::NORTH {Point::EAST} else {Point::SOUTH}
             _ => dir
         };
         length += 1;

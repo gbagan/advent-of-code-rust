@@ -1,6 +1,8 @@
 use rayon::prelude::*;
 use crate::util::{coord::Coord, grid::Grid, iter::AOCIter};
 
+type Point = Coord::<i32>;
+
 struct Input {
     grid: Grid<u8>,
     north: Grid<i32>,
@@ -76,12 +78,12 @@ pub fn solve(input: &str) -> Option<(usize, usize)>{
     }
 
     let input = Input { grid, north, south, west, east};
-    let p1 = count_energized(&input, Coord::ORIGIN, EAST);
+    let p1 = count_energized(&input, Point::new(0, 0), EAST);
     let p2 = part2(&input)?;
     Some((p1, p2))
 }
 
-fn count_energized(input: &Input, start_pos: Coord, start_dir: u8) -> usize {
+fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> usize {
     let Input { grid, north, south, west, east } = input;
     let mut energized = input.grid.map(|_| false);
     let mut visited: Grid<u8> = input.grid.map(|_|  0);

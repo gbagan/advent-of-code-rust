@@ -1,24 +1,26 @@
 use crate::util::coord::Coord;
 
-fn to_coord(s: &str) -> Coord {
+type Point = Coord<i32>;
+
+fn to_coord(s: &str) -> Point {
     match s {
-        "nw" => Coord::new(-1, -1),
-        "ne" => Coord::new(1, 0),
-        "n" => Coord::new(0, -1),
-        "sw" => Coord::new(-1, 0),
-        "se" => Coord::new(1, 1),
-        "s" => Coord::new(0, 1),
+        "nw" => Point::new(-1, -1),
+        "ne" => Point::new(1, 0),
+        "n" => Point::new(0, -1),
+        "sw" => Point::new(-1, 0),
+        "se" => Point::new(1, 1),
+        "s" => Point::new(0, 1),
         _ => panic!("unexpected characters: {s}")
     }
 }
 
-fn distance(Coord {x, y}: Coord) -> i32 {
+fn distance(Point {x, y}: Point) -> i32 {
     x.abs().max(y.abs()).max((x-y).abs())
 }
 
 pub fn solve(input: &str) -> Option<(i32, i32)> {
     let directions = input.trim().split(',').map(to_coord);
-    let coords = directions.scan(Coord::ORIGIN, |acc, dir| {
+    let coords = directions.scan(Point::ORIGIN, |acc, dir| {
         *acc += dir;
         Some (*acc)
     });

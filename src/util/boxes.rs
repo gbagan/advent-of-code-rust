@@ -9,7 +9,7 @@ pub struct Box {
 
 impl Box {
     #[inline]
-    pub fn contains (&self, point: &Coord) -> bool {
+    pub fn contains (&self, point: &Coord<i32>) -> bool {
         self.xmin <= point.x && point.x <= self.xmax && self.ymin <= point.y && point.y <= self.ymax
     }
 }

@@ -31,7 +31,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
     // compute number_grid which at each position associates the number written at this position or None otherwise
     for y in 0..(grid.width as i64) {
         for x in 0..(grid.height as i64) {
-            let c = grid.vec[i];
+            let c = grid[i];
             if c.is_ascii_digit() {
                 if first_digit.is_none() {
                     first_digit = Some(x)

@@ -3,23 +3,25 @@
 use itertools::Itertools;
 use crate::util::coord::Coord;
 
-fn parse_line(line: &str) -> Option<((Coord, i32), (Coord, i32))> {
+type Point = Coord<i32>;
+
+fn parse_line(line: &str) -> Option<((Point, i32), (Point, i32))> {
     let (dir1, len1, hex) = line.split_ascii_whitespace().next_tuple()?;
     let dir1 = match dir1 {
-        "L" => Coord::WEST,
-        "R" => Coord::EAST,
-        "U" => Coord::NORTH,
-        "D" => Coord::SOUTH,
+        "L" => Point::WEST,
+        "R" => Point::EAST,
+        "U" => Point::NORTH,
+        "D" => Point::SOUTH,
         _ => panic!("unexcepted character: {dir1}")
     };
     let len1 = len1.parse().ok()?;
     let mut hex = hex.trim_matches(['(', ')', '#']).to_string();
     let dir2 = hex.pop()?;
     let dir2 = match dir2 {
-        '0' => Coord::EAST,
-        '1' => Coord::SOUTH,
-        '2' => Coord::WEST,
-        '3'   => Coord::NORTH,
+        '0' => Point::EAST,
+        '1' => Point::SOUTH,
+        '2' => Point::WEST,
+        '3'   => Point::NORTH,
         _ => panic!("unexcepted character: {dir2}")
     };
     let len2 = i32::from_str_radix(&hex, 16).ok()?;
@@ -39,11 +41,11 @@ pub fn solve(input: &str) -> Option<(i64, i64)> {
 }
 
 
-fn lava(instrs: &Vec<(Coord, i32)>) -> i64 {
+fn lava(instrs: &Vec<(Point, i32)>) -> i64 {
     let mut boundary = 0;
     let mut area = 0;
     let mut prev;
-    let mut current = Coord::ORIGIN;
+    let mut current = Point::ORIGIN;
     for (direction, length) in instrs {
         boundary += length;
         prev = current;

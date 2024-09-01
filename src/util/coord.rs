@@ -1,48 +1,63 @@
 use std::ops::{Add,AddAssign,Mul,Neg,Sub};
 use std::iter::Sum;
+use num_integer::Integer;
+use num_traits::{ConstOne, Signed};
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord, Hash)]
-pub struct Coord {
-    pub y: i32,
-    pub x: i32,
+fn distance<A: Integer + Ord>(a: A, b: A) -> A {
+    if a >= b { a - b } else { b - a} 
 }
 
-impl Coord {
+#[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord, Hash)]
+pub struct Coord<A> {
+    pub y: A,
+    pub x: A,
+}
+
+impl<A: Copy + Ord + Integer + ConstOne> Coord<A> {
     #[inline]
-    pub fn new(x: i32, y: i32) -> Coord {
+    pub fn new(x: A, y: A) -> Coord<A> {
         Coord { x, y }
     }
 
-    pub fn manhattan(&self, other: &Self) -> i32 {
-        (self.x - other.x).abs() +  (self.y - other.y).abs()
+    pub fn manhattan(&self, other: Self) -> A {
+        distance(self.x, other.x) +  distance(self.y, other.y)
     }
 
+    /*
     pub const ORIGIN: Coord = Coord { x: 0, y: 0 };
     pub const NORTH: Coord = Coord { x: 0, y: -1 };
     pub const SOUTH: Coord = Coord { x: 0, y: 1 };
     pub const WEST: Coord = Coord { x: -1, y: 0 };
     pub const EAST: Coord = Coord { x: 1, y: 0 };
+    */
 
     #[inline]
     pub fn left(&self) -> Self {
-        Coord { x: self.x-1, y: self.y }
+        Coord { x: self.x-A::ONE, y: self.y }
     }
 
     #[inline]
     pub fn right(&self) -> Self {
-        Coord { x: self.x+1, y: self.y }
+        Coord { x: self.x+A::ONE, y: self.y }
     }
 
     #[inline]
     pub fn above(&self) -> Self {
-        Coord { x: self.x, y: self.y-1 }
+        Coord { x: self.x, y: self.y-A::ONE }
     }
 
     #[inline]
     pub fn below(&self) -> Self {
-        Coord { x: self.x, y: self.y+1 }
+        Coord { x: self.x, y: self.y+A::ONE }
     }
 
+    #[inline]
+    pub fn adjacent(&self) -> Vec<Self> {
+        vec!( self.left(), self.right(), self.above(), self.below())
+    }
+}
+
+impl<A: Copy + Ord + Integer + Signed + ConstOne> Coord<A> {
     #[inline]
     pub fn turn_left(&self) -> Self {
         Coord { x: self.y, y: -self.x }
@@ -54,11 +69,6 @@ impl Coord {
     }
 
     #[inline]
-    pub fn adjacent(&self) -> Vec<Self> {
-        vec!( self.left(), self.right(), self.above(), self.below())
-    }
-
-    #[inline]
     pub fn surrounding(&self) -> Vec<Self> {
         let left = self.left();
         let right = self.right();
@@ -66,11 +76,11 @@ impl Coord {
     }
 }
 
-impl Add for Coord {
+impl<A: Integer> Add for Coord<A> {
     type Output = Self;
 
     #[inline]
-    fn add(self, other: Self) -> Coord {
+    fn add(self, other: Self) -> Self {
         Coord {
             x: self.x + other.x,
             y: self.y + other.y,
@@ -78,7 +88,7 @@ impl Add for Coord {
     }
 }
 
-impl AddAssign for Coord {
+impl<A: Integer + Copy> AddAssign for Coord<A> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
         *self = Self {
@@ -88,7 +98,7 @@ impl AddAssign for Coord {
     }
 }
 
-impl Neg for Coord {
+impl<A: Signed> Neg for Coord<A> {
     type Output = Self;
 
     #[inline]
@@ -100,11 +110,11 @@ impl Neg for Coord {
     }
 }
 
-impl Mul<i32> for Coord {
+impl<A: Integer + Copy> Mul<A> for Coord<A> {
     type Output = Self;
 
     #[inline]
-    fn mul(self, n: i32) -> Self::Output {
+    fn mul(self, n: A) -> Self::Output {
         Coord {
             x: n * self.x,
             y: n * self.y,
@@ -112,11 +122,11 @@ impl Mul<i32> for Coord {
     }
 }
 
-impl Sub for Coord {
+impl<A: Integer>Sub for Coord<A> {
     type Output = Self;
 
     #[inline]
-    fn sub(self, other: Coord) -> Coord {
+    fn sub(self, other: Self) -> Self {
         Coord {
             x: self.x - other.x,
             y: self.y - other.y,
@@ -124,19 +134,38 @@ impl Sub for Coord {
     }
 }
 
-impl Sum for Coord {
+/* 
+impl<A> Sum for Coord<A> {
     fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
         iter.fold(Self::ORIGIN, |a, b| a + b)
     }
 }
 
-impl<'a> Sum<&'a Self> for Coord {
+impl<'a, A> Sum<&'a Self> for Coord<A> {
     fn sum<I>(iter: I) -> Self
     where I: Iterator<Item = &'a Self>,
      {
         iter.fold(Self::ORIGIN, |a, b| a + *b)
     }
 }
+*/
+ 
+macro_rules! constant {
+    ($($t:ty)*) => ($(
+        impl Coord<$t> {
+            pub const ORIGIN: Coord<$t> = Coord { x: 0, y: 0 };
+            pub const NORTH: Coord<$t> = Coord { x: 0, y: -1 };
+            pub const SOUTH: Coord<$t> = Coord { x: 0, y: 1 };
+            pub const WEST: Coord<$t> = Coord { x: -1, y: 0 };
+            pub const EAST: Coord<$t> = Coord { x: 1, y: 0 };
+        }
+    )*)
+}
+
+constant!(i16 i32 i64 i128);
+
+
+
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord, Hash)]
 pub struct Coord3 {

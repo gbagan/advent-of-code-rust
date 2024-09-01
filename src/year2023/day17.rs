@@ -1,5 +1,7 @@
 use crate::util::{coord::Coord, grid::Grid};
 
+type Point = Coord<i32>;
+
 pub fn solve(input: &str) -> Option<(u16, u16)> {
     let grid= Grid::parse(input);
     let p1 = astar(&grid, 1, 3)?;
@@ -11,11 +13,11 @@ const VERTICAL: usize = 0;
 const HORIZONTAL: usize = 1;
 
 fn astar(grid: &Grid<u8>, min_dist: u16, max_dist: u16) -> Option<u16> {
-    let start= Coord::ORIGIN;
-    let goal = Coord::new(grid.width as i32 - 1, grid.height as i32 - 1);
+    let start= Point::ORIGIN;
+    let goal = Point::new(grid.width as i32 - 1, grid.height as i32 - 1);
     let heuristic = grid.map_with_indices(|p, _| {
         let diff = goal - p;
-        let dist = p.manhattan(&goal);
+        let dist = p.manhattan(goal);
         let penalty = diff.x.abs_diff(diff.y) as u16 * min_dist / max_dist;
         dist as usize + penalty as usize
     });
@@ -33,9 +35,9 @@ fn astar(grid: &Grid<u8>, min_dist: u16, max_dist: u16) -> Option<u16> {
         }
 
         let dirs = if direction == VERTICAL {
-            [Coord::NORTH, Coord::SOUTH]}
+            [Point::NORTH, Point::SOUTH]}
         else {
-            [Coord::WEST, Coord::EAST]
+            [Point::WEST, Point::EAST]
         };
         
         for dir2 in dirs {

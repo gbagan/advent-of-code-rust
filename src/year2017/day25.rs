@@ -64,10 +64,10 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
         center = next_tape;
         if move_right {
             left.push(center & LEFT_MASK);
-            center = ((center & RIGHT_MASK) << N) | right.pop().unwrap_or(0) as usize;
+            center = ((center & RIGHT_MASK) << N) | right.pop().unwrap_or(0);
         } else {
             right.push(center & RIGHT_MASK);
-            center = (center >> N) | left.pop().unwrap_or(0) as usize;
+            center = (center >> N) | left.pop().unwrap_or(0);
         }
         state = next_state;
     }

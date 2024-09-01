@@ -1,12 +1,14 @@
 use crate::util::{coord::Coord, grid::Grid};
 use std::collections::VecDeque;
 
+type Point = Coord<i32>;
+
 const NB_STEPS: u64 = 26_501_365;
 
 pub fn solve(input: &str) -> Option<(u64, u64)> {
     let grid = Grid::parse(input);
     debug_assert!(grid.height == grid.width); 
-    let start = Coord::new(grid.width as i32 / 2, grid.height as i32 / 2);
+    let start = Point::new(grid.width as i32 / 2, grid.height as i32 / 2);
     debug_assert_eq!(grid[start], b'S');
     
     let (even_inside, odd_inside, even_outside, odd_outside) =
@@ -20,10 +22,10 @@ pub fn solve(input: &str) -> Option<(u64, u64)> {
     debug_assert_eq!(remainder * 2 + 1, grid.height as u64);
 
     let corners = vec!(
-        Coord::new(0, 0),
-        Coord::new(0, grid.height as i32 - 1),
-        Coord::new(grid.width as i32 - 1, 0),
-        Coord::new(grid.width as i32 - 1, grid.height as i32 - 1),
+        Point::new(0, 0),
+        Point::new(0, grid.height as i32 - 1),
+        Point::new(grid.width as i32 - 1, 0),
+        Point::new(grid.width as i32 - 1, grid.height as i32 - 1),
     );
 
 
@@ -34,7 +36,7 @@ pub fn solve(input: &str) -> Option<(u64, u64)> {
     Some((p1, p2))
 }
 
-fn bfs(grid: &Grid<u8>, starts: &[Coord], inside_limit: u64, limit: u64) -> (u64, u64, u64, u64) {
+fn bfs(grid: &Grid<u8>, starts: &[Point], inside_limit: u64, limit: u64) -> (u64, u64, u64, u64) {
     let mut queue = VecDeque::new();
     for &start in starts {
         queue.push_back((start, 0));

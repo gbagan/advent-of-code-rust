@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use crate::util::coord::Coord;
 
+type Point = Coord<i32>;
+
 pub fn solve(input: &str) -> Option<(i32, i32)> {
     let n = input.trim().parse().ok()?;
     Some((part1(n), part2(n)))
@@ -17,17 +19,17 @@ fn part1(n: i32) -> i32 {
     (cycle+1)/2 + (start % period).abs_diff(cycle/2) as i32
 }
 
-fn fill(grid: &HashMap<Coord,i32>, c: &Coord) -> i32 {
+fn fill(grid: &HashMap<Point,i32>, c: &Point) -> i32 {
     c.surrounding().iter().filter_map(|a| grid.get(a)).sum()
 }
 
 fn part2(n: i32) -> i32 {
     let mut grid = HashMap::new();
-    let mut c = Coord::ORIGIN;
+    let mut c = Point::ORIGIN;
     grid.insert(c, 1);
     let mut k = 1;
     loop {
-        for (steps, dir) in [(k, Coord::EAST), (k, Coord::NORTH), (k+1, Coord::WEST), (k+1, Coord::WEST)] {
+        for (steps, dir) in [(k, Point::EAST), (k, Point::NORTH), (k+1, Point::WEST), (k+1, Point::WEST)] {
             for _ in 0..steps {
                 c += dir;
                 let r = fill(&grid, &c);

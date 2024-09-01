@@ -1,13 +1,15 @@
 use crate::util::{coord::Coord,grid::Grid};
 
+type Point = Coord<i32>;
+
 pub fn solve(input: &str) -> Option<(String, u32)> {
     let grid = Grid::parse(input);
     let start = (0..grid.height).find_map(|i| {
-        let c = Coord::new(i as i32, 0);
+        let c = Point::new(i as i32, 0);
         if grid[c] != b' ' { Some(c) } else { None }
     }).expect("no start found");
     let mut pos = start;
-    let mut dir = Coord::SOUTH;
+    let mut dir = Point::SOUTH;
     let mut letter_path = vec!();
     let mut len = 0;
     loop {

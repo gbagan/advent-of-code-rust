@@ -2,13 +2,17 @@ use crate::util::coord::Coord;
 use crate::util::grid::Grid;
 use std::collections::{HashSet, HashMap};
 
+type Point = Coord<i32>;
+
+
 struct GridGraph {
     extremities: u32,
     horizontal: [[u32; 5]; 6],
     vertical: [[u32; 6]; 5],
 }
 
-fn neighbors2 (grid: &Grid<u8>, c: Coord) -> Vec<Coord> {
+// todo
+fn neighbors2 (grid: &Grid<u8>, c: Point) -> Vec<Point> {
     if grid[c] == b'#' {
         vec!()
     } else {
@@ -20,7 +24,7 @@ fn neighbors2 (grid: &Grid<u8>, c: Coord) -> Vec<Coord> {
     }
 }
 
-fn follow_path(grid: &Grid<u8>, pos: Coord, pred: Coord, goal: Coord) -> Option<(Coord, u32)>
+fn follow_path(grid: &Grid<u8>, pos: Point, pred: Point, goal: Point) -> Option<(Point, u32)>
 {
     let mut pred = pred;
     let mut pos = pos;

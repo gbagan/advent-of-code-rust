@@ -53,7 +53,7 @@ pub fn solve(input: &str) -> Option<(u64, u64)> {
 fn part1(monkeys: &[Monkey], items: &[(usize, u64)]) -> u64 {
     let mut business = vec![0; monkeys.len()];
     for item in items {
-        let item_business = simulate_item(&monkeys, *item, 20, |n| n / 3);
+        let item_business = simulate_item(monkeys, *item, 20, |n| n / 3);
         for (b, ib) in business.iter_mut().zip(item_business) {
             *b += ib;
         }
@@ -64,9 +64,9 @@ fn part1(monkeys: &[Monkey], items: &[(usize, u64)]) -> u64 {
 
 fn part2(monkeys: &[Monkey], items: &[(usize, u64)]) -> u64 {
     let id = || vec![0; monkeys.len()];
-    let lcm = monkeys.into_iter().fold(1, |acc, monkey| acc.lcm(&monkey.divided_by));
+    let lcm = monkeys.iter().fold(1, |acc, monkey| acc.lcm(&monkey.divided_by));
     let mut business = items.into_par_iter()
-        .map(|item| simulate_item(&monkeys, *item, 10000, |n| n % lcm))
+        .map(|item| simulate_item(monkeys, *item, 10000, |n| n % lcm))
         .reduce(id, |b1, b2| b1.iter().zip(b2).map(|(x, y)| x + y).collect());
     business.sort_unstable();
     business.iter().rev().take(2).product()
