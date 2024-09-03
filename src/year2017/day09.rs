@@ -9,7 +9,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
                 while let Some(c) = it.next() {
                     match c {
                         '>' => break,
-                        '!' => {let _ = it.next(); },
+                        '!' => { it.next(); },
                         _ => p2 += 1,
                     }
                 }

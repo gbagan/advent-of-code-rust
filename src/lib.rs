@@ -32,6 +32,13 @@ pub mod year2015 {
 }
 
 pub mod year2016 {
+    pub mod day01;
+    pub mod day02;
+    pub mod day03;
+    pub mod day04;
+    pub mod day05;
+    pub mod day06;
+    pub mod day07;
     pub mod day20;
 }
 
@@ -81,6 +88,7 @@ pub mod year2022 {
     pub mod day12;
     pub mod day13;
     pub mod day14;
+    pub mod day15;
 }
 
 pub mod year2023 {

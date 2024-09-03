@@ -49,7 +49,7 @@ fn step2(seeds: &Vec<Range<i64>>, ranges: &Vec<ShiftRange>) -> Vec<Range<i64>> {
     let mut result = vec!(); 
     for &seed_range in seeds {
         for range in ranges {
-            if let Some(intersection) = seed_range & range.range {
+            if let Some(intersection) = seed_range.intersection(&range.range) {
                 result.push(intersection.shift(range.shift));
             }
         }
