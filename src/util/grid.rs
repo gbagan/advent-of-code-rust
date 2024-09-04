@@ -185,3 +185,15 @@ impl Grid<u8> {
         Grid { width, height, vec }
     }
 }
+
+impl Grid<char> {
+    pub fn to_string(&self) -> String {
+        let mut output = self.vec
+            .chunks_exact(self.width)
+            .map(|row| row.iter().collect())
+            .collect::<Vec<String>>()
+            .join("\n");
+        output.insert(0, '\n');
+        output
+    }
+}

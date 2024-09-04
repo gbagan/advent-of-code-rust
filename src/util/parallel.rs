@@ -10,7 +10,7 @@ struct Shared<A> {
 pub trait ParallelIterator: Sized + Send {
     type Item: Send;
     
-    fn get(&self, index: usize) -> Self::Item;
+    fn get(&self, index: usize) -> Option<Self::Item>;
 
     fn start(&self) -> usize;
 
@@ -22,6 +22,21 @@ pub trait ParallelIterator: Sized + Send {
         A: Send,
     {
         Map::new(self, f)
+    }
+
+    fn filter<F>(self, f: F) -> Filter<Self, F>
+    where
+        F: Fn(&Self::Item) -> bool + Sync + Send,
+    {
+        Filter::new(self, f)
+    }
+
+    fn filter_map<F, A>(self, f: F) -> FilterMap<Self, F>
+    where
+        F: Fn(&Self::Item) -> Option<A> + Sync + Send,
+        A: Send,
+    {
+        FilterMap::new(self, f)
     }
 
 }
@@ -43,10 +58,11 @@ macro_rules! parallel_iterator {
                                 if i >= self.end() {
                                     break;
                                 }
-                                let res = self.get(i);
-                                let _ = shared.result.fetch_update(Ordering::Relaxed,
-                                                                  Ordering::Relaxed,
-                                                                  |x| Some(reduce(x, res)));                
+                                if let Some(res) = self.get(i) {
+                                    let _ = shared.result.fetch_update(Ordering::Relaxed,
+                                                                      Ordering::Relaxed,
+                                                                      |x| Some(reduce(x, res)));
+                                    }
                             }
                         });
                     }
@@ -70,14 +86,6 @@ parallel_iterator!(ParallelIteratorI32, i32, AtomicI32);
 parallel_iterator!(ParallelIteratorU32, u32, AtomicU32);
 parallel_iterator!(ParallelIteratorU64, u64, AtomicU64);
 parallel_iterator!(ParallelIteratorUSize, usize, AtomicUsize);
-
-
-
-
-
-
-
-
 
 
 
@@ -109,8 +117,8 @@ where
 {
     type Item = &'a T;
     
-    fn get(&self, index: usize) -> Self::Item {
-        &self.slice[index]
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        Some(&self.slice[index])
     }
 
     fn start(&self) -> usize {
@@ -153,8 +161,8 @@ where
 {
     type Item = usize;
     
-    fn get(&self, index: usize) -> Self::Item {
-        index
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        Some(index)
     }
 
     fn start(&self) -> usize {
@@ -186,8 +194,8 @@ where
 {
     type Item = usize;
     
-    fn get(&self, index: usize) -> Self::Item {
-        index
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        Some(index)
     }
 
     fn start(&self) -> usize {
@@ -213,7 +221,7 @@ where
     I: ParallelIterator,
 {
     fn new(base: I, f: F) -> Self {
-        Map { base, f }
+        Self { base, f }
     }
 }
 
@@ -225,8 +233,81 @@ where
 {
     type Item = A;
     
-    fn get(&self, index: usize) -> Self::Item {
-        (self.f)(self.base.get(index))
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        self.base.get(index).map(&self.f)
+    }
+
+    fn start(&self) -> usize {
+        self.base.start()
+    }
+
+    fn end(&self) -> usize {
+        self.base.end()
+    }
+}
+
+// filter
+
+pub struct Filter<I: ParallelIterator, F> {
+    base: I,
+    f: F,
+} 
+
+impl<I, F> Filter<I, F>
+where
+    I: ParallelIterator,
+{
+    fn new(base: I, f: F) -> Self {
+        Self { base, f }
+    }
+}
+
+impl<I, F> ParallelIterator for Filter<I, F>
+where
+    I: ParallelIterator,
+    F: Fn(&I::Item) -> bool + Sync + Send,
+{
+    type Item = I::Item;
+    
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        self.base.get(index).and_then(|x|if (self.f)(&x) {Some(x)} else {None})
+    }
+
+    fn start(&self) -> usize {
+        self.base.start()
+    }
+
+    fn end(&self) -> usize {
+        self.base.end()
+    }
+}
+
+// filter_map
+
+pub struct FilterMap<I: ParallelIterator, F> {
+    base: I,
+    f: F,
+} 
+
+impl<I, F> FilterMap<I, F>
+where
+    I: ParallelIterator,
+{
+    fn new(base: I, f: F) -> Self {
+        Self { base, f }
+    }
+}
+
+impl<I, F, A> ParallelIterator for FilterMap<I, F>
+where
+    I: ParallelIterator,
+    F: Fn(I::Item) -> Option<A> + Sync + Send,
+    A: Send,
+{
+    type Item = A;
+    
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        self.base.get(index).and_then(&self.f)
     }
 
     fn start(&self) -> usize {

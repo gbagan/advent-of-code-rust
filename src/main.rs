@@ -62,7 +62,7 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
 
             if !display_solution {
                 elapsed = Duration::ZERO;
-                iterations = if microseconds < 1000 {100} else {10};
+                iterations = if microseconds < 5000 {100} else {10};
                 for _ in 0..iterations {
                     let data = data.clone();
                     let instant = Instant::now();
@@ -185,6 +185,8 @@ fn solutions() -> Vec<Solution> {
         solution!(year2016, day05),
         solution!(year2016, day06),
         solution!(year2016, day07),
+        solution!(year2016, day08),
+        solution!(year2016, day09),
         solution!(year2016, day20),
 
         solution!(year2017, day01),

@@ -16,11 +16,9 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
     let mut position2  = 2;
     for line in lines.iter() {
         if less_than(line, "[[2]]") {
-            println!("{line} < [[2]]");
             position1 += 1;
             position2 += 1;
         } else if less_than(line, "[[6]]") {
-            println!("{line} < [[6]]");
             position2 += 1;
         }
     }

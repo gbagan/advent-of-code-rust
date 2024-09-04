@@ -20,7 +20,7 @@ pub fn solve(input: &str) -> Option<(i32, String)> {
         .map(|(i, v)| (i+1) as i32 * v)
         .sum();
 
-    let p2 = values
+    let mut p2 = values
         .chunks_exact(40)
         .map(|chunk|
             chunk
@@ -29,9 +29,9 @@ pub fn solve(input: &str) -> Option<(i32, String)> {
                 .map(|(i, &c)| draw_pixel(i, c))
                 .collect::<String>()
         ).join("\n");
+    p2.insert(0, '\n');
 
-
-    Some((p1, format!("\n{p2}")))
+    Some((p1, p2))
 }
 
 fn draw_pixel (i: usize, c: i32) -> char {
