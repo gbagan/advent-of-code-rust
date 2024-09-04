@@ -11,6 +11,7 @@ pub mod heap;
 pub mod iter;
 pub mod knothash;
 pub mod math;
+pub mod parallel;
 pub mod parser;
 pub mod permutation;
 pub mod range;

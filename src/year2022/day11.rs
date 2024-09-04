@@ -1,7 +1,10 @@
 use itertools::Itertools;
 use num_integer::Integer;
-use rayon::prelude::*;
 use crate::util::parser::*;
+use std::sync::Mutex;
+use std::thread;
+use std::sync::atomic::{AtomicUsize, Ordering};
+
 
 pub enum Operation {
     Add(u64),
@@ -10,7 +13,6 @@ pub enum Operation {
 }
 
 struct Monkey {
-    //_items :: ![Integer]
     operation: Operation,
     divided_by: u64,
     if_true: usize,
@@ -63,13 +65,34 @@ fn part1(monkeys: &[Monkey], items: &[(usize, u64)]) -> u64 {
 }
 
 fn part2(monkeys: &[Monkey], items: &[(usize, u64)]) -> u64 {
-    let id = || vec![0; monkeys.len()];
+    let mutex = Mutex::new(vec![0; monkeys.len()]);
+    let counter = AtomicUsize::new(0);
+
     let lcm = monkeys.iter().fold(1, |acc, monkey| acc.lcm(&monkey.divided_by));
-    let mut business = items.into_par_iter()
-        .map(|item| simulate_item(monkeys, *item, 10000, |n| n % lcm))
-        .reduce(id, |b1, b2| b1.iter().zip(b2).map(|(x, y)| x + y).collect());
+    
+    thread::scope(|scope| {
+        for _ in 0..thread::available_parallelism().unwrap().get() {
+            scope.spawn(|| worker(monkeys, items, lcm, &counter, &mutex));
+        }
+    });    
+    let mut business = mutex.into_inner().unwrap();
+    
     business.sort_unstable();
     business.iter().rev().take(2).product()
+}
+
+fn worker(monkeys: &[Monkey], items: &[(usize, u64)], lcm: u64, counter: &AtomicUsize, mutex: &Mutex<Vec<u64>>) {
+    loop {
+        let i = counter.fetch_add(1, Ordering::Relaxed);
+        if i >= items.len() {
+            break;
+        }
+        let item_business = simulate_item(&monkeys, items[i], 10_000, |n| n % lcm);
+        let mut business = mutex.lock().unwrap();
+        for (i, v) in item_business.iter().enumerate() {
+            business[i] += v;
+        }
+    }
 }
 
 fn simulate_item(monkeys: &[Monkey], item: (usize, u64), rounds: usize, func: impl Fn(u64) -> u64) -> Vec<u64> {

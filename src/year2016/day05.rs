@@ -27,7 +27,6 @@ pub fn solve(input: &str) -> Option<(String, String)> {
         check(&mut buffer, i, &shared, &mutex);
     }
 
-
     thread::scope(|scope| {
         for _ in 0..thread::available_parallelism().unwrap().get() {
             scope.spawn(|| worker(input, &shared, &mutex));

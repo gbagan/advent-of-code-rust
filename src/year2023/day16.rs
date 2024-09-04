@@ -1,5 +1,5 @@
-use rayon::prelude::*;
-use crate::util::{coord::Coord, grid::Grid, iter::AOCIter};
+use std::cmp::max;
+use crate::util::{coord::Coord, grid::Grid, iter::AOCIter, parallel::*};
 
 type Point = Coord::<i32>;
 
@@ -27,7 +27,7 @@ fn next_directions (c: u8, dir: u8) -> Vec<u8> {
     }
 }
 
-pub fn solve(input: &str) -> Option<(usize, usize)>{
+pub fn solve(input: &str) -> Option<(u64, u64)>{
     let grid = Grid::parse(input);
     let mut north = grid.map(|_| 0);
     let mut south = grid.map(|_| 0);
@@ -79,11 +79,11 @@ pub fn solve(input: &str) -> Option<(usize, usize)>{
 
     let input = Input { grid, north, south, west, east};
     let p1 = count_energized(&input, Point::new(0, 0), EAST);
-    let p2 = part2(&input)?;
+    let p2 = part2(&input);
     Some((p1, p2))
 }
 
-fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> usize {
+fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> u64 {
     let Input { grid, north, south, west, east } = input;
     let mut energized = input.grid.map(|_| false);
     let mut visited: Grid<u8> = input.grid.map(|_|  0);
@@ -137,10 +137,10 @@ fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> usize {
             }
         }
     }
-    energized.vec.iter().count_by(|&x| x)
+    energized.vec.iter().count_by(|&x| x) as u64
 }
 
-fn part2(input: &Input) -> Option<usize> {
+fn part2(input: &Input) -> u64 {
     let Input {grid, ..} = input;
     let mut starts = vec!();
     for x in 0..grid.width as i32 {
@@ -152,5 +152,8 @@ fn part2(input: &Input) -> Option<usize> {
         starts.push((Coord::new(grid.width as i32 -1, y), WEST));
     }
 
-    starts.par_iter().map(|(pos, dir)| count_energized(input, *pos, *dir)).max()
+    starts
+        .into_par_iter()
+        .map(|(pos, dir)| count_energized(input, *pos, *dir))
+        .reduce(0, max)
 }

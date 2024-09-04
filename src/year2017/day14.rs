@@ -1,19 +1,36 @@
-use rayon::prelude::*;
+use std::sync::Mutex;
+use std::thread;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::util::{coord::Coord, grid::Grid, knothash::knothash};
 
 pub fn solve(input: &str) -> Option<(u32, usize)> {
-    let mut hashes: Vec<_> = vec!(); 
-    (0..128)
-        .into_par_iter()
-        .map(|i| knothash(&format!("{}-{}", input, i)))
-        .collect_into_vec(&mut hashes);
+    let mutex = Mutex::new([[0u8; 16]; 128]);
+    let counter = AtomicUsize::new(0);
+    thread::scope(|scope| {
+        for _ in 0..thread::available_parallelism().unwrap().get() {
+            scope.spawn(|| worker(input, &counter, &mutex));
+        }
+    });    
+    let hashes = mutex.into_inner().unwrap();
     let p1 = part1(&hashes);
     let p2 = part2(&hashes);
     Some((p1, p2))
 }
 
-fn part1(hashes: &[Vec<u8>]) -> u32 {
+fn worker(input: &str, counter: &AtomicUsize, mutex: &Mutex<[[u8; 16]; 128]>) {
+    loop {
+        let i = counter.fetch_add(1, Ordering::Relaxed);
+        if i >= 128 {
+            break;
+        }
+        let hash = knothash(&format!("{}-{}", input, i));
+        let mut hashes = mutex.lock().unwrap();
+        hashes[i] = hash;
+    }
+}
+
+fn part1(hashes: &[[u8; 16]]) -> u32 {
     hashes
     .iter()
     .map(|h| h.iter()
@@ -23,11 +40,11 @@ fn part1(hashes: &[Vec<u8>]) -> u32 {
     .sum()
 }
 
-fn is_used(hashes: &[Vec<u8>], (i, j) : (usize, usize)) -> bool {
+fn is_used(hashes: &[[u8;16]], (i, j) : (usize, usize)) -> bool {
     hashes[i][j/8] >> (7 - j%8) & 1 == 1
 }
 
-fn part2(hashes: &[Vec<u8>]) -> usize {
+fn part2(hashes: &[[u8;16]]) -> usize {
     let grid: Grid<bool> = Grid::generate(128, 128, |i, j| is_used(hashes, (i, j)));
     let mut seen = Grid::new(128, 128, false);
     let mut nb_components = 0;

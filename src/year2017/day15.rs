@@ -2,8 +2,7 @@
 // no idea how to improve the execution time of part 2
 
 use itertools::{iterate, Itertools};
-use crate::util::{iter::*, parser::*, power};
-use rayon::prelude::*;
+use crate::util::{iter::*, parallel::*, parser::*, power};
 
 pub fn solve(input: &str) -> Option<(usize, usize)> {
     let (a, b) = input.iter_unsigned().next_tuple()?;
@@ -39,8 +38,8 @@ fn nth_b(n: usize, x: u64) -> u64 {
 
 
 fn part1(a: u64, b: u64) -> usize {
-    let n = 40_000_000usize / 16;
-    (0..16).into_par_iter().map(|i| {
+    let n = 40_000_000usize / 64;
+    (0..64).into_par_iter().map(|i| {
         let iter_a = iterate(nth_a(i*n, a), next_a);
         let iter_b = iterate(nth_b(i*n, b), next_b);
         iter_a.zip(iter_b).take(n).count_by(|(a, b)| a & 0xffff == b & 0xffff)

@@ -1,8 +1,7 @@
 // dynamic programming
 
-use rayon::prelude::*;
-
 use crate::util::{grid::Grid, parser::*};
+use crate::util::parallel::*;
 
 fn parse_line(line: &str) -> Option<(&[u8], Vec<u8>)> {
     let (springs, groups) = line.split_once(' ')?;
@@ -49,17 +48,23 @@ pub fn solve(input: &str) -> Option<(u64, u64)> {
         springs.push(b'.');
         count_arrangements(&springs, groups)
     }).sum();
-    let p2 = puzzles.par_iter().map(|(springs, groups)| {
-        let mut springs2 =springs.to_vec();
-        let mut groups2 = groups.to_vec();
-        for _ in 0..4 {
-            springs2.push(b'?');
-            springs2.extend_from_slice(springs);
-            groups2.extend_from_slice(groups);
-        }
-        springs2.push(b'.');
-        count_arrangements(&springs2, &groups2)
-    }).sum();
+    
+    let p2 = puzzles
+        .into_par_iter()
+        .map(|puzzle| {
+            let (springs, groups) = puzzle;
 
+            let mut springs2 = springs.to_vec();
+            let mut groups2 = groups.to_vec();
+            for _ in 0..4 {
+                springs2.push(b'?');
+                springs2.extend_from_slice(springs);
+                groups2.extend_from_slice(&groups);
+            }
+            springs2.push(b'.');
+
+            count_arrangements(&springs2, &groups2)
+        })
+        .sum();
     Some((p1, p2))
 }

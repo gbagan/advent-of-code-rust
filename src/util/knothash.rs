@@ -15,11 +15,13 @@ pub fn reverse(lengths: &Vec<usize>, nb_rounds: u32) -> Vec<u8> {
     knot
 }
 
-pub fn knothash(input: &str) -> Vec<u8> {
+pub fn knothash(input: &str) -> [u8;16] {
     let mut lengths: Vec<_> = input.bytes().map(|l| l as usize).collect(); 
     lengths.extend([17, 31, 73, 47, 23]);
     let sparse_hash = reverse(&lengths, 64);
     sparse_hash.chunks_exact(16)
         .map(|chunk| chunk.iter().fold(0, |x, y| x^y))
-        .collect()
+        .collect::<Vec<_>>()
+        .try_into()
+        .unwrap()
 }

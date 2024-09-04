@@ -1,6 +1,7 @@
-use rayon::prelude::*;
+use std::cmp::max;
+
 use itertools::Itertools;
-use crate::util::parser::*;
+use crate::util::{parallel::*, parser::*};
 
 pub struct Ingredient {
     capacity: i32,
@@ -15,7 +16,7 @@ pub fn solve(input: &str) -> Option<(i32, i32)> {
     for (capacity, durability, flavor, texture, calories) in input.iter_unsigned().tuples() {
         ingredients.push(Ingredient { capacity, durability, flavor, texture, calories });
     }
-    let p1 = part1(&ingredients)?;
+    let p1 = part1(&ingredients);
     let p2 = part2(&ingredients);
     Some((p1, p2))
 }
@@ -60,8 +61,9 @@ fn calories(quantities: & Vec<u32>, ingredients: &[Ingredient]) -> i32 {
         .sum()
 }
 
-pub fn part1(ingredients: &[Ingredient]) -> Option<i32> {
-    (0..100).into_par_iter().filter_map(|i| {
+pub fn part1(ingredients: &[Ingredient]) -> i32 {
+    (0usize..=100).into_par_iter().map(|i| {
+        let i = i as u32;
         let mut best_score = 0;
         for j in 0..=100-i {
             for k in 0..=100-i-j {
@@ -74,8 +76,8 @@ pub fn part1(ingredients: &[Ingredient]) -> Option<i32> {
                 } 
             }
         }
-        Some(best_score)
-    }).max()
+        best_score
+    }).reduce(0, max)
 }
 
 pub fn part2(ingredients: &[Ingredient]) -> i32 {
