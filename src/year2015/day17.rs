@@ -16,9 +16,9 @@ fn solve1(numbers: &[usize], target: usize) -> u32 {
     let mut table: Vec<u32> = vec![0; size];
 
     table[0] = 1;
-    for i in 1..=n {
+    for i in 1..n+1 {
         table[i*m] = 1;
-        for j in 1..=target {
+        for j in 1..target+1 {
             let idx = i*m+j;
             table[idx] = table[idx-m];
             if numbers[i-1] <= j {
@@ -36,7 +36,7 @@ fn solve2(numbers: &[usize], target: usize) -> Option<u32> {
     let mut table: Vec<u32> = vec![0; size];
     let mut prev_table: Vec<u32> = vec![0; size];
 
-    for i in 0..=n {
+    for i in 0..n+1 {
         prev_table[i*m] = 1;
     }
     
@@ -45,9 +45,9 @@ fn solve2(numbers: &[usize], target: usize) -> Option<u32> {
             *v = 0;
         }
 
-        for i in 1..=n {
+        for i in 1..n+1 {
             table[i*m] = 1;
-            for j in 1..=target {
+            for j in 1..target+1 {
                 let idx = i*m+j;
                 table[idx] = table[idx-m];
                 if numbers[i-1] <= j {

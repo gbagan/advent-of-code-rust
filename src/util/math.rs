@@ -16,7 +16,7 @@ where A: Ord + Num + Signed + Copy + AddAssign + DivAssign
             mat.swap(i, j);
         }
         let factor = mat[i][i];
-        for k in 0..=n {
+        for k in 0..n+1 {
             mat[i][k] /= factor;
         }
 
@@ -25,7 +25,7 @@ where A: Ord + Num + Signed + Copy + AddAssign + DivAssign
             if factor.is_zero() {
                 continue;
             }
-            for k in 0..=n {
+            for k in 0..n+1 {
                 let v= mat[i][k];
                 mat[j][k] += factor * v;
             }

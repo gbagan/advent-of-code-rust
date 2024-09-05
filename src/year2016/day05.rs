@@ -63,11 +63,11 @@ fn worker(input: &str, shared: &Shared, mutex: &Mutex<Exclusive>) {
         let mut buffer = format_string(input, offset);
         let len = buffer.len();
 
-        for n in 0..1000 {
-            buffer[len - 3] = b'0' + (n / 100) as u8;
-            buffer[len - 2] = b'0' + ((n / 10) % 10) as u8;
-            buffer[len - 1] = b'0' + (n % 10) as u8;
-            check(&mut buffer, offset + n, shared, mutex);
+        for i in 0..1000 {
+            buffer[len - 3] = b'0' + (i / 100) as u8;
+            buffer[len - 2] = b'0' + ((i / 10) % 10) as u8;
+            buffer[len - 1] = b'0' + (i % 10) as u8;
+            check(&mut buffer, offset + i, shared, mutex);
         }
     }
 }
@@ -80,10 +80,12 @@ fn check(buffer: &mut [u8], i: u32, shared: &Shared, mutex: &Mutex<Exclusive>) {
     if hash[0] | hash[1] | (hash[2] & 240) == 0 {
         let mut exclusive = mutex.lock().unwrap();
         exclusive.hashes.push((i, hash[2], hash[3] >> 4));
-        exclusive.mask |= 1 << hash[2];
+        if hash[2] <= 7 {
+            exclusive.mask |= 1 << hash[2];
 
-        if exclusive.mask & 0xff == 0xff {
-            shared.done.store(true, Ordering::Relaxed);
+            if exclusive.mask == 0xff {
+                shared.done.store(true, Ordering::Relaxed);
+            }
         }
     }
 }

@@ -99,7 +99,7 @@ fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> u64 {
             match dir {
                 NORTH => {
                     let next_y = north[pos];
-                    for y in next_y+1..=pos.y {
+                    for y in next_y+1..pos.y+1 {
                         energized[(pos.x, y)] = true;
                     }
                     if next_y >= 0 {
@@ -117,7 +117,7 @@ fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> u64 {
                 }
                 WEST => {
                     let next_x = west[pos];
-                    for x in next_x+1..=pos.x {
+                    for x in next_x+1..pos.x+1 {
                         energized[(x, pos.y)] = true;
                     }
                     if next_x >= 0 {

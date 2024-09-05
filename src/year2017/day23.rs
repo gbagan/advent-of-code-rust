@@ -7,7 +7,7 @@ pub fn solve(input: &str) -> Option<(i32, usize)> {
     
     let b = x * y - z;
     let c = b - t;
-    let p2 = (b..=c).step_by(17).count_by(|x| !is_prime(x));
+    let p2 = (b..c+1).step_by(17).count_by(|x| !is_prime(x));
     Some((p1, p2))
 }
 

@@ -58,9 +58,9 @@ pub fn solve(input: &str) -> Option<(usize, u32)> {
 
 fn cubes_of((pmin, pmax): &(Coord3, Coord3)) -> Vec<Coord3> {
     let mut output = vec!();
-    for x in pmin.x..=pmax.x {
-        for y in pmin.y..=pmax.y {
-            for z in pmin.z..=pmax.z {
+    for x in pmin.x..pmax.x+1 {
+        for y in pmin.y..pmax.y+1 {
+            for z in pmin.z..pmax.z+1 {
                 output.push(Coord3::new(x, y, z));
             }
         }

@@ -29,8 +29,8 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
 
     for row in &coords {
         for (&(x1, y1), &(x2, y2)) in row.iter().tuple_windows() {
-            for x in x1.min(x2)..=x1.max(x2) {
-                for y in y1.min(y2)..=y1.max(y2) {
+            for x in x1.min(x2)..x1.max(x2)+1 {
+                for y in y1.min(y2)..y1.max(y2)+1 {
                     grid[(x + height - 500, y)] = Kind::Rock;
                 }
             }
@@ -76,7 +76,7 @@ fn part2(grid: &mut Grid<Kind>) -> u32 {
     grid[height] = Kind::Sand;
 
     for y in 1..height {
-        for index in y*width+height-y..=y*width+height+y {
+        for index in y*width+height-y..y*width+height+y+1 {
             let test = matches!(grid[index], Kind::Empty | Kind::Falling)
                     && (grid[index - width] == Kind::Sand
                     || grid[index - width - 1] == Kind::Sand 

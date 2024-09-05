@@ -8,8 +8,8 @@ fn is_symbol(c: u8) -> bool {
 }
 
 fn part_member(grid: &Grid<u8>, y: i64, x1: i64, x2: i64, i: usize) -> Option<u32> {
-    let it_x = (x1-1).max(0)..=(x2+1).min(grid.height as i64 - 1);
-    let it_y = (y-1).max(0)..=(y+1).min(grid.height as i64 - 1);
+    let it_x = (x1-1).max(0)..(x2+2).min(grid.height as i64);
+    let it_y = (y-1).max(0)..(y+2).min(grid.height as i64);
     if it_x
         .cartesian_product(it_y)
         .any(|(x, y)| is_symbol(grid[(x, y)])) {

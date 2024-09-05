@@ -45,7 +45,7 @@ fn part2(n: i32) -> i32 {
 
 #[test]
 fn part1_test() {
-    let output: Vec<i32> = (1..=26).map(|v| part1(v)).collect();
+    let output: Vec<i32> = (1..27).map(|v| part1(v)).collect();
     let res = vec!(0, 1, 2, 1, 2, 1, 2, 1, 2, 3, 2, 3, 4, 3, 2, 3, 4, 3, 2, 3, 4, 3, 2, 3, 4, 5);
     assert_eq!(output, res);
 }

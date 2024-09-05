@@ -18,9 +18,9 @@ fn subset_sum(numbers: &[u64], n: u64) -> Option<u64> {
     let size = (m+1) * (n+1);
     let mut table: Vec<Option<u64>> = vec![None; size];
     table[0] = Some(1);
-    for i in 1..=m {
+    for i in 1..m+1 {
         let v = numbers[i-1];
-        for j in 0..=n {
+        for j in 0..n+1 {
             let index = i * (n+1) + j;
             table[index] =
                 if v > j as u64 {

@@ -62,11 +62,11 @@ fn calories(quantities: & Vec<u32>, ingredients: &[Ingredient]) -> i32 {
 }
 
 pub fn part1(ingredients: &[Ingredient]) -> i32 {
-    (0usize..=100).into_par_iter().map(|i| {
+    (0usize..101).into_par_iter().map(|i| {
         let i = i as u32;
         let mut best_score = 0;
-        for j in 0..=100-i {
-            for k in 0..=100-i-j {
+        for j in 0..100-i+1 {
+            for k in 0..100-i-j+1 {
                 let quantities = vec!(i, j, k, 100 - i - j - k);
                 match score(&quantities, ingredients) {
                     Some(s) if s > best_score => {
@@ -82,9 +82,9 @@ pub fn part1(ingredients: &[Ingredient]) -> i32 {
 
 pub fn part2(ingredients: &[Ingredient]) -> i32 {
     let mut best_score = 0;
-    for i in 0..=100 {
-        for j in 0..=100-i {
-            for k in 0..=100-i-j {
+    for i in 0..101 {
+        for j in 0..101-i {
+            for k in 0..101-i-j {
                 let quantities = vec!(i, j, k, 100 - i - j - k);
                 if calories(&quantities, ingredients) != 500 {
                     break;

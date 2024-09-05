@@ -2,7 +2,7 @@ fn part1(n: usize) -> usize {
     let mut v = Vec::with_capacity(2018);
     v.push(0);
     let mut pos = 0;
-    for i in 1..=2017 {
+    for i in 1..2018 {
         pos = 1 + (pos + n) % i;
         v.insert(pos, i);
     }

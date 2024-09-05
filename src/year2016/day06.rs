@@ -15,7 +15,7 @@ fn most_and_least_common(words: &[&[u8]], i: usize) -> (u8, u8) {
     for &word in words {
         freqs[(word[i] - b'a') as usize] += 1;
     }
-    let most_common = (b'a'..=b'z').max_by_key(|&c| freqs[(c - b'a') as usize]).unwrap();
-    let least_common = (b'a'..=b'z').min_by_key(|&c| freqs[(c - b'a') as usize]).unwrap();
+    let most_common = (b'a'..b'z'+1).max_by_key(|&c| freqs[(c - b'a') as usize]).unwrap();
+    let least_common = (b'a'..b'z'+1).min_by_key(|&c| freqs[(c - b'a') as usize]).unwrap();
     (most_common, least_common)
 }

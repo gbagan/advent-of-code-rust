@@ -95,6 +95,15 @@ impl<T> Index<Coord<i32>> for Grid<T> {
     }
 }
 
+impl<T> Index<Coord<u32>> for Grid<T> {
+    type Output = T;
+
+    #[inline]
+    fn index(&self, c: Coord<u32>) -> &Self::Output {
+        &self.vec[self.width * c.y as usize + c.x as usize]
+    }
+}
+
 impl<T> Index<Coord<usize>> for Grid<T> {
     type Output = T;
 
@@ -147,6 +156,14 @@ impl<T> IndexMut<Coord<i32>> for Grid<T> {
     }
 }
 
+
+impl<T> IndexMut<Coord<u32>> for Grid<T> {
+    #[inline]
+    fn index_mut(&mut self, c: Coord<u32>) -> &mut Self::Output {
+        &mut self.vec[self.width * c.y as usize + c.x as usize]
+    }
+}
+
 impl<T> IndexMut<Coord<usize>> for Grid<T> {
     #[inline]
     fn index_mut(&mut self, c: Coord<usize>) -> &mut Self::Output {
@@ -182,6 +199,7 @@ impl Grid<u8> {
         let height = raw.len();
         let mut vec = Vec::with_capacity(width * height);
         raw.iter().for_each(|slice| vec.extend_from_slice(slice));
+        assert_eq!(vec.len(), width * height);
         Grid { width, height, vec }
     }
 }

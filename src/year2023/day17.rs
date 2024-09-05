@@ -1,3 +1,5 @@
+// A* algorithm
+
 use crate::util::{coord::Coord, grid::Grid};
 
 type Point = Coord<i32>;
@@ -44,7 +46,7 @@ fn astar(grid: &Grid<u8>, min_dist: u16, max_dist: u16) -> Option<u16> {
             let mut psum = 0;
             let mut next = node;
             let next_dir = 1 - direction;
-            for i in 1..=max_dist {
+            for i in 1..max_dist+1 {
                 next += dir2;
                 if !grid.contains(next) {
                     break;
