@@ -1,11 +1,11 @@
 // Shoelace formula and Pick theorem for Part 2
 
+use anyhow::*;
 use crate::util::{coord::Coord, grid::Grid};
 
 type Point = Coord::<i32>;
 
-
-pub fn solve(input: &str) -> Option<(i32,i32)> {
+pub fn solve(input: &str) -> Result<(i32,i32)> {
     let grid = Grid::parse(input);
     let mut start = None;
     for y in 0..grid.height {
@@ -15,8 +15,9 @@ pub fn solve(input: &str) -> Option<(i32,i32)> {
             }
         }
     }
-    let start = start?;
-    let mut current = start.adjacent().iter().copied().find(|&p| grid[p] != b'.')?;
+    let start = start.ok_or_else(|| anyhow!("Start tile not found"))?;
+    let mut current = start.adjacent().iter().copied().find(|&p| grid[p] != b'.')
+                .ok_or_else(|| anyhow!("No empty tile adjacent to the start tile"))?;
     let mut length = 1;
     let mut dir = current - start;
     let mut prev = start;
@@ -36,5 +37,5 @@ pub fn solve(input: &str) -> Option<(i32,i32)> {
     }
     let p1 = length / 2;
     let p2 = (area.abs() - length) / 2 + 1;
-    Some((p1, p2))
+    Ok((p1, p2))
 }

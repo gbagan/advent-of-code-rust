@@ -1,3 +1,4 @@
+use anyhow::*;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use crate::util::{math::solve_linear_system, parser::*};
@@ -11,16 +12,15 @@ struct Hailstone {
     vz: i64,
 } 
 
-fn parse_line(line: &str) -> Option<Hailstone>{
-    let (px, py, pz, vx, vy, vz) = line.iter_unsigned().next_tuple()?;
-    Some(Hailstone {px, py, pz, vx, vy, vz})
-}
-
-pub fn solve(input: &str) -> Option<(u32, i64)> {
-    let hailstones: Vec<_> = input.lines().filter_map(parse_line).collect();
+pub fn solve(input: &str) -> Result<(u32, i64)> {
+    let hailstones: Vec<_> = input
+        .iter_unsigned()
+        .tuples()
+        .map(|(px, py, pz, vx, vy, vz)| Hailstone {px, py, pz, vx, vy, vz})
+        .collect();
     let p1 = part1(&hailstones);
-    let p2 = part2(&hailstones)?;
-    Some((p1, p2))
+    let p2 = part2(&hailstones).ok_or_else(|| anyhow!("No solution"))?;
+    Ok((p1, p2))
 }
 
 fn crosses_inside_test_area(start: i64, end: i64, h1: &Hailstone, h2: &Hailstone) -> bool {

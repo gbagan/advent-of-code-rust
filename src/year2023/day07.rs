@@ -1,6 +1,29 @@
+use anyhow::*;
 use crate::util::iter::*;
+use itertools::Itertools;
 
 type Hand<'a> = (&'a [u8], usize);
+
+pub fn solve(input: &str) -> Result<(usize, usize)> {
+    let hands: Vec<_> = input.lines().map(parse_hand).try_collect()?;
+    let p1 = solve_with(&hands, hand_score1);
+    let p2 = solve_with(&hands, hand_score2);
+    Ok((p1, p2))
+}
+
+fn parse_hand(line: &str) -> Result<Hand> {
+    let (cards, bid) = line.split_once(' ')
+                    .ok_or_else(|| anyhow!("Parse error on line: {line}"))?;
+    let bid = bid.parse()?;
+    let cards = cards.as_bytes();
+    Ok((cards, bid))
+}
+
+fn solve_with(hands: &[Hand], hand_score: fn(&[u8]) -> u64) -> usize {
+    let mut hands: Vec<_> = hands.iter().map(|(hand, bid)| (hand_score(hand), bid)).collect();
+    hands.sort_unstable();
+    hands.iter().enumerate().map(|(i, c)| (i+1) * c.1).sum()
+}
 
 fn card_score(c: u8) -> u64 {
     match c {
@@ -11,21 +34,6 @@ fn card_score(c: u8) -> u64 {
         b'A' => 14,
         _ => (c - b'0') as u64,
     }
-}
-
-fn parse_hand(line: &str) -> Option<Hand> {
-    let (cards, bid) = line.split_once(' ')?;
-    let bid = bid.parse().ok()?;
-    let cards = cards.as_bytes();
-    Some ((cards, bid))
-}
-
-
-pub fn solve(input: &str) -> Option<(usize, usize)> {
-    let hands: Vec<_> = input.lines().filter_map(parse_hand).collect();
-    let p1 = solve_with(&hands, hand_score1);
-    let p2 = solve_with(&hands, hand_score2);
-    Some((p1, p2))
 }
 
 fn card_freq(cards: &[u8]) -> Vec<u64> {
@@ -85,13 +93,6 @@ fn hand_score2(cards: &[u8]) -> u64 {
     }
     encode_score(&cards, &freq)
 }
-
-fn solve_with(hands: &[Hand], hand_score: fn(&[u8]) -> u64) -> usize {
-    let mut hands: Vec<_> = hands.iter().map(|(hand, bid)| (hand_score(hand), bid)).collect();
-    hands.sort_unstable();
-    hands.iter().enumerate().map(|(i, c)| (i+1) * c.1).sum()
-}
-
 
 #[test]
 fn power_test() {

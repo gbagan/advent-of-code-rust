@@ -205,7 +205,7 @@ impl Grid<u8> {
 }
 
 impl Grid<char> {
-    pub fn to_string(&self) -> String {
+    pub fn draw(&self) -> String {
         let mut output = self.vec
             .chunks_exact(self.width)
             .map(|row| row.iter().collect())

@@ -1,43 +1,46 @@
 // shoelace formula and Pick theorem
 
+use anyhow::*;
 use itertools::Itertools;
 use crate::util::coord::Coord;
 
 type Point = Coord<i32>;
 
-fn parse_line(line: &str) -> Option<((Point, i32), (Point, i32))> {
-    let (dir1, len1, hex) = line.split_ascii_whitespace().next_tuple()?;
+fn parse_line(line: &str) -> Result<((Point, i32), (Point, i32))> {
+    let (dir1, len1, hex) = line.split_ascii_whitespace().next_tuple()
+                                            .ok_or_else(|| anyhow!("Parse error on line {line}"))?;
     let dir1 = match dir1 {
         "L" => Point::WEST,
         "R" => Point::EAST,
         "U" => Point::NORTH,
         "D" => Point::SOUTH,
-        _ => panic!("unexcepted character: {dir1}")
+        _ => bail!("Parsing errror: unexpected {dir1}, expecting 'L', 'R', 'U', 'D'")
     };
-    let len1 = len1.parse().ok()?;
+    let len1 = len1.parse()?;
     let mut hex = hex.trim_matches(['(', ')', '#']).to_string();
-    let dir2 = hex.pop()?;
+    let dir2 = hex.pop().ok_or_else(|| anyhow!("Parse error on line {line}"))?;
     let dir2 = match dir2 {
         '0' => Point::EAST,
         '1' => Point::SOUTH,
         '2' => Point::WEST,
         '3'   => Point::NORTH,
-        _ => panic!("unexcepted character: {dir2}")
+        _ => bail!("Parsing: unexpected {dir2}, expecting '1', '2', '3', '4'")
     };
-    let len2 = i32::from_str_radix(&hex, 16).ok()?;
-    Some(((dir1, len1), (dir2, len2)))
+    let len2 = i32::from_str_radix(&hex, 16)?;
+    Ok(((dir1, len1), (dir2, len2)))
 }
 
-pub fn solve(input: &str) -> Option<(i64, i64)> {
+pub fn solve(input: &str) -> Result<(i64, i64)> {
     let mut instrs1 = vec!();
     let mut instrs2 = vec!();
-    for (t1, t2) in input.lines().filter_map(parse_line) {
+    for pair in input.lines().map(parse_line) {
+        let (t1, t2) = pair?;
         instrs1.push(t1);
         instrs2.push(t2);
     }
     let p1 = lava(&instrs1);
     let p2 = lava(&instrs2);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 

@@ -2,9 +2,10 @@
 // given a non decreasing sequence v_1, ... v_n
 // sum_{1 <= i < j <= n} |v_i - v_j| = sum_{1 <= i <= n} v_i * (2i - n - 1)
 
+use anyhow::*;
 use crate::util::grid::Grid;
 
-pub fn solve(input: &str) -> Option<(i64, i64)>{
+pub fn solve(input: &str) -> Result<(i64, i64)>{
     let grid = Grid::parse(input);
     let mut galaxy_xs: Vec<i64> = Vec::new();
     let mut galaxy_ys: Vec<i64> = Vec::new();
@@ -55,5 +56,5 @@ pub fn solve(input: &str) -> Option<(i64, i64)>{
         p2 += c * (galaxy_xs[i] + galaxy_ys[i] + 999_999 * expansion);
     }
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }

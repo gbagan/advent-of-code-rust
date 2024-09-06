@@ -1,19 +1,21 @@
+use anyhow::*;
 use itertools::Itertools;
 use std::collections::HashMap;
 use num_integer::Integer;
 
-fn parse_line(line: &str) -> Option<(&str, (&str, &str))> {
-    let (node, _, succ1, succ2) = line.split(' ').next_tuple()?;
+fn parse_line(line: &str) -> Result<(&str, (&str, &str))> {
+    let (node, _, succ1, succ2) = line.split(' ').next_tuple()
+                                            .ok_or_else(|| anyhow!("Parse error"))?;
     let succ1 = succ1.trim_matches(['(', ',']);
     let succ2 = succ2.trim_matches(')');
-    Some((node, (succ1, succ2)))
+    Ok((node, (succ1, succ2)))
 }
 
-pub fn solve(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Result<(usize, usize)> {
     let mut lines = input.lines();
-    let (directions, _) = lines.next_tuple()?;
+    let (directions, _) = lines.next_tuple().ok_or_else(|| anyhow!("Parse error: empty input"))?;
     let directions = directions.as_bytes();
-    let nodes: HashMap<&str, (&str, &str)> = HashMap::from_iter(lines.filter_map(parse_line));
+    let nodes: HashMap<&str, (&str, &str)> = lines.map(parse_line).try_collect()?;
 
     let starting_nodes: Vec<_> = nodes.keys().filter(|n| n.ends_with('A')).collect();
 
@@ -35,5 +37,5 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
         p2 = p2.lcm(&counter);
     }
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }

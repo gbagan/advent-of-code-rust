@@ -20,7 +20,7 @@ struct State {
 
 pub fn solve(input: &str) -> Result<(i16, i16)> {
     let (boss_hp, boss_damage) = input.iter_unsigned().collect_tuple()
-                                            .ok_or_else(|| anyhow!("Parsing error"))?;
+                                            .ok_or_else(|| anyhow!("Parse error"))?;
 
     let p1 = simulate(boss_hp, boss_damage, false)
                     .ok_or_else(|| anyhow!("Part 1: Player cannot win"))?;

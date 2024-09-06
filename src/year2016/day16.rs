@@ -39,7 +39,7 @@ fn count_ones(input_ones: &[u32], mut length: u32) -> u32 {
             full /= 2;
         }
         let next = full - length;
-        ones += (half - next) as u32;
+        ones += half - next;
         length = next;
     }
 

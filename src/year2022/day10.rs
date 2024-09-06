@@ -1,12 +1,13 @@
+use anyhow::*;
 use itertools::Itertools;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Option<(i32, String)> {
+pub fn solve(input: &str) -> Result<(i32, String)> {
     let mut values = vec!(1);
     let it = input.split_ascii_whitespace().scan(1, |acc, token| {
         match token {
             "noop" | "addx" => (),
-            _ => *acc += token.iter_signed::<i32>().next().unwrap(),
+            _ => *acc += token.next_signed::<i32>()?,
         };
         Some(*acc)
     }).take(240);
@@ -31,7 +32,7 @@ pub fn solve(input: &str) -> Option<(i32, String)> {
         ).join("\n");
     p2.insert(0, '\n');
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn draw_pixel (i: usize, c: i32) -> char {

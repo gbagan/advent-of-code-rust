@@ -1,7 +1,9 @@
-pub fn solve(input: &str) -> Option<(usize, usize)> {
-    let p1 = marker(input, 4)?;
-    let p2 = marker(input, 14)?;
-    Some((p1, p2))
+use anyhow::*;
+
+pub fn solve(input: &str) -> Result<(usize, usize)> {
+    let p1 = marker(input, 4).ok_or_else(|| anyhow!("Part 1: No solution found"))?;
+    let p2 = marker(input, 14).ok_or_else(|| anyhow!("Part 2: No solution found"))?;
+    Ok((p1, p2))
 }
 
 pub fn marker(input: &str, size: usize) -> Option<usize> {

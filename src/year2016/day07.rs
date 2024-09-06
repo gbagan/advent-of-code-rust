@@ -1,10 +1,11 @@
+use anyhow::*;
 use itertools::Itertools;
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let p1 = part1(input);
     let p2 = part2(input);
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn part1(input: &str) -> u32 {
@@ -46,8 +47,8 @@ fn part2(input: &str) -> u32 {
     let mut counter = 0;
     let mut found = false;
     for (a, b, c) in input.trim().bytes().tuple_windows() {
-        if b.is_ascii_lowercase() {
-            if a == c && a != b {
+        if a.is_ascii_lowercase() {
+            if a == c && a != b &&  b.is_ascii_lowercase() {
                 let i = (a - b'a') as usize;
                 let j = (b - b'a') as usize;
                 if inside {
@@ -56,12 +57,10 @@ fn part2(input: &str) -> u32 {
                     } else {
                     inside_aba[26*i+j] = line_no;
                     }
+                } else if inside_aba[26*j+i] == line_no {
+                    found = true;
                 } else {
-                    if inside_aba[26*j+i] == line_no {
-                        found = true;
-                    } else {
-                        outside_aba[26*i+j] = line_no;
-                    }
+                    outside_aba[26*i+j] = line_no;
                 }
             }
         } else if a == b'[' {

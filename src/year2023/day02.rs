@@ -1,6 +1,7 @@
+use anyhow::*;
 use itertools::Itertools;
 
-pub fn solve(input: &str) -> Option<(usize, u32)> {
+pub fn solve(input: &str) -> Result<(usize, u32)> {
     let mut p1 = 0;
     let mut p2 = 0;
     for (i, line) in input.lines().enumerate() {
@@ -10,7 +11,7 @@ pub fn solve(input: &str) -> Option<(usize, u32)> {
         let mut b = 0;
 
         for (n, color) in line.split(' ').skip(2).tuples() {
-            let n = n.parse().unwrap_or(0); 
+            let n = n.parse()?; 
             let color = color.trim_end_matches([',', ';']);
             match color {
                 "red" => {
@@ -36,5 +37,5 @@ pub fn solve(input: &str) -> Option<(usize, u32)> {
         p2 += r * g * b;
 
     }
-    Some((p1, p2))
+    Ok((p1, p2))
 }

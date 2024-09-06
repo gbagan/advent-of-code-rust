@@ -1,12 +1,14 @@
+use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Option<(u64, u64)> {
-    let (line1, line2) = input.split_once('\n')?;
+pub fn solve(input: &str) -> Result<(u64, u64)> {
+    let (line1, line2) = input.split_once('\n')
+        .ok_or_else(|| anyhow!("Parse error"))?;
     let times: Vec<_> = line1.iter_unsigned().collect();
     let distances: Vec<_> = line2.iter_unsigned().collect();
     let p1 = part1(&times, &distances);
     let p2 = part2(line1, line2);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn solve_race(time: u64, distance: u64) -> u64 {

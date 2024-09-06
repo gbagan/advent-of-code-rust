@@ -53,7 +53,7 @@ pub fn solve(input: &str) -> Result<(i32, i32)> {
     let (hp, damage, armor) = input
         .iter_unsigned()
         .collect_tuple()
-        .ok_or_else(|| anyhow!("Parsing error"))?;
+        .ok_or_else(|| anyhow!("Parse error"))?;
     let boss = Boss { hp, damage, armor};
 
     let p1 = part1(&boss).ok_or_else(|| anyhow!("Player cannot win"))?;

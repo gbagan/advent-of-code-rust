@@ -1,6 +1,18 @@
+use anyhow::*;
 use crate::util::grid::Grid;
 
-fn parse_grid(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Result<(usize, usize)> {
+    let mut p1 = 0;
+    let mut p2 = 0;
+    for pair in input.split("\n\n").map(parse_grid) {
+        let (a, b) = pair?;
+        p1 += a;
+        p2 += b;
+    };
+    Ok((p1, p2))
+}
+
+fn parse_grid(input: &str) -> Result<(usize, usize)> {
     let grid = Grid::parse(input);
     let mut rows: Vec<u32> = vec![0; grid.height];
     let mut columns: Vec<u32> = vec![0; grid.width];
@@ -27,7 +39,7 @@ fn parse_grid(input: &str) -> Option<(usize, usize)> {
     };
 
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn reflect(encoding: &[u32]) -> Option<usize> {
@@ -54,14 +66,4 @@ fn reflect2(encoding: &[u32]) -> Option<usize> {
         }
         one_diff
     })
-}
-
-pub fn solve(input: &str) -> Option<(usize, usize)> {
-    let mut p1 = 0;
-    let mut p2 = 0;
-    for (a, b) in input.split("\n\n").filter_map(parse_grid) {
-        p1 += a;
-        p2 += b;
-    };
-    Some((p1, p2))
 }

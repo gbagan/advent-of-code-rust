@@ -5,7 +5,7 @@ type Point = Coord::<u32>;
 
 fn is_wall(p: Point, n: u32) -> bool {
     let Point {x, y} = p;
-    (x*x + 3*x + 2*x*y + y + y*y + n)   .count_ones() % 2 == 1
+    (x*x + 3*x + 2*x*y + y + y*y + n).count_ones() % 2 == 1
 }
 
 pub fn solve(input: &str) -> Option<(u32, u32)> {
@@ -34,5 +34,5 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
             queue.push_back((node.above(), dist+1));
         }
     }
-    unreachable!();
+    None
 }

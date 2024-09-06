@@ -78,7 +78,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
     Some((p1, p2))
 }
 
-fn bfs(start: State) -> u32 {
+fn bfs(start: State) -> u32 {       
     let moves = [Floor::new(1, 1), Floor::new(2, 0), Floor::new(0, 2), Floor::new(1, 0), Floor::new(0, 1)];
     let mut queue = VecDeque::new();
     let mut seen = HashSet::new();

@@ -1,3 +1,4 @@
+use anyhow::*;
 use crate::util::{parser::*, range::Range};
 use itertools::Itertools;
 
@@ -6,9 +7,9 @@ struct ShiftRange {
     shift: i64,
 }
 
-pub fn solve(input: &str) -> Option<(i64, i64)> {
+pub fn solve(input: &str) -> Result<(i64, i64)> {
     let mut lines = input.lines();
-    let (line, _) = lines.next_tuple()?;
+    let (line, _) = lines.next_tuple().ok_or_else(|| anyhow!("Parse error"))?;
     let seeds: Vec<i64> = line.iter_unsigned().collect();
     
     let mut maps = vec!();
@@ -16,16 +17,17 @@ pub fn solve(input: &str) -> Option<(i64, i64)> {
         let mut map = vec!();
         for line in lines.by_ref() {
             if line.is_empty() { break }
-            let (destination, source, length) = line.iter_unsigned().next_tuple()?;
+            let (destination, source, length) = line.iter_unsigned().next_tuple()
+                                                            .ok_or_else(|| anyhow!("Parse error"))?;
             let range = Range{lower: source, upper: source+length-1};
             map.push(ShiftRange {range, shift: destination - source});
         }
         maps.push(map)
     }
     
-    let p1 = part1(&seeds, &maps)?;
-    let p2 = part2(&seeds, &maps)?;
-    Some((p1, p2))
+    let p1 = part1(&seeds, &maps).ok_or_else(|| anyhow!("Part 1: No soluton found"))?;
+    let p2 = part2(&seeds, &maps).ok_or_else(|| anyhow!("Part 2: No soluton found"))?;
+    Ok((p1, p2))
 }
 
 fn step(seeds: &mut [i64], ranges: &[ShiftRange]) {

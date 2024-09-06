@@ -1,6 +1,7 @@
 // dominators
 // https://en.wikipedia.org/wiki/Dominator_(graph_theory)
 
+use anyhow::*;
 use std::collections::HashMap;
 
 use itertools::Itertools;
@@ -8,19 +9,22 @@ use crate::util::{coord::Coord3, grid::Grid, iter::*, parser::*};
 
 type Dominators = Vec<(usize, u32)>;
 
-fn parse_line(line: &str) -> Option<(Coord3, Coord3)> {
-    let (x1, y1, z1, x2, y2, z2) = line.iter_unsigned().next_tuple()?;
-    let p1 = Coord3::new(x1, y1, z1);
-    let p2 = Coord3::new(x2, y2, z2);
-    Some((p1.min(p2), p1.max(p2)))
-}
+pub fn solve(input: &str) -> Result<(usize, u32)> {
+    let mut bricks: Vec<_> = input
+        .iter_unsigned()
+        .tuples()
+        .map(|(x1, y1, z1, x2, y2, z2)| {
+            let p1 = Coord3::new(x1, y1, z1);
+            let p2 = Coord3::new(x2, y2, z2);
+            (p1.min(p2), p1.max(p2))
+        }).collect();
 
-pub fn solve(input: &str) -> Option<(usize, u32)> {
-    let mut bricks: Vec<_> = input.lines().filter_map(parse_line).collect();
+    ensure!(!bricks.is_empty(), "No brick has been parsed");
+
     bricks.sort_unstable_by_key(|b| b.0.z);
     
-    let xmax = bricks.iter().map(|&p| p.1.x).max()? as usize;
-    let ymax = bricks.iter().map(|&p| p.1.y).max()? as usize;
+    let xmax = bricks.iter().map(|&p| p.1.x).max().unwrap() as usize;
+    let ymax = bricks.iter().map(|&p| p.1.y).max().unwrap() as usize;
     let mut heights = Grid::new(xmax+1, ymax+1, -1);
     let mut cube_owners = HashMap::new();
     let mut dominator = vec![(0, 0); bricks.len()+1];
@@ -30,7 +34,8 @@ pub fn solve(input: &str) -> Option<(usize, u32)> {
         let height = cubes
             .iter()
             .map(|p| heights[(p.x, p.y)])
-            .max()?;
+            .max()
+            .unwrap();
         let fall = bricks[i].0.z - height - 1;
         let mut supported_by = vec!();
         for cube in &cubes {
@@ -53,7 +58,7 @@ pub fn solve(input: &str) -> Option<(usize, u32)> {
 
     let p1 = part1(&dominator);
     let p2 = dominator.iter().map(|(_, h)| *h).sum();
-    Some((p1, p2))
+    Ok((p1, p2))
 }   
 
 fn cubes_of((pmin, pmax): &(Coord3, Coord3)) -> Vec<Coord3> {

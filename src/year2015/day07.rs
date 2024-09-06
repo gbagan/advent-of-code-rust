@@ -99,7 +99,7 @@ fn eval_circuit(circuit: &Circuit) -> u16 {
 pub fn solve(input: &str) -> Result<(u16, u16)> {
     let mut circuit: HashMap<String, Gate> = input
         .lines()
-        .map(|line| parse_line(line).ok_or_else(|| anyhow!("Parsing error: ")))
+        .map(|line| parse_line(line).ok_or_else(|| anyhow!("Parse error: ")))
         .try_collect()?;
     let p1 = eval_circuit(&circuit);
     circuit.insert("b".to_string(), Gate::Const(Wire::Signal(p1)));

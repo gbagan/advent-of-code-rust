@@ -1,35 +1,32 @@
-fn card_score(table: &mut [u16; 100], i: usize, line: &str) -> Option<u32> {
-    let i = i as u16;
-    let mut score = 0;
-    let (left, right) = line.split_once('|')?;
-    for v in left.split_ascii_whitespace().skip(2) {
-        if let Ok(v) = v.parse::<usize>() {
-            table[v] = i;
-        }
-    }
-    for v in right.split_ascii_whitespace() {
-        if let Ok(v2) = v.parse::<usize>() {
-            if table[v2] == i {
-                score += 1;
-            }
-        }
-    }
-    Some(score)
-}
+use anyhow::*;
+use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut table = [0; 100];
 
     let scores: Vec<_> =
         input
         .lines()
         .enumerate()
-        .filter_map(|(i, line)| card_score(&mut table, i+1, line))
+        .map(|(i, line)| card_score(&mut table, (i+1) as u16, line))
         .collect();
     
     let p1 = part1(&scores);
     let p2 = part2(&scores);
-    Some((p1, p2))
+    Ok((p1, p2))
+}
+
+fn card_score(table: &mut [u16; 100], i: u16, line: &str) -> u32 {
+    let i = i as u16;
+    let mut score = 0;
+    for v in line.iter_unsigned::<usize>().skip(1) {
+        if table[v] == i {
+            score += 1;
+        } else {
+            table[v] = i;
+        }
+    }
+    score
 }
 
 pub fn part1(scores: &[u32]) -> u32 {

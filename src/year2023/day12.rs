@@ -1,13 +1,44 @@
 // dynamic programming
 
+use anyhow::*;
 use crate::util::{grid::Grid, parser::*};
 use crate::util::parallel::*;
+use itertools::Itertools;
 
-fn parse_line(line: &str) -> Option<(&[u8], Vec<u8>)> {
-    let (springs, groups) = line.split_once(' ')?;
+pub fn solve(input: &str) -> Result<(u64, u64)> {
+    let puzzles: Vec<_> = input.lines().map(parse_line).try_collect()?;
+    let p1 = puzzles.iter().map(|(springs, groups)| {
+        let mut springs = springs.to_vec();
+        springs.push(b'.');
+        count_arrangements(&springs, groups)
+    }).sum();
+    
+    let p2 = puzzles
+        .into_par_iter()
+        .map(|puzzle| {
+            let (springs, groups) = puzzle;
+
+            let mut springs2 = springs.to_vec();
+            let mut groups2 = groups.to_vec();
+            for _ in 0..4 {
+                springs2.push(b'?');
+                springs2.extend_from_slice(springs);
+                groups2.extend_from_slice(groups);
+            }
+            springs2.push(b'.');
+
+            count_arrangements(&springs2, &groups2)
+        })
+        .sum();
+    Ok((p1, p2))
+}
+
+fn parse_line(line: &str) -> Result<(&[u8], Vec<u8>)> {
+    let (springs, groups) = line.split_once(' ')
+                    .ok_or_else(|| anyhow!("Parse error on line: {line}"))?;
     let springs = springs.as_bytes();
     let groups = groups.iter_unsigned().collect();
-    Some((springs, groups))
+    Ok((springs, groups))
 }
 
 fn count_arrangements(springs: &[u8], groups: &[u8]) -> u64 {
@@ -39,32 +70,4 @@ fn count_arrangements(springs: &[u8], groups: &[u8]) -> u64 {
         }
     }
     table[(0, 0)]
-}
-
-pub fn solve(input: &str) -> Option<(u64, u64)> {
-    let puzzles: Vec<_> = input.lines().filter_map(parse_line).collect();
-    let p1 = puzzles.iter().map(|(springs, groups)| {
-        let mut springs = springs.to_vec();
-        springs.push(b'.');
-        count_arrangements(&springs, groups)
-    }).sum();
-    
-    let p2 = puzzles
-        .into_par_iter()
-        .map(|puzzle| {
-            let (springs, groups) = puzzle;
-
-            let mut springs2 = springs.to_vec();
-            let mut groups2 = groups.to_vec();
-            for _ in 0..4 {
-                springs2.push(b'?');
-                springs2.extend_from_slice(springs);
-                groups2.extend_from_slice(&groups);
-            }
-            springs2.push(b'.');
-
-            count_arrangements(&springs2, &groups2)
-        })
-        .sum();
-    Some((p1, p2))
 }

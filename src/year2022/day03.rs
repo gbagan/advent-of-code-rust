@@ -1,6 +1,7 @@
+use anyhow::*;
 use itertools::Itertools;
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let lines: Vec<_> = input.lines().map(str::as_bytes).collect();
 
     let p1 = lines.iter().map(|line| {
@@ -14,7 +15,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
         (mask(line1) & mask(line2) & mask(line3)).trailing_zeros()
     }).sum();
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 pub fn priority(c: u8) -> u32 {

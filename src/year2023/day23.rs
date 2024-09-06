@@ -1,15 +1,25 @@
+use anyhow::*;
 use crate::util::coord::Coord;
 use crate::util::grid::Grid;
 use std::collections::{HashSet, HashMap};
 
 type Point = Coord<i32>;
 
-
 struct GridGraph {
     extremities: u32,
     horizontal: [[u32; 5]; 6],
     vertical: [[u32; 6]; 5],
 }
+
+pub fn solve(input: &str) -> Result<(u32, u32)> {
+    let grid = Grid::parse(input);
+    let graph = compress_grid(&grid);
+    let grid = graph_to_grid(&graph);
+    let p1 = part1(&grid);
+    let p2 = part2(&grid);
+    Ok((p1, p2))
+}
+
 
 // todo
 fn neighbors2 (grid: &Grid<u8>, c: Point) -> Vec<Point> {
@@ -151,15 +161,6 @@ fn graph_to_grid(graph: &[Vec<(usize, u32)>]) -> GridGraph {
 
     GridGraph { horizontal, vertical, extremities }
 
-}
-
-pub fn solve(input: &str) -> Option<(u32, u32)> {
-    let grid = Grid::parse(input);
-    let graph = compress_grid(&grid);
-    let grid = graph_to_grid(&graph);
-    let p1 = part1(&grid);
-    let p2 = part2(&grid);
-    Some((p1, p2))
 }
 
 fn part1(grid: &GridGraph) -> u32 {

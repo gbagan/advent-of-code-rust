@@ -1,3 +1,5 @@
+use anyhow::*;
+
 const PATTERNS: [(&[u8], u32); 9] = [
     (b"one", 1),
     (b"two", 2),
@@ -10,14 +12,14 @@ const PATTERNS: [(&[u8], u32); 9] = [
     (b"nine", 9),
 ];
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut p1 = 0;
     let mut p2 = 0;
     for line in input.lines() {
-        p1 += solve_one(line)?;
-        p2 += solve_two(line)?;
+        p1 += solve_one(line).ok_or_else(|| anyhow!("No pattern found: {line}"))?;
+        p2 += solve_two(line).ok_or_else(|| anyhow!("No pattern found: {line}"))?;
     }
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn matches_pattern1(c: u8) -> Option<u32> {

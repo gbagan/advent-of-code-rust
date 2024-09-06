@@ -1,8 +1,10 @@
+use anyhow::*;
 use itertools::Itertools;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Option<(String, String)> {
-    let (input1, input2) = input.split_once("\n\n")?;
+pub fn solve(input: &str) -> Result<(String, String)> {
+    let (input1, input2) = input.split_once("\n\n")
+        .ok_or_else(|| anyhow!("Parse error"))?;
     let input1: Vec<_> = input1.lines().rev().collect();
     let width = (input1[0].len() + 1) / 4;
     let mut stacks = vec![vec!(); width];
@@ -25,7 +27,7 @@ pub fn solve(input: &str) -> Option<(String, String)> {
     let p1 = stacks.iter().filter_map(|stack| stack.last()).collect();
     let p2 = stacks2.iter().filter_map(|stack| stack.last()).collect();
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn move_crates<const REVERSE: bool>(stacks: &mut [Vec<char>], amount: usize, from: usize, to: usize) {

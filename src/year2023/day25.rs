@@ -1,6 +1,8 @@
 // Ford-Fulkerson algorithm
 
+use anyhow::*;
 use crate::util::iter::AOCIter;
+use itertools::Itertools;
 use std::collections::{HashMap, HashSet, VecDeque};
 
 type Graph = Vec<Vec<usize>>;
@@ -11,8 +13,11 @@ fn parse_line(line: &str) -> Option<(&str, Vec<&str>)> {
     Some((node, neighbors))
 }
 
-pub fn solve(input: &str) -> Option<(usize, usize)> {
-    let nodes: Vec<_> = input.lines().filter_map(parse_line).collect();
+pub fn solve(input: &str) -> Result<(usize, usize)> {
+    let nodes: Vec<_> = input
+        .lines()
+        .map(|line| parse_line(line).ok_or_else(|| anyhow!("Parse error on line: {line}")))
+        .try_collect()?;
     let mut graph: Vec<Vec<_>> = Vec::with_capacity(nodes.len());
     let mut i = 0;
     let mut dict = HashMap::new();
@@ -42,12 +47,12 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
     }
 
     let p1 = part1(&graph);
-    Some((p1, 0))
+    Ok((p1, 0))
 }
 
 fn part1(graph: &Graph) -> usize {
     let n = graph.len();
-    let mut saturated = HashSet::new(); //Grid::new(n, n, false);
+    let mut saturated = HashSet::new();
     let mut visited: Vec<_> = graph.iter().map(|_| 0).collect();
     let mut parent: Vec<_> = graph.iter().map(|_| 0).collect();
     let source = 0;

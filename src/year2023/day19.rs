@@ -1,5 +1,8 @@
+use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
+
+use crate::util::parser::UnsignedIter;
 
 type Workflows<'a> = HashMap<&'a str, Vec<Step<'a>>>;
 
@@ -10,20 +13,21 @@ struct Step<'a> {
     instr: Instr<'a>,
 }
 
-pub fn solve(input: &str) -> Option<(u32, u64)> {
+pub fn solve(input: &str) -> Result<(u32, u64)> {
     let mut workflows = HashMap::new();
     let mut lines = input.lines();
     for line in lines.by_ref() {
         if line.is_empty() {
             break
-        } else if let Some((name, workflow)) = parse_workflow(line) {
+        } else {
+            let (name, workflow) = parse_workflow(line)?;
             workflows.insert(name, workflow);
         }
     }
     let ratings: Vec<_> = lines.filter_map(parse_rating).collect();
     let p1 = part1(&workflows, &ratings);
     let p2 = part2(&workflows);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 
@@ -35,37 +39,36 @@ fn parse_instr(s: &str) -> Instr {
     }
 }
 
-fn parse_workflow(line: &str) -> Option<(&str, Vec<Step>)> {
-    let (name, line) = line.split_once('{')?;
-    let workflow = line.split([',', ':', '}']).tuples().filter_map(|(first, second)| {
+fn parse_workflow(line: &str) -> Result<(&str, Vec<Step>)> {
+    let error = || anyhow!("Parse error on line: {line}");
+
+    let (name, line) = line.split_once('{').ok_or_else(error)?;
+    let workflow = line.split([',', ':', '}']).tuples().map(|(first, second)| {
         if second.is_empty() {
-            Some(Step{test: Test::Otherwise, instr: parse_instr(first)})
+            Ok(Step{test: Test::Otherwise, instr: parse_instr(first)})
         } else {
-            let (c, rel) = first.chars().next_tuple()?;
+            let (c, rel) = first.chars().next_tuple().ok_or_else(error)?;
             let c = match c {
                 'x' => 0,
                 'm' => 1,
                 'a' => 2,
                 's' => 3,
-                _ => panic!("unexcepted character {c}")
+                _ => bail!("Parse error: unexpected '{c}, expecting 'x', 'm', 'a', s'")
             };
-            let val = first[2..].parse().ok()?;
+            let val = first[2..].parse()?;
             let test = match rel {
                 '<' => Test::LT(c, val),
                 '>' => Test::GT(c, val),
-                _ => panic!("unexcepted character {rel}")
+                _ => bail!("Parse error: unexpected '{c}, expecting '<', '>'")
             };
-            Some(Step{test, instr: parse_instr(second)})
+            Ok(Step{test, instr: parse_instr(second)})
         }
-    }).collect();
-    Some((name, workflow))
+    }).try_collect()?;
+    Ok((name, workflow))
 }
 
 fn parse_rating(line: &str) -> Option<[u16; 4]> {
-    let (x, m, a, s) = line.split([',', '}']).filter_map(|s| {
-        let (_, v) = s.split_once('=')?;
-        v.parse().ok()
-    }).next_tuple()?;
+    let (x, m, a, s) = line.iter_unsigned().collect_tuple()?;
     Some([x, m, a, s])
 }
 

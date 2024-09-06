@@ -1,3 +1,4 @@
+use anyhow::*;
 use itertools::Itertools;
 use num_integer::Integer;
 use crate::util::parser::*;
@@ -19,7 +20,7 @@ struct Monkey {
     if_false: usize
 }
 
-pub fn solve(input: &str) -> Option<(u64, u64)> {
+pub fn solve(input: &str) -> Result<(u64, u64)> {
     let mut items = vec!();
     let mut monkeys = vec!();
     let mut lines = input.lines();
@@ -33,7 +34,7 @@ pub fn solve(input: &str) -> Option<(u64, u64)> {
                 match line3.as_bytes()[23] {
                     b'+' => Operation::Add(val),
                     b'*' => Operation::Multiply(val),
-                    _ => panic!("unexpected character"),
+                    _ => bail!("unexpected character"),
                 }
             } else {
                 Operation::Square
@@ -49,7 +50,7 @@ pub fn solve(input: &str) -> Option<(u64, u64)> {
     let p1 = part1(&monkeys, &items);
     let p2 = part2(&monkeys, &items);
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn part1(monkeys: &[Monkey], items: &[(usize, u64)]) -> u64 {
@@ -87,7 +88,7 @@ fn worker(monkeys: &[Monkey], items: &[(usize, u64)], lcm: u64, counter: &Atomic
         if i >= items.len() {
             break;
         }
-        let item_business = simulate_item(&monkeys, items[i], 10_000, |n| n % lcm);
+        let item_business = simulate_item(monkeys, items[i], 10_000, |n| n % lcm);
         let mut business = mutex.lock().unwrap();
         for (i, v) in item_business.iter().enumerate() {
             business[i] += v;

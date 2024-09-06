@@ -1,3 +1,5 @@
+use anyhow::*;
+use itertools::Itertools;
 use std::collections::HashMap;
 
 fn parse_line(line: &str) -> Option<(&str, (bool, Vec<&str>))> {
@@ -8,8 +10,11 @@ fn parse_line(line: &str) -> Option<(&str, (bool, Vec<&str>))> {
     Some((key, (first_char == '&', values)))
 }
 
-pub fn solve(input: &str) -> Option<(u64, u64)> {
-    let network: HashMap<_, _> = HashMap::from_iter(input.lines().filter_map(parse_line));
+pub fn solve(input: &str) -> Result<(u64, u64)> {
+    let network: HashMap<_, _> = input
+        .lines()
+        .map(|line| parse_line(line).ok_or_else(|| anyhow!("Parse error on line: {line}")))
+        .try_collect()?;
 
     let numbers: Vec<u32> = network["broadcaster"].1.iter().map(|&node| {
         let mut number = 0;
@@ -30,7 +35,7 @@ pub fn solve(input: &str) -> Option<(u64, u64)> {
     }).collect();
     let p1 = part1(&numbers);
     let p2 = part2(&numbers);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn part1(numbers: &[u32]) -> u64 {

@@ -37,7 +37,7 @@ pub fn solve(input: &str) -> Option<(usize, String)> {
         grid[pixel] = '#';
     }
 
-    let p2 = grid.to_string();
+    let p2 = grid.draw();
 
     Some((p1, p2))
 

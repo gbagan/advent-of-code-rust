@@ -1,3 +1,4 @@
+use anyhow::*;
 use crate::util::grid::Grid;
 use crate::util::many_times_on;
 
@@ -16,7 +17,7 @@ struct Input {
     next_cube_east: Vec::<i16>,
 }
 
-pub fn solve(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Result<(usize, usize)> {
     let parsed = Grid::parse(input);
     let mut grid = Grid::new(parsed.width+2, parsed.height+2, b'#');
     let mut rounded = vec!();
@@ -84,7 +85,7 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
 
     let p1 = part1(&input);
     let p2 = part2(&input);
-    Some((p1, p2))
+    Ok((p1, p2))
 
 }
 

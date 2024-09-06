@@ -1,3 +1,4 @@
+use anyhow::*;
 use crate::util::grid::Grid;
 use crate::util::coord::Coord;
 use itertools::Itertools;
@@ -7,20 +8,27 @@ fn is_symbol(c: u8) -> bool {
     c != b'.' && !c.is_ascii_digit()
 }
 
+fn bytes_to_int(bytes: &[u8]) -> u32 {
+    let mut n = 0;
+    for c in bytes {
+        n = n * 10 + (c - b'0') as u32;
+    }
+    n
+}
+
 fn part_member(grid: &Grid<u8>, y: i64, x1: i64, x2: i64, i: usize) -> Option<u32> {
     let it_x = (x1-1).max(0)..(x2+2).min(grid.height as i64);
     let it_y = (y-1).max(0)..(y+2).min(grid.height as i64);
-    if it_x
-        .cartesian_product(it_y)
-        .any(|(x, y)| is_symbol(grid[(x, y)])) {
-            let i2 = i - (x2 - x1 + 1) as usize;
-            str::from_utf8(&grid.vec[i2..i]).ok().and_then(|str| str.parse().ok())
+    let test = it_x.cartesian_product(it_y).any(|(x, y)| is_symbol(grid[(x, y)]));
+    if test {
+        let i2 = i - (x2 - x1 + 1) as usize;
+        Some(bytes_to_int(&grid.vec[i2..i]))
     } else {
         None
     }
 }
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let grid = Grid::parse(input);
     let mut number_grid = grid.map::<Option<u32>>(|_| None);
     let mut i = 0;
@@ -38,8 +46,8 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
                 }
             } else if let Some(x1) = first_digit {
                 if let Some(v) = part_member(&grid, y, x1, x-1, i) {
+                    p1 += v;
                     for ix in x1..x {
-                        p1 += v;
                         number_grid[(ix, y)] = Some(v)
                     }
                 }
@@ -49,8 +57,8 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
         }
         if let Some(x1) = first_digit {
             if let Some(v) = part_member(&grid, y, x1, grid.height as i64 -1, i) {
+                p1 += v;
                 for ix in x1..grid.height as i64 {
-                    p1 += v;
                     number_grid[(ix, y)] = Some(v)
                 }
             }
@@ -75,5 +83,5 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
             }
         }
     }
-    Some((p1, p2))
+    Ok((p1, p2))
 }

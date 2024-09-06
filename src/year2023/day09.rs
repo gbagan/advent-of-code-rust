@@ -1,3 +1,4 @@
+use anyhow::*;
 use crate::util::parser::*;
 
 fn pascal_triangle(n: usize) -> Vec<i64> {
@@ -13,7 +14,7 @@ fn pascal_triangle(n: usize) -> Vec<i64> {
     triangle
 }
 
-pub fn solve(input: &str) -> Option<(i64, i64)> {
+pub fn solve(input: &str) -> Result<(i64, i64)> {
     let mut p1 = 0;
     let mut p2 = 0;
     let mut prev_n = 0;
@@ -32,5 +33,5 @@ pub fn solve(input: &str) -> Option<(i64, i64)> {
         prev_n = n;
     }
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }
