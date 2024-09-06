@@ -1,14 +1,19 @@
+use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
+use crate::util::parser::*;
 
 fn parse_line(s: &str) -> Option<(&str, &str, u32)> {
     let (city1, _, city2, _, dist) = s.split(' ').next_tuple()?;
-    let dist = dist.parse().ok()?;
+    let dist = dist.next_unsigned()?;
     Some((city1, city2, dist))
 }
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
-    let travels: Vec<(&str, &str, u32)> = input.lines().filter_map(parse_line).collect();
+pub fn solve(input: &str) -> Result<(u32, u32)> {
+    let travels: Vec<_> = input
+        .lines()
+        .map(|line| parse_line(line).ok_or_else(|| anyhow!("Parse error on line {line}")))
+        .try_collect()?;
     let mut dict = HashMap::new();
 
     let mut i = 0;
@@ -56,5 +61,5 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
         min_travel = min_travel.min(sum - max);
         max_travel = max_travel.max(sum - min);
     }
-    Some((min_travel, max_travel))
+    Ok((min_travel, max_travel))
 }

@@ -1,3 +1,4 @@
+use anyhow::*;
 use itertools::Itertools;
 use std::collections::HashSet;
 use crate::util::{heap::MinHeap, parser::*};
@@ -17,12 +18,15 @@ struct State {
     shield: u8,
 }
 
-pub fn solve(input: &str) -> Option<(i16, i16)> {
-    let (boss_hp, boss_damage) = input.iter_unsigned().next_tuple()?;
+pub fn solve(input: &str) -> Result<(i16, i16)> {
+    let (boss_hp, boss_damage) = input.iter_unsigned().collect_tuple()
+                                            .ok_or_else(|| anyhow!("Parsing error"))?;
 
-    let p1 = simulate(boss_hp, boss_damage, false)?;
-    let p2 = simulate(boss_hp, boss_damage, false)?;
-    Some((p1, p2))
+    let p1 = simulate(boss_hp, boss_damage, false)
+                    .ok_or_else(|| anyhow!("Part 1: Player cannot win"))?;
+    let p2 = simulate(boss_hp, boss_damage, false)
+                    .ok_or_else(|| anyhow!("Part 2: Player cannot win"))?;
+    Ok((p1, p2))
 }
 
 fn apply_effects(state: &mut State) -> bool {

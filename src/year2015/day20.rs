@@ -1,12 +1,13 @@
+use anyhow::*;
 use itertools::iterate;
 
 const PRIMES: [u32; 12] = [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37];
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
-    let goal = input.trim().parse().ok()?;
+pub fn solve(input: &str) -> Result<(u32, u32)> {
+    let goal = input.trim().parse()?;
     let p1 = part1(goal / 10, PRIMES.len());
     let p2 = part2(goal);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn part1(goal: u32, prime_index: usize) -> u32 {

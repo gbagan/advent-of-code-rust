@@ -1,6 +1,8 @@
+use anyhow::*;
 use itertools::Itertools;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
+use crate::util::parser::*;
 
 pub struct Aunt<'a> {
     number: u32,
@@ -10,21 +12,24 @@ pub struct Aunt<'a> {
 fn parse_aunt(line: &str) -> Option<Aunt> {
     let mut words = line.split(' ');
     let (_, number) = words.next_tuple()?;
-    let number = number.trim_end_matches(':').parse().ok()?;
+    let number = number.next_unsigned()?;
     let mut compounds = Vec::new();
     while let Some((compound, nbr)) = words.next_tuple() {
         let compound = compound.trim_end_matches(':');
-        let nbr = nbr.trim_end_matches(',').parse().ok()?;
+        let nbr = nbr.next_unsigned()?;
         compounds.push((compound, nbr));
     }
     Some(Aunt {number, compounds})
 }
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
-    let aunts: Vec<_> = input.lines().filter_map(parse_aunt).collect();
-    let p1 = solve_for(&aunts, test1)?;
-    let p2 = solve_for(&aunts, test2)?;
-    Some((p1, p2))
+pub fn solve(input: &str) -> Result<(u32, u32)> {
+    let aunts: Vec<_> = input
+        .lines()
+        .map(|line| parse_aunt(line).ok_or_else(|| anyhow!("Parse error on line {line}")))
+        .try_collect()?;
+    let p1 = solve_for(&aunts, test1).ok_or_else(|| anyhow!("Part1: No solution found"))?;
+    let p2 = solve_for(&aunts, test2).ok_or_else(|| anyhow!("Part2: No solution found"))?;
+    Ok((p1, p2))
 }
 
 lazy_static! {

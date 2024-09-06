@@ -1,8 +1,10 @@
+use anyhow::*;
 use std::collections::HashSet;
+use num_integer::Integer;
 
-pub fn solve(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Result<(usize, usize)> {
     let bytes = input.trim().as_bytes();
-    Some((part1(bytes), part2(bytes)))
+    Ok((part1(bytes), part2(bytes)))
 }
 
 pub fn part1(bytes: &[u8]) -> usize {
@@ -27,7 +29,7 @@ pub fn part2(bytes: &[u8]) -> usize {
     let origin: (isize, isize) = (0, 0);
 
     let positions = bytes.iter().enumerate().scan((origin, origin), |(acc1, acc2), (i, dir)| {
-        if i % 2 == 0 {
+        if i.is_even() {
             match dir {
                 b'<' => acc1.0 -= 1,
                 b'>' => acc1.0 += 1,

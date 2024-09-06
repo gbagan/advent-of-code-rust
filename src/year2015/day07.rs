@@ -1,3 +1,4 @@
+use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
 
@@ -59,7 +60,7 @@ fn eval_circuit(circuit: &Circuit) -> u16 {
         match vals.get(&label) {
             Some(val) => *val,
             None => {
-                let val = eval_gate(circuit, vals, circuit.get(&label).unwrap());
+                let val = eval_gate(circuit, vals, &circuit[&label]);
                 vals.insert(label, val);
                 val
             }
@@ -95,10 +96,13 @@ fn eval_circuit(circuit: &Circuit) -> u16 {
     get_val(circuit, &mut vals, "a".to_string())
 }
 
-pub fn solve(input: &str) -> Option<(u16, u16)> {
-    let mut circuit = HashMap::from_iter(input.lines().filter_map(parse_line));
+pub fn solve(input: &str) -> Result<(u16, u16)> {
+    let mut circuit: HashMap<String, Gate> = input
+        .lines()
+        .map(|line| parse_line(line).ok_or_else(|| anyhow!("Parsing error: ")))
+        .try_collect()?;
     let p1 = eval_circuit(&circuit);
     circuit.insert("b".to_string(), Gate::Const(Wire::Signal(p1)));
     let p2 = eval_circuit(&circuit);
-    Some((p1, p2))
+    Ok((p1, p2))
 }

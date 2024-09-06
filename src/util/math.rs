@@ -1,4 +1,4 @@
-use std::ops::{AddAssign, DivAssign};
+use std::ops::{AddAssign, DivAssign, MulAssign};
 use num_integer::Integer;
 use num_traits::{Num, Signed};
 
@@ -66,7 +66,7 @@ fn extgcd_test() {
     assert_eq!(a * x + b * y, g);
 }
 
-// Given a list of (ri, mi)
+// Given a slice of (ri, mi)
 // returns a tuple (q, m) where {q + j m | j in Z} is the set of solutions
 // of the equations x = ri (mod mi)
 // It is not necessary that all mi are pairwise coprime
@@ -76,15 +76,36 @@ pub fn chinese_remainder<A>(pairs: &[(A, A)]) -> Option<(A, A)>
 {
     let mut a = A::zero();
     let mut n = A::one();
-    for (b, m) in pairs {
-        //go (a, m) (b, n) = do
-        let (g, u, v) = extgcd(*m, n);
-        if !((a - *b) % g).is_zero() {
+    for &(b, m) in pairs {
+        let (g, u, v) = extgcd(m, n);
+        if !((a - b) % g).is_zero() {
             return None;
         }
-        let x = (a * v * n + *b * u * *m).mod_floor(&g);
-        n = (n * *m) / g;
+        let x = (a * u * m + b * v * n) / g;
+        n = (n * m) / g;
         a = x % n;
     }
+    Some((a.mod_floor(&n), n))
+}
+
+
+// same as chinese_remainder but only works if all mi are pairwise coprime
+// faster than chinese_remainder if the mi are small
+pub fn chinese_remainder2<A>(pairs: &[(A, A)]) -> Option<(A, A)> 
+    where A: Integer + Signed + Copy + AddAssign + MulAssign
+{
+    if pairs.is_empty() {
+        return None
+    }
+    let (mut a, mut n) = pairs[0];
+    a = a.mod_floor(&n);
+    for &(b, m) in &pairs[1..] {
+        let b = b.mod_floor(&m);
+        while a % m != b {
+            a += n;
+        }
+        n *= m;
+    }
+
     Some((a, n))
 }

@@ -42,12 +42,12 @@ fn part1(a: u64, b: u64) -> usize {
     (0..64).into_par_iter().map(|i| {
         let iter_a = iterate(nth_a(i*n, a), next_a);
         let iter_b = iterate(nth_b(i*n, b), next_b);
-        iter_a.zip(iter_b).take(n).count_by(|(a, b)| a & 0xffff == b & 0xffff)
+        iter_a.zip(iter_b).take(n).count_if(|(a, b)| a & 0xffff == b & 0xffff)
     }).sum()
 }
 
 fn part2(a: u64, b: u64) -> usize {
     let iter_a = iterate(a, next_a).filter(|&a| a & 3 == 0);
     let iter_b = iterate(b, next_b).filter(|&a| a & 7 == 0);
-    iter_a.zip(iter_b).take(5_000_000).count_by(|(a, b)| a & 0xffff == b & 0xffff)
+    iter_a.zip(iter_b).take(5_000_000).count_if(|(a, b)| a & 0xffff == b & 0xffff)
 }

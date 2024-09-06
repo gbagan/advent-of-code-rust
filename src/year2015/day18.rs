@@ -1,8 +1,9 @@
+use anyhow::*;
 use std::simd::{u64x8, Simd};
 
 type Lights = [u64x8; 100];
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut grid: Lights = [Simd::splat(0); 100];
  
     for (y, row) in input.lines().enumerate() {
@@ -17,7 +18,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
     
     let p1 = game_of_life(&grid, false);
     let p2 = game_of_life(&grid, true);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn game_of_life(input: &Lights, part_two: bool) -> u32 {

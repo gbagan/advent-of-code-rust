@@ -99,7 +99,7 @@ fn part1(graph: &Graph) -> usize {
                 current = parent[current];
             }
         } else {
-            let m = visited.iter().count_by(|&node| node == i);
+            let m = visited.iter().count_if(|&node| node == i);
             return m * (n - m);
         }
     }

@@ -71,7 +71,7 @@ fn hand_score1(cards: &[u8]) -> u64 {
 
 fn hand_score2(cards: &[u8]) -> u64 {
     let mut cards = cards.to_vec();
-    let nb_jokers = cards.iter().count_by(|&c| c == b'J');
+    let nb_jokers = cards.iter().count_if(|&c| c == b'J');
     for card in cards.iter_mut() {
         if *card == b'J' {
             *card = b'1';

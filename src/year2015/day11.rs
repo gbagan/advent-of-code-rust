@@ -1,4 +1,19 @@
+use anyhow::*;
 use std::str::from_utf8;
+
+pub fn solve(input: &str) -> Result<(String, String)> {
+    let pwd = input
+        .trim()
+        .as_bytes()
+        .try_into()
+        .map_err(|_| anyhow!("Input must contain 8 characters"))?;
+    let pwd = next_password(pwd);
+    let p1 =  from_utf8(&pwd).map(|p| p.to_string()).unwrap();
+    let pwd = next_password(pwd);
+    let p2 =  from_utf8(&pwd).map(|p| p.to_string()).unwrap();
+    Ok((p1, p2))
+}
+
 
 fn next_password(mut pwd: [u8; 8]) -> [u8; 8] {
     if (b'g'..b'o').contains(&pwd[3]) {
@@ -37,13 +52,4 @@ fn complete(mut pwd: [u8;8], c: u8) -> [u8; 8] {
     pwd[6] = c+2;
     pwd[7] = c+2;
     pwd
-}
-
-pub fn solve(input: &str) -> Option<(String, String)> {
-    let pwd = input.trim().as_bytes().try_into().unwrap();
-    let pwd = next_password(pwd);
-    let p1 =  from_utf8(&pwd).map(|p| p.to_string()).unwrap();
-    let pwd = next_password(pwd);
-    let p2 =  from_utf8(&pwd).map(|p| p.to_string()).unwrap();
-    Some((p1, p2))
 }

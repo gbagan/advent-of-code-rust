@@ -1,10 +1,11 @@
+use anyhow::*;
 use itertools::Itertools;
 use crate::util::{parser::*, power};
 
-pub fn solve(input: &str) -> Option<(u64, u64)> {
-    let (row, col) = input.iter_unsigned().next_tuple()?;
+pub fn solve(input: &str) -> Result<(u64, u64)> {
+    let (row, col) = input.iter_unsigned().next_tuple().ok_or_else(|| anyhow!("Parsing error"))?;
     let p1 = part1(row, col);
-    Some((p1, 0))
+    Ok((p1, 0))
 }
 
 fn mul(x: u64, y: u64) -> u64 {

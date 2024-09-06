@@ -1,4 +1,6 @@
-pub fn solve(input: &str) -> Option<(u32, usize)> {
+use anyhow::*;
+
+pub fn solve(input: &str) -> Result<(u32, usize)> {
     let mut p1 = 0;
     let mut p2 = 0;
     let mut pairs = [0; 729];
@@ -12,7 +14,7 @@ pub fn solve(input: &str) -> Option<(u32, usize)> {
             p2 += 1;
         }
     }
-    Some((p1, p2))
+    Ok((p1, p2))
 
 }
 

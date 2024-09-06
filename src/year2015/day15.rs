@@ -1,5 +1,5 @@
+use anyhow::*;
 use std::cmp::max;
-
 use itertools::Itertools;
 use crate::util::{parallel::*, parser::*};
 
@@ -11,14 +11,14 @@ pub struct Ingredient {
     calories: i32,
 }
 
-pub fn solve(input: &str) -> Option<(i32, i32)> {
+pub fn solve(input: &str) -> Result<(i32, i32)> {
     let mut ingredients = vec!();
     for (capacity, durability, flavor, texture, calories) in input.iter_unsigned().tuples() {
         ingredients.push(Ingredient { capacity, durability, flavor, texture, calories });
     }
     let p1 = part1(&ingredients);
     let p2 = part2(&ingredients);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn score(quantities: & Vec<u32>, ingredients: &[Ingredient]) -> Option<i32> {

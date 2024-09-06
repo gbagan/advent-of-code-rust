@@ -1,13 +1,16 @@
 // dynamic programming
 // subset sum
 
+use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Option<(u64, u64)> {
+pub fn solve(input: &str) -> Result<(u64, u64)> {
     let numbers: Vec<_> = input.iter_unsigned().collect();
-    let p1 = subset_sum(&numbers,  numbers.iter().sum::<u64>() / 3)?;
-    let p2 = subset_sum(&numbers,  numbers.iter().sum::<u64>() / 4)?;
-    Some((p1, p2))
+    let p1 = subset_sum(&numbers,  numbers.iter().sum::<u64>() / 3)
+        .ok_or_else(|| anyhow!("Part 1: No solution found"))?;
+    let p2 = subset_sum(&numbers,  numbers.iter().sum::<u64>() / 4)
+        .ok_or_else(|| anyhow!("Part 2: No solution found"))?;
+    Ok((p1, p2))
 }
 
 fn subset_sum(numbers: &[u64], n: u64) -> Option<u64> {

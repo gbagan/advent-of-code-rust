@@ -6,12 +6,13 @@ use std::io;
 use std::io::Write;
 use std::time::{Duration, Instant};
 use ansi_term::Color::{Red, Yellow, Green};
+use anyhow::{Result, anyhow};
 use aoc::*;
 
 struct Solution {
     year: String,
     day: String,
-    func: fn(&String) -> Option<(String, String)>,
+    func: fn(&String) -> Result<(String, String)>,
 }
 
 macro_rules! solution {
@@ -21,13 +22,29 @@ macro_rules! solution {
         let func = |input: &String| {
             use $year::$day::*;
 
-            let (p1, p2) = solve(input)?;
-            Some((p1.to_string(), p2.to_string()))
+            let (p1, p2) = solve(input).ok_or_else(|| anyhow!("Failed"))?;
+            Ok((p1.to_string(), p2.to_string()))
         };
 
         Solution { year, day, func }
     }};
 }
+
+macro_rules! solution_with_error {
+    ($year:tt, $day:tt) => {{
+        let year = stringify!($year).trim_matches(char::is_alphabetic).to_string(); 
+        let day = stringify!($day).trim_matches(char::is_alphabetic).to_string();
+        let func = |input: &String| {
+            use $year::$day::*;
+
+            let (p1, p2) = solve(input)?;
+            Ok((p1.to_string(), p2.to_string()))
+        };
+
+        Solution { year, day, func }
+    }};
+}
+
 
 fn main() {
     let (command, arg_year, arg_day) = (args().nth(1), args().nth(2), args().nth(3));
@@ -66,7 +83,7 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
                 for _ in 0..iterations {
                     let data = data.clone();
                     let instant = Instant::now();
-                    func(&data);
+                    let _ = func(&data);
                     elapsed += instant.elapsed();
                 }
                 elapsed /= iterations;
@@ -90,8 +107,8 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
                 println!("{year} Day {day} in {text} on average over {iterations} iterations.");
             }
             match res  {
-                None => println!("  has failed"),
-                Some((part1, part2)) => {
+                Err(err) => println!("{err}"),
+                Ok((part1, part2)) => { 
                     if display_solution {
                         println!("    Part 1: {part1}");
                         println!("    Part 2: {part2}");
@@ -138,7 +155,7 @@ fn download(arg_year: &Option<String>, arg_day: &Option<String>) {
                 println!("aoc is not callable. Please install aoc-cli with \"cargo install aoc-cli\"");
                 return
             }
-            Ok(output) => {
+            std::result::Result::Ok(output) => {
                 if output.status.success() {
                     println!("Successfully wrote input of year {year} day {day}");
                 } else {
@@ -152,31 +169,31 @@ fn download(arg_year: &Option<String>, arg_day: &Option<String>) {
 
 fn solutions() -> Vec<Solution> {
     vec![
-        solution!(year2015, day01),
-        solution!(year2015, day02),
-        solution!(year2015, day03),
-        solution!(year2015, day04),
-        solution!(year2015, day05),
-        solution!(year2015, day06),
-        solution!(year2015, day07),
-        solution!(year2015, day08),
-        solution!(year2015, day09),
-        solution!(year2015, day10),
-        solution!(year2015, day11),
-        solution!(year2015, day12),
-        solution!(year2015, day13),
-        solution!(year2015, day14),
-        solution!(year2015, day15),
-        solution!(year2015, day16),
-        solution!(year2015, day17),
-        solution!(year2015, day18),
-        solution!(year2015, day19),
-        solution!(year2015, day20),
-        solution!(year2015, day21),
-        solution!(year2015, day22),
-        solution!(year2015, day23),
-        solution!(year2015, day24),
-        solution!(year2015, day25),
+        solution_with_error!(year2015, day01),
+        solution_with_error!(year2015, day02),
+        solution_with_error!(year2015, day03),
+        solution_with_error!(year2015, day04),
+        solution_with_error!(year2015, day05),
+        solution_with_error!(year2015, day06),
+        solution_with_error!(year2015, day07),
+        solution_with_error!(year2015, day08),
+        solution_with_error!(year2015, day09),
+        solution_with_error!(year2015, day10),
+        solution_with_error!(year2015, day11),
+        solution_with_error!(year2015, day12),
+        solution_with_error!(year2015, day13),
+        solution_with_error!(year2015, day14),
+        solution_with_error!(year2015, day15),
+        solution_with_error!(year2015, day16),
+        solution_with_error!(year2015, day17),
+        solution_with_error!(year2015, day18),
+        solution_with_error!(year2015, day19),
+        solution_with_error!(year2015, day20),
+        solution_with_error!(year2015, day21),
+        solution_with_error!(year2015, day22),
+        solution_with_error!(year2015, day23),
+        solution_with_error!(year2015, day24),
+        solution_with_error!(year2015, day25),
 
         solution!(year2016, day01),
         solution!(year2016, day02),
@@ -191,6 +208,9 @@ fn solutions() -> Vec<Solution> {
         solution!(year2016, day11),
         solution!(year2016, day12),
         solution!(year2016, day13),
+        // todo
+        solution_with_error!(year2016, day15),
+        solution_with_error!(year2016, day16),
         solution!(year2016, day20),
 
         solution!(year2017, day01),
@@ -210,7 +230,6 @@ fn solutions() -> Vec<Solution> {
         solution!(year2017, day15),
         solution!(year2017, day16),
         solution!(year2017, day17),
-        solution!(year2020, day18),
         // todo
         solution!(year2017, day19),
         solution!(year2017, day20),

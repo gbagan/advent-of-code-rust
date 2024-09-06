@@ -1,3 +1,4 @@
+use anyhow::*;
 use md5::{Md5, Digest};
 use std::thread;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
@@ -9,7 +10,7 @@ pub struct Shared {
     p2: AtomicU32,
 }
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let input = input.trim();
     let shared = Shared {
         done: AtomicBool::new(false),
@@ -26,7 +27,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
 
     let p1 = shared.p1.load(Ordering::Relaxed);
     let p2 = shared.p2.load(Ordering::Relaxed);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn worker(input: &str, shared: &Shared) {

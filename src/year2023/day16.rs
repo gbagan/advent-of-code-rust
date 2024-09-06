@@ -137,7 +137,7 @@ fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> u64 {
             }
         }
     }
-    energized.vec.iter().count_by(|&x| x) as u64
+    energized.vec.iter().count_if(|&x| x) as u64
 }
 
 fn part2(input: &Input) -> u64 {

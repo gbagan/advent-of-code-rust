@@ -1,21 +1,23 @@
+use anyhow::*;
 use crate::util::iter::AOCIter;
 use std::collections::HashSet;
 
-pub fn solve(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Result<(usize, usize)> {
     let mut replacements = vec!();
     let mut lines = input.lines ();
     for line in lines.by_ref() {
         if line.is_empty() {
             break;
         }
-        let (mol1, mol2) = line.split_once(" => ")?;
-            replacements.push((mol1, mol2));
+        let (mol1, mol2) = line.split_once(" => ")
+                .ok_or_else(|| anyhow!("Parse error: No delimiter => found on line {line}"))?;
+        replacements.push((mol1, mol2));
     }
-    let molecule = lines.next()?;
+    let molecule = lines.next().ok_or_else(|| anyhow!("Parse error: No molecule found"))?;
 
     let p1 = part1(molecule, &replacements);
     let p2 = part2(molecule);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn do_replacements<'a>(
@@ -44,7 +46,7 @@ pub fn part1(molecule: &str, replacements: &[(&str, &str)]) -> usize {
 }
 
 fn nb_atoms(mol: &str) -> usize {
-    mol.chars().count_by(|c| c.is_ascii_uppercase())
+    mol.chars().count_if(|c| c.is_ascii_uppercase())
 }
 
 pub fn part2(molecule: &str) -> usize {

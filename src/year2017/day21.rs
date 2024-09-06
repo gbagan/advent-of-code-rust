@@ -60,8 +60,8 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
         });
         Pattern {
             three: three.count_ones(),
-            four: four.iter().count_by(|&b| b) as u32,
-            six: six.iter().count_by(|&b| b) as u32,
+            four: four.iter().count_if(|&b| b) as u32,
+            six: six.iter().count_if(|&b| b) as u32,
             nine,
         }
     }).collect();

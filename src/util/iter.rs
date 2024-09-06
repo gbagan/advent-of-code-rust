@@ -1,10 +1,13 @@
 use core::hash::Hash;
 use std::collections::HashSet;
 use std::collections::HashMap;
+use std::ops::AddAssign;
+
+use num_traits::ConstZero;
 
 pub trait AOCIter: Iterator {
     #[inline]
-    fn count_by<P>(self, mut predicate: P) -> usize
+    fn count_if<P>(self, mut predicate: P) -> usize
     where
         Self: Sized,
         P: FnMut(Self::Item) -> bool,
@@ -32,6 +35,21 @@ pub trait AOCIter: Iterator {
         }
         true
     }
+
+    fn partial_sums(self) -> Vec<Self::Item>
+    where 
+        Self: Sized,
+        Self::Item: AddAssign + ConstZero + Copy
+    {   
+        let mut sum = Self::Item::ZERO;
+        let mut psums = vec!(Self::Item::ZERO);
+        for x in self {
+            sum += x;
+            psums.push(sum);
+        }
+        psums
+    }
+
 
     fn find_duplicate(self) -> Option<(usize, usize, Self::Item)>
     where

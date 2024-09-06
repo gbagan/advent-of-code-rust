@@ -1,5 +1,6 @@
+use anyhow::*;
 use itertools::Itertools;
-use crate::util::boxes::Box;
+use crate::util::{boxes::Box, parser::UnsignedIter};
 
 #[derive(Clone, Copy)]
 enum Command {
@@ -29,13 +30,7 @@ fn parse_instruction(line: &str) -> Option<Instruction> {
         } else {
             line.strip_prefix("turn off ").map(|s| (Command::Off, s))
         }?;
-    let (w1, _, w2) = s.split_ascii_whitespace().next_tuple()?;
-    let (xmin, ymin) = w1.split_once(',')?;
-    let (xmax, ymax) = w2.split_once(',')?;
-    let xmin = xmin.parse().ok()?;
-    let ymin = ymin.parse().ok()?;
-    let xmax = xmax.parse().ok()?;
-    let ymax = ymax.parse().ok()?;
+    let (xmin, ymin, xmax, ymax) = s.iter_unsigned().collect_tuple()?;
     let rectangle = Box { xmin, ymin, xmax, ymax };
     Some(Instruction { cmd, rectangle })
 }
@@ -56,9 +51,12 @@ fn do_cmd2(cmd: Command, v: &mut i32) {
     }
 }
 
-pub fn solve(input: &str) -> Option<(i32, i32)>
+pub fn solve(input: &str) -> Result<(i32, i32)>
 {
-    let instrs: Vec<_> = input.lines().filter_map(parse_instruction).collect();
+    let instrs: Vec<_> = input
+        .lines()
+        .map(|line| parse_instruction(line).ok_or_else(|| anyhow!("Parse error on line {line}")))
+        .try_collect()?;
     
     let mut rect_xs: Vec<i32> = Vec::with_capacity(2*instrs.len());
     let mut rect_ys: Vec<i32> = Vec::with_capacity(2*instrs.len());
@@ -88,7 +86,7 @@ pub fn solve(input: &str) -> Option<(i32, i32)>
 
     let p1 = part1(&input);
     let p2 = part2(&input);
-    Some((p1, p2))
+    Ok((p1, p2))
 
 }
 

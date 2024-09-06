@@ -76,7 +76,7 @@ fn check(buffer: &mut [u8], i: u32, shared: &Shared, mutex: &Mutex<Exclusive>) {
     let mut hasher = Md5::new();
     hasher.update(buffer);
     let hash = hasher.finalize(); 
-
+    
     if hash[0] | hash[1] | (hash[2] & 240) == 0 {
         let mut exclusive = mutex.lock().unwrap();
         exclusive.hashes.push((i, hash[2], hash[3] >> 4));

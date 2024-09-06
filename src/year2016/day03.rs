@@ -12,5 +12,5 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
 }
 
 fn count_triangles(iter: impl Iterator<Item = u32>) -> usize {
-    iter.tuples().count_by(|(a, b, c)| a < b + c && b < a + c && c < a + b)
+    iter.tuples().count_if(|(a, b, c)| a < b + c && b < a + c && c < a + b)
 }

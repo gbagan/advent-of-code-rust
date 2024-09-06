@@ -1,3 +1,4 @@
+use anyhow::*;
 use itertools::Itertools;
 use lazy_static::lazy_static;
 use crate::util::parser::*;
@@ -48,13 +49,16 @@ lazy_static! {
     );
 }
 
-pub fn solve(input: &str) -> Option<(i32, i32)> {
-    let (hp, damage, armor) = input.iter_unsigned().next_tuple()?;
+pub fn solve(input: &str) -> Result<(i32, i32)> {
+    let (hp, damage, armor) = input
+        .iter_unsigned()
+        .collect_tuple()
+        .ok_or_else(|| anyhow!("Parsing error"))?;
     let boss = Boss { hp, damage, armor};
 
-    let p1 = part1(&boss)?;
-    let p2 = part2(&boss)?;
-    Some((p1, p2))
+    let p1 = part1(&boss).ok_or_else(|| anyhow!("Player cannot win"))?;
+    let p2 = part2(&boss).ok_or_else(|| anyhow!("Boss cannot win"))?;
+    Ok((p1, p2))
 }
 
 fn is_player_win(gear: &[&Item], boss: &Boss) -> bool {

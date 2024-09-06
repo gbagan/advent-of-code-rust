@@ -1,3 +1,4 @@
+use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
 
@@ -9,10 +10,13 @@ fn parse_line(s: &str) -> Option<(&str, i32, &str)> {
     Some((name1, gain, name2))
 }
 
-pub fn solve(input: &str) -> Option<(i32, i32)> {
-    let entries: Vec<_> = input.lines().filter_map(parse_line).collect();
+pub fn solve(input: &str) -> Result<(i32, i32)> {
+    let entries: Vec<_> = input
+        .lines()
+        .map(|line| parse_line(line).ok_or_else(|| anyhow!("Parse error on line {line}")))
+        .try_collect()?;
     let mut i = 0;
-    let mut dict: HashMap<&str, usize> = HashMap::new();
+    let mut dict = HashMap::new();
     for (name1, _, name2) in entries.iter() {
         if !dict.contains_key(name1) {
             dict.insert(*name1, i);
@@ -51,6 +55,5 @@ pub fn solve(input: &str) -> Option<(i32, i32)> {
         p1 = p1.max(sum);
         p2 = p2.max(sum - min_edge);
     }
-    Some((p1, p2))
+    Ok((p1, p2))
 }
-

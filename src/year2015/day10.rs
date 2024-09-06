@@ -1,6 +1,7 @@
 // look-and-say  (Conway)
 // http://njohnston.ca/2010/10/a-derivation-of-conways-degree-71-look-and-say-polynomial/
 
+use anyhow::*;
 use lazy_static::lazy_static;
 use crate::util::times;
 
@@ -109,9 +110,12 @@ fn freqs_size(freqs: &[u32]) -> u32 {
     .sum()
 }
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let sequence = input.trim();
-    let init = CONWAY_TABLE.iter().position(|(seq, _)| *seq == sequence)?;
+    let init = CONWAY_TABLE
+        .iter()
+        .position(|(seq, _)| *seq == sequence)
+        .ok_or_else(|| anyhow!("Pattern {sequence} is not found in Conway table"))?;
 
     let mut freqs = [0; 92];
     freqs[init] = 1;
@@ -120,7 +124,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
     let p1 = freqs_size(&freqs);
     let freqs = times(10, freqs, |x| next(x));
     let p2 = freqs_size(&freqs);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn next(freqs: &[u32]) -> [u32; 92] {

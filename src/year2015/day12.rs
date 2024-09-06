@@ -1,23 +1,10 @@
-pub fn solve(input: &str) -> Option<(i32, i32)> {
-    let p1 = part1(input);
-    let p2 = parse_json(input.as_bytes(), 0).value;
-    Some((p1, p2))
-}
+use anyhow::*;
+use crate::util::parser::*;
 
-pub fn part1(input: &str) -> i32 {
-    let mut total = 0;
-    let mut first_position = None;
-    for (i,c) in input.chars().enumerate() {
-        if c.is_ascii_digit() || c == '-' {
-            if first_position.is_none() {
-                first_position = Some(i);
-            }
-        } else if let Some(j) = first_position {
-            total += input[j..i].parse::<i32>().unwrap();
-            first_position = None;
-        }
-    }
-    total
+pub fn solve(input: &str) -> Result<(i32, i32)> {
+    let p1 = input.iter_signed::<i32>().sum();
+    let p2 = parse_json(input.as_bytes(), 0).value;
+    Ok((p1, p2))
 }
 
 struct Parsed {

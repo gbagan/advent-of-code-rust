@@ -1,3 +1,6 @@
+use anyhow::*;
+use itertools::Itertools;
+
 pub enum Instr {
     Hlf(bool),
     Tpl(bool),
@@ -28,11 +31,14 @@ fn parse_instr(line: &str) -> Option<Instr> {
     }
 }
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
-    let program: Vec<_> = input.lines().filter_map(parse_instr).collect();
+pub fn solve(input: &str) -> Result<(u32, u32)> {
+    let program: Vec<_> = input
+        .lines()
+        .map(|line| parse_instr(line).ok_or_else(|| anyhow!("Parse error on line {line}")))
+        .try_collect()?;
     let p1 = run_program(&program, 0);
     let p2 = run_program(&program, 1);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn run_program(program: &[Instr], a: u32) -> u32 {

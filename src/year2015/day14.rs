@@ -1,3 +1,4 @@
+use anyhow::*;
 use std::cmp::min;
 use itertools::Itertools;
 use crate::util::parser::*;
@@ -8,15 +9,15 @@ pub struct Reindeer {
     cycle: u32,
 }
 
-pub fn solve(input: &str) -> Option<(u32, u16)> {
+pub fn solve(input: &str) -> Result<(u32, u16)> {
     let reindeers: Vec<_> = input
                             .iter_unsigned()
                             .tuples()
                             .map(|(speed, duration, rest)| Reindeer{speed, duration, cycle: duration + rest})
                             .collect();
-    let p1 = reindeers.iter().map(|r| distance(r, 2503)).max()?;
-    let p2 = part2(&reindeers)?;
-    Some((p1, p2))
+    let p1 = reindeers.iter().map(|r| distance(r, 2503)).max().unwrap_or(0);
+    let p2 = part2(&reindeers);
+    Ok((p1, p2))
 }
 
 
@@ -33,7 +34,7 @@ fn step(reindeer: &Reindeer, i: u32) -> u32 {
 }
 
 
-pub fn part2(reindeers: &[Reindeer]) -> Option<u16> {
+pub fn part2(reindeers: &[Reindeer]) -> u16 {
     let n = reindeers.len();
     let mut distances: Vec<u32> = vec![0; n]; 
     let mut scores: Vec<u16> = vec![0; n];
@@ -48,5 +49,5 @@ pub fn part2(reindeers: &[Reindeer]) -> Option<u16> {
             }
         }
     }
-    scores.iter().max().copied()
+    scores.iter().max().copied().unwrap_or(0)
 }
