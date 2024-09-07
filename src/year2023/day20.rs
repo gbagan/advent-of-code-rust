@@ -13,7 +13,7 @@ fn parse_line(line: &str) -> Option<(&str, (bool, Vec<&str>))> {
 pub fn solve(input: &str) -> Result<(u64, u64)> {
     let network: HashMap<_, _> = input
         .lines()
-        .map(|line| parse_line(line).ok_or_else(|| anyhow!("Parse error on line: {line}")))
+        .map(|line| parse_line(line).with_context(|| format!("Parse error on line: {line}")))
         .try_collect()?;
 
     let numbers: Vec<u32> = network["broadcaster"].1.iter().map(|&node| {

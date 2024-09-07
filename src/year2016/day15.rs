@@ -10,10 +10,10 @@ pub fn solve(input: &str) -> Result<(i64, i64)> {
             .collect();
 
     let (p1, n) = chinese_remainder2(&pairs)
-        .ok_or_else(|| anyhow!("Part 1: No solution found"))?;
+        .context("Part 1: No solution found")?;
 
     let (p2, _) = chinese_remainder2(&[(p1, n), (-(pairs.len() as i64) - 1, 11)])
-        .ok_or_else(|| anyhow!("Part 1: No solution found"))?;
+        .context("Part 1: No solution found")?;
 
     Ok((p1, p2))
 }

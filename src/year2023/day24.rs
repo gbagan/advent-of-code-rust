@@ -19,7 +19,7 @@ pub fn solve(input: &str) -> Result<(u32, i64)> {
         .map(|(px, py, pz, vx, vy, vz)| Hailstone {px, py, pz, vx, vy, vz})
         .collect();
     let p1 = part1(&hailstones);
-    let p2 = part2(&hailstones).ok_or_else(|| anyhow!("No solution"))?;
+    let p2 = part2(&hailstones).context("Part 2: No solution found")?;
     Ok((p1, p2))
 }
 

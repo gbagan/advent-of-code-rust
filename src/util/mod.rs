@@ -1,6 +1,9 @@
+use anyhow::*;
+use std::fmt::Debug;
 use std::mem;
+use std::str::pattern::Pattern;
 use core::hash::Hash;
-use itertools::iterate;
+use itertools::{Itertools, iterate};
 use crate::util::iter::AOCIter;
 
 pub mod boxes;
@@ -74,3 +77,28 @@ fn power_test() {
     let n = power(|&x, &y| x* y, 2, 6);
     assert_eq!(n, 64);
 }
+
+pub trait TryParseLines {
+    fn try_parse_lines_and_collect<A, F>(self, f: F) -> Result<Vec<A>> 
+        where Self: Sized, F: Fn(Self) -> Result<A>;
+
+    fn try_split_once<P>(self, delim: P) -> Result<(Self, Self)>
+        where Self: Sized, P: Pattern + Debug + Copy;
+}
+
+impl TryParseLines for &str {
+    #[inline]
+    fn try_parse_lines_and_collect<A, F>(self, f: F) -> Result<Vec<A>>
+        where Self: Sized, F: Fn(Self) -> Result<A> {
+        self
+            .lines()
+            .map(|line| f(line).with_context(|| format!("Parse error on line: '{line}'")))
+            .try_collect()
+    }
+
+    fn try_split_once<P>(self, delim: P) -> Result<(Self, Self)>
+        where Self: Sized, P: Pattern + Debug + Copy
+    {
+        self.split_once(delim).with_context(|| format!("No delimiter '{delim:?}' found in string '{self}'"))
+    }
+}   

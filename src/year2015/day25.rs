@@ -3,7 +3,7 @@ use itertools::Itertools;
 use crate::util::{parser::*, power};
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
-    let (row, col) = input.iter_unsigned().next_tuple().ok_or_else(|| anyhow!("Parse error"))?;
+    let (row, col) = input.iter_unsigned().next_tuple().context("Parse error")?;
     let p1 = part1(row, col);
     Ok((p1, 0))
 }

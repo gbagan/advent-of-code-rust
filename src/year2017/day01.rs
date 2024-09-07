@@ -1,8 +1,10 @@
-pub fn solve(input: &str) -> Option<(usize, usize)> {
+use anyhow::*;
+
+pub fn solve(input: &str) -> Result<(usize, usize)> {
     let bytes = input.trim().as_bytes();
     let p1 = captcha_sum(bytes, 1);
     let p2 = captcha_sum(bytes, bytes.len() / 2);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn captcha_sum (bytes: &[u8], shift: usize) -> usize {

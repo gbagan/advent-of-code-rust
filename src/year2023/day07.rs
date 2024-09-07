@@ -1,11 +1,10 @@
 use anyhow::*;
-use crate::util::iter::*;
-use itertools::Itertools;
+use crate::util::{iter::*, parser::*, TryParseLines};
 
 type Hand<'a> = (&'a [u8], usize);
 
 pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let hands: Vec<_> = input.lines().map(parse_hand).try_collect()?;
+    let hands: Vec<_> = input.try_parse_lines_and_collect(parse_hand)?;
     let p1 = solve_with(&hands, hand_score1);
     let p2 = solve_with(&hands, hand_score2);
     Ok((p1, p2))
@@ -13,8 +12,8 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
 
 fn parse_hand(line: &str) -> Result<Hand> {
     let (cards, bid) = line.split_once(' ')
-                    .ok_or_else(|| anyhow!("Parse error on line: {line}"))?;
-    let bid = bid.parse()?;
+                    .with_context(|| format!("Parse error on line: {line}"))?;
+    let bid = bid.next_unsigned()?;
     let cards = cards.as_bytes();
     Ok((cards, bid))
 }

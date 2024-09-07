@@ -1,3 +1,4 @@
+use anyhow::*;
 use std::marker::PhantomData;
 use std::str::Bytes;
 use num_integer::Integer;
@@ -16,7 +17,7 @@ macro_rules! ten {
     )*)
 }
 
-ten!(u8 u16 u32 u64 u128 usize i16 i32 i64 i128);
+ten!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128);
 
 pub struct ParseUnsigned<'a, T> {
     bytes: Bytes<'a>,
@@ -96,20 +97,20 @@ fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(bytes: &mut Bytes<'_>) -
 }
 
 pub trait UnsignedIter {
-    fn next_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> Option<T>;
-    fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> Option<T>;
+    fn next_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> Result<T>;
+    fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> Result<T>;
     fn iter_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> ParseUnsigned<'_, T>;
     fn iter_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> ParseSigned<'_, T>;
 
 }
 
 impl UnsignedIter for &str {
-    fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> Option<T> {
-        next_signed(&mut self.bytes())  
+    fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> Result<T> {
+        next_signed(&mut self.bytes()).context("No integer found")
     }
     
-    fn next_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> Option<T> {
-        next_unsigned(&mut self.bytes())  
+    fn next_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> Result<T> {
+        next_unsigned(&mut self.bytes()).context("No integer found")
     }
 
 

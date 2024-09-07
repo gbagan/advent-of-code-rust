@@ -16,8 +16,8 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut p1 = 0;
     let mut p2 = 0;
     for line in input.lines() {
-        p1 += solve_one(line).ok_or_else(|| anyhow!("No pattern found: {line}"))?;
-        p2 += solve_two(line).ok_or_else(|| anyhow!("No pattern found: {line}"))?;
+        p1 += solve_one(line).with_context(|| format!("No pattern found: {line}"))?;
+        p2 += solve_two(line).with_context(|| format!("No pattern found: {line}"))?;
     }
     Ok((p1, p2))
 }

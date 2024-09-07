@@ -8,23 +8,23 @@ type Point = Coord<i32>;
 
 fn parse_line(line: &str) -> Result<((Point, i32), (Point, i32))> {
     let (dir1, len1, hex) = line.split_ascii_whitespace().next_tuple()
-                                            .ok_or_else(|| anyhow!("Parse error on line {line}"))?;
+                                            .context("Missing space characters")?;
     let dir1 = match dir1 {
         "L" => Point::WEST,
         "R" => Point::EAST,
         "U" => Point::NORTH,
         "D" => Point::SOUTH,
-        _ => bail!("Parsing errror: unexpected {dir1}, expecting 'L', 'R', 'U', 'D'")
+        _ => bail!("Unexpected {dir1}, expecting 'L', 'R', 'U', 'D'")
     };
     let len1 = len1.parse()?;
     let mut hex = hex.trim_matches(['(', ')', '#']).to_string();
-    let dir2 = hex.pop().ok_or_else(|| anyhow!("Parse error on line {line}"))?;
+    let dir2 = hex.pop().context("Parse error")?;
     let dir2 = match dir2 {
         '0' => Point::EAST,
         '1' => Point::SOUTH,
         '2' => Point::WEST,
         '3'   => Point::NORTH,
-        _ => bail!("Parsing: unexpected {dir2}, expecting '1', '2', '3', '4'")
+        _ => bail!("Unexpected {dir2}, expecting '1', '2', '3', '4'")
     };
     let len2 = i32::from_str_radix(&hex, 16)?;
     Ok(((dir1, len1), (dir2, len2)))
@@ -33,8 +33,8 @@ fn parse_line(line: &str) -> Result<((Point, i32), (Point, i32))> {
 pub fn solve(input: &str) -> Result<(i64, i64)> {
     let mut instrs1 = vec!();
     let mut instrs2 = vec!();
-    for pair in input.lines().map(parse_line) {
-        let (t1, t2) = pair?;
+    for line in input.lines() {
+        let (t1, t2) =  parse_line(line).with_context(|| format!("Parse error on line: '{line}'"))?;
         instrs1.push(t1);
         instrs2.push(t2);
     }

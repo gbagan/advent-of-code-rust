@@ -115,7 +115,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     let init = CONWAY_TABLE
         .iter()
         .position(|(seq, _)| *seq == sequence)
-        .ok_or_else(|| anyhow!("Pattern {sequence} is not found in Conway table"))?;
+        .with_context(|| format!("Pattern {sequence} is not found in Conway table"))?;
 
     let mut freqs = [0; 92];
     freqs[init] = 1;

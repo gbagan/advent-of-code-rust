@@ -1,3 +1,4 @@
+use anyhow::*;
 use md5::{Md5, Digest};
 use std::sync::Mutex;
 use std::thread;
@@ -13,7 +14,7 @@ struct Exclusive {
     mask: u8,
 }
 
-pub fn solve(input: &str) -> Option<(String, String)> {
+pub fn solve(input: &str) -> Result<(String, String)> {
     let input = input.trim();
     let shared = Shared {
         done: AtomicBool::new(false),
@@ -49,7 +50,7 @@ pub fn solve(input: &str) -> Option<(String, String)> {
     }
     let p2 = format!("{p2:08x}");
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn format_string(input: &str, n: u32) -> Vec<u8> {

@@ -20,7 +20,8 @@ pub fn solve(input: &str) -> Result<(u32, u64)> {
         if line.is_empty() {
             break
         } else {
-            let (name, workflow) = parse_workflow(line)?;
+            let (name, workflow) = parse_workflow(line)
+                                            .with_context(|| format!("Parse error on line '{line}'"))?;
             workflows.insert(name, workflow);
         }
     }
@@ -40,26 +41,24 @@ fn parse_instr(s: &str) -> Instr {
 }
 
 fn parse_workflow(line: &str) -> Result<(&str, Vec<Step>)> {
-    let error = || anyhow!("Parse error on line: {line}");
-
-    let (name, line) = line.split_once('{').ok_or_else(error)?;
+    let (name, line) = line.split_once('{').context("Character '{' not found")?;
     let workflow = line.split([',', ':', '}']).tuples().map(|(first, second)| {
         if second.is_empty() {
             Ok(Step{test: Test::Otherwise, instr: parse_instr(first)})
         } else {
-            let (c, rel) = first.chars().next_tuple().ok_or_else(error)?;
+            let (c, rel) = first.chars().collect_tuple().context("")?;
             let c = match c {
                 'x' => 0,
                 'm' => 1,
                 'a' => 2,
                 's' => 3,
-                _ => bail!("Parse error: unexpected '{c}, expecting 'x', 'm', 'a', s'")
+                _ => bail!("Unexpected '{c}, expecting 'x', 'm', 'a', s'")
             };
             let val = first[2..].parse()?;
             let test = match rel {
                 '<' => Test::LT(c, val),
                 '>' => Test::GT(c, val),
-                _ => bail!("Parse error: unexpected '{c}, expecting '<', '>'")
+                _ => bail!("Unexpected '{c}, expecting '<', '>'")
             };
             Ok(Step{test, instr: parse_instr(second)})
         }

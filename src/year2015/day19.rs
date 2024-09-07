@@ -10,10 +10,10 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
             break;
         }
         let (mol1, mol2) = line.split_once(" => ")
-                .ok_or_else(|| anyhow!("Parse error: No delimiter => found on line {line}"))?;
+                .with_context(|| format!("Parse error: No delimiter => found on line {line}"))?;
         replacements.push((mol1, mol2));
     }
-    let molecule = lines.next().ok_or_else(|| anyhow!("Parse error: No molecule found"))?;
+    let molecule = lines.next().context("Parse error: No molecule found")?;
 
     let p1 = part1(molecule, &replacements);
     let p2 = part2(molecule);

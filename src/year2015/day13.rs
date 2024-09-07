@@ -1,20 +1,19 @@
 use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
+use crate::util::TryParseLines;
 
-fn parse_line(s: &str) -> Option<(&str, i32, &str)> {
+fn parse_line(s: &str) -> Result<(&str, i32, &str)> {
     let s = s.trim_end_matches('.');
-    let (name1, _, g, gain, _, _, _, _, _, _, name2) = s.split(' ').next_tuple()?;
-    let gain: i32 = gain.parse().ok()?;
+    let (name1, _, g, gain, _, _, _, _, _, _, name2) =
+        s.split(' ').collect_tuple().context("The number of tokens does not match")?;
+    let gain: i32 = gain.parse()?;
     let gain = if g == "gain" {gain} else {-gain};
-    Some((name1, gain, name2))
+    Ok((name1, gain, name2))
 }
 
 pub fn solve(input: &str) -> Result<(i32, i32)> {
-    let entries: Vec<_> = input
-        .lines()
-        .map(|line| parse_line(line).ok_or_else(|| anyhow!("Parse error on line {line}")))
-        .try_collect()?;
+    let entries: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
     let mut i = 0;
     let mut dict = HashMap::new();
     for (name1, _, name2) in entries.iter() {

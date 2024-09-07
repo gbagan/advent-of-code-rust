@@ -1,10 +1,11 @@
+use anyhow::*;
 use crate::util::grid::Grid;
 
-pub fn solve(input: &str) -> Option<(String, String)> {
+pub fn solve(input: &str) -> Result<(String, String)> {
     let lines: Vec<_> = input.lines().collect();
     let p1 = simulate(&lines, "#####\n#123#\n#456#\n#789#\n#####");
     let p2 = simulate(&lines, "#######\n###1###\n##234##\n#56789#\n##ABC##\n###D###\n#######");
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 #[inline]

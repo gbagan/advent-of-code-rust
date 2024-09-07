@@ -9,7 +9,7 @@ struct ShiftRange {
 
 pub fn solve(input: &str) -> Result<(i64, i64)> {
     let mut lines = input.lines();
-    let (line, _) = lines.next_tuple().ok_or_else(|| anyhow!("Parse error"))?;
+    let (line, _) = lines.next_tuple().context("Parse error")?;
     let seeds: Vec<i64> = line.iter_unsigned().collect();
     
     let mut maps = vec!();
@@ -18,15 +18,15 @@ pub fn solve(input: &str) -> Result<(i64, i64)> {
         for line in lines.by_ref() {
             if line.is_empty() { break }
             let (destination, source, length) = line.iter_unsigned().next_tuple()
-                                                            .ok_or_else(|| anyhow!("Parse error"))?;
+                                                            .context("Parse error")?;
             let range = Range{lower: source, upper: source+length-1};
             map.push(ShiftRange {range, shift: destination - source});
         }
         maps.push(map)
     }
     
-    let p1 = part1(&seeds, &maps).ok_or_else(|| anyhow!("Part 1: No soluton found"))?;
-    let p2 = part2(&seeds, &maps).ok_or_else(|| anyhow!("Part 2: No soluton found"))?;
+    let p1 = part1(&seeds, &maps).context("Part 1: No solution found")?;
+    let p2 = part2(&seeds, &maps).context("Part 2: No solution found")?;
     Ok((p1, p2))
 }
 

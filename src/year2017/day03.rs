@@ -1,11 +1,12 @@
+use anyhow::*;
 use std::collections::HashMap;
-use crate::util::coord::Coord;
+use crate::util::{coord::Coord, parser::*};
 
 type Point = Coord<i32>;
 
-pub fn solve(input: &str) -> Option<(i32, i32)> {
-    let n = input.trim().parse().ok()?;
-    Some((part1(n), part2(n)))
+pub fn solve(input: &str) -> Result<(i32, i32)> {
+    let n = input.next_unsigned()?;
+    Ok((part1(n), part2(n)))
 }
 
 fn part1(n: i32) -> i32 {

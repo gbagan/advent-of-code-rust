@@ -20,12 +20,12 @@ struct State {
 
 pub fn solve(input: &str) -> Result<(i16, i16)> {
     let (boss_hp, boss_damage) = input.iter_unsigned().collect_tuple()
-                                            .ok_or_else(|| anyhow!("Parse error"))?;
+                                            .context("Parse error")?;
 
     let p1 = simulate(boss_hp, boss_damage, false)
-                    .ok_or_else(|| anyhow!("Part 1: Player cannot win"))?;
+                    .context("Part 1: Player cannot win")?;
     let p2 = simulate(boss_hp, boss_damage, false)
-                    .ok_or_else(|| anyhow!("Part 2: Player cannot win"))?;
+                    .context("Part 2: Player cannot win")?;
     Ok((p1, p2))
 }
 

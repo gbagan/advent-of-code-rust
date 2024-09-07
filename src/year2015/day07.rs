@@ -16,41 +16,53 @@ enum Gate {
 
 type Circuit = HashMap<String,Gate>;
 
+pub fn solve(input: &str) -> Result<(u16, u16)> {
+    let mut circuit: HashMap<String, Gate> = input
+        .lines()
+        .map(|line| parse_line(line).with_context(|| format!("Parse error on line: '{line}'")))
+        .try_collect()?;
+         //input.try_parse_lines_and_collect(parse_line)?;
+    let p1 = eval_circuit(&circuit);
+    circuit.insert("b".to_string(), Gate::Const(Wire::Signal(p1)));
+    let p2 = eval_circuit(&circuit);
+    Ok((p1, p2))
+}
+
 fn parse_wire(s: &str) -> Wire {
     s.parse::<u16>()
     .map(Wire::Signal)
     .unwrap_or_else(|_| Wire::Wire(s.to_string()))
 }
 
-fn parse_gate(s: &str) -> Option<Gate> {
+fn parse_gate(s: &str) -> Result<Gate> {
     let mut words = s.split_ascii_whitespace();
-    let first = words.next()?;
+    let first = words.next().context("Empty string after '=>'")?;
     if first == "NOT" {
-        let second = words.next()?;
+        let second = words.next().context("Empty string after token NOT")?;
         let wire = parse_wire(second);
-        Some(Gate::Not(wire))
+        Ok(Gate::Not(wire))
     } else {
         match words.next_tuple() {
-            None => Some(Gate::Const(parse_wire(first))),
+            None => Ok(Gate::Const(parse_wire(first))),
             Some ((second, third)) => {
                 let wire1 = parse_wire(first);
                 let wire2 = parse_wire(third);
                 match second {
-                    "AND" => Some(Gate::Gate2(wire1, Op::And, wire2)),
-                    "OR" => Some(Gate::Gate2(wire1, Op::Or, wire2)),
-                    "LSHIFT" => Some(Gate::Gate2(wire1, Op::LShift, wire2)),
-                    "RSHIFT" => Some(Gate::Gate2(wire1, Op::RShift, wire2)),
-                    _ => None
+                    "AND" => Ok(Gate::Gate2(wire1, Op::And, wire2)),
+                    "OR" => Ok(Gate::Gate2(wire1, Op::Or, wire2)),
+                    "LSHIFT" => Ok(Gate::Gate2(wire1, Op::LShift, wire2)),
+                    "RSHIFT" => Ok(Gate::Gate2(wire1, Op::RShift, wire2)),
+                    _ => bail!("Unexpected '{second}', xpecting AND, OR, LSHIFT, RSHIFT")
                 }
             }
         }
     }
 }
 
-fn parse_line(line: &str) -> Option<(String, Gate)> {
-    let (s1, s2) = line.split_once(" -> ")?;
+fn parse_line(line: &str) -> Result<(String, Gate)> {
+    let (s1, s2) = line.split_once(" -> ").context("No delimiter '->' found")?;
     let gate = parse_gate(s1)?;
-    Some((s2.to_string(), gate))
+    Ok((s2.to_string(), gate))
 }
 
 fn eval_circuit(circuit: &Circuit) -> u16 {
@@ -94,15 +106,4 @@ fn eval_circuit(circuit: &Circuit) -> u16 {
     }
     
     get_val(circuit, &mut vals, "a".to_string())
-}
-
-pub fn solve(input: &str) -> Result<(u16, u16)> {
-    let mut circuit: HashMap<String, Gate> = input
-        .lines()
-        .map(|line| parse_line(line).ok_or_else(|| anyhow!("Parse error: ")))
-        .try_collect()?;
-    let p1 = eval_circuit(&circuit);
-    circuit.insert("b".to_string(), Gate::Const(Wire::Signal(p1)));
-    let p2 = eval_circuit(&circuit);
-    Ok((p1, p2))
 }

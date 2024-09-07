@@ -2,7 +2,7 @@ use anyhow::*;
 
 pub fn solve(input: &str) -> Result<(i32, usize)> {
     let p1 = part1(input);
-    let p2 = part2(input).ok_or_else(|| anyhow!("Part 2: no solution found"))?;
+    let p2 = part2(input).context("Part 2: no solution found")?;
     Ok((p1, p2))
 }
 

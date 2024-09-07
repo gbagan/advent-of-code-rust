@@ -1,3 +1,4 @@
+use anyhow::*;
 use itertools::Itertools;
 use crate::util::parser::*;
 
@@ -7,7 +8,7 @@ struct Room<'a> {
     checksum: &'a str,
 }
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let rooms: Vec<_> = input.lines().map(parse_room).collect();
     
     let p1 = rooms
@@ -15,12 +16,12 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
         .filter_map(|room| is_real_room(room).then_some(room.sector_id))
         .sum();
     
-        let p2 = rooms
+    let p2 = rooms
         .iter()
         .find_map(|room| is_northpole_room(room).then_some(room.sector_id))
-        .unwrap();
+        .context("Part 2: No solution found")?;
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 

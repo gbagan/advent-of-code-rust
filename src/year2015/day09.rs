@@ -1,19 +1,16 @@
 use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
-use crate::util::parser::*;
+use crate::util::{parser::*, TryParseLines};
 
-fn parse_line(s: &str) -> Option<(&str, &str, u32)> {
-    let (city1, _, city2, _, dist) = s.split(' ').next_tuple()?;
+fn parse_line(s: &str) -> Result<(&str, &str, u32)> {
+    let (city1, _, city2, _, dist) = s.split(' ').next_tuple().context("No space character found")?;
     let dist = dist.next_unsigned()?;
-    Some((city1, city2, dist))
+    Ok((city1, city2, dist))
 }
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let travels: Vec<_> = input
-        .lines()
-        .map(|line| parse_line(line).ok_or_else(|| anyhow!("Parse error on line {line}")))
-        .try_collect()?;
+    let travels: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
     let mut dict = HashMap::new();
 
     let mut i = 0;

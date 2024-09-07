@@ -1,6 +1,7 @@
 #![feature(get_many_mut)]
 #![feature(int_roundings)]
 #![feature(iter_map_windows)]
+#![feature(pattern)]
 #![feature(portable_simd)]
 
 pub mod util;

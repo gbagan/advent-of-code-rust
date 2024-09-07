@@ -7,8 +7,8 @@ type Point = Coord<i32>;
 
 pub fn solve(input: &str) -> Result<(u16, u16)> {
     let grid= Grid::parse(input);
-    let p1 = astar(&grid, 1, 3).ok_or_else(|| anyhow!("Part 1: No solution found"))?;
-    let p2 = astar(&grid, 4, 10).ok_or_else(|| anyhow!("Part 1: No solution found"))?;
+    let p1 = astar(&grid, 1, 3).context("Part 1: No solution found")?;
+    let p2 = astar(&grid, 4, 10).context("Part 2: No solution found")?;
     Ok((p1, p2))
 }
 

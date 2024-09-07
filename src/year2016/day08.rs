@@ -1,32 +1,36 @@
+use anyhow::*;
 use itertools::Itertools;
 use crate::util::{coord::Coord, grid::Grid, parser::*};
 
 type Pixel = Coord<i32>;
 
-pub fn solve(input: &str) -> Option<(usize, String)> {
+pub fn solve(input: &str) -> Result<(usize, String)> {
+    let error_fn = |line: &str| format!("Parse error on line '{line}'");
     let mut pixels = vec!();
     for line in input.lines() {
         if let Some(suffix) = line.strip_prefix("rect") {
-            let (width, height) = suffix.iter_unsigned().next_tuple().unwrap();
+            let (width, height) = suffix.iter_unsigned().next_tuple().with_context(|| error_fn(line))?;
             for x in 0..width {
                 for y in 0..height {
                     pixels.push(Pixel::new(x, y));
                 }
             }
         } else if let Some(suffix) = line.strip_prefix("rotate row") {
-            let (row, shifts) = suffix.iter_unsigned().next_tuple().unwrap();
+            let (row, shifts) = suffix.iter_unsigned().next_tuple().with_context(|| error_fn(line))?;
             pixels.iter_mut().for_each(|p| {
                 if p.y == row {
                     p.x = (p.x + shifts) % 50;
                 }
             })
-        } else { // rotate column
-            let (column, shifts) = line.iter_unsigned().next_tuple().unwrap();
+        } else if let Some(suffix) = line.strip_prefix("rotate column") {
+            let (column, shifts) = suffix.iter_unsigned().next_tuple().with_context(|| error_fn(line))?;
             pixels.iter_mut().for_each(|p| {
                 if p.x == column {
                     p.y = (p.y + shifts) % 6;
                 }
             })
+        } else {
+            bail!("Expecting 'rect', 'rotate row' or 'rotate column'");
         }
     }
     
@@ -39,6 +43,6 @@ pub fn solve(input: &str) -> Option<(usize, String)> {
 
     let p2 = grid.draw();
 
-    Some((p1, p2))
+    Ok((p1, p2))
 
 }

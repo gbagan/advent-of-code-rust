@@ -7,9 +7,9 @@ use crate::util::parser::*;
 pub fn solve(input: &str) -> Result<(u64, u64)> {
     let numbers: Vec<_> = input.iter_unsigned().collect();
     let p1 = subset_sum(&numbers,  numbers.iter().sum::<u64>() / 3)
-        .ok_or_else(|| anyhow!("Part 1: No solution found"))?;
+        .context("Part 1: No solution found")?;
     let p2 = subset_sum(&numbers,  numbers.iter().sum::<u64>() / 4)
-        .ok_or_else(|| anyhow!("Part 2: No solution found"))?;
+        .context("Part 2: No solution found")?;
     Ok((p1, p2))
 }
 

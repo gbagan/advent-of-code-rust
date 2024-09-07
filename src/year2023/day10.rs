@@ -15,9 +15,9 @@ pub fn solve(input: &str) -> Result<(i32,i32)> {
             }
         }
     }
-    let start = start.ok_or_else(|| anyhow!("Start tile not found"))?;
+    let start = start.context("Start tile not found")?;
     let mut current = start.adjacent().iter().copied().find(|&p| grid[p] != b'.')
-                .ok_or_else(|| anyhow!("No empty tile adjacent to the start tile"))?;
+                        .context("No empty tile adjacent to the start tile")?;
     let mut length = 1;
     let mut dir = current - start;
     let mut prev = start;

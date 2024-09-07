@@ -1,4 +1,6 @@
-pub fn solve(input: &str) -> Option<(String, String)> {
+use anyhow::*;
+
+pub fn solve(input: &str) -> Result<(String, String)> {
     let words: Vec<_> = input.lines().map(str::as_bytes).collect();
     let mut p1 = String::new();
     let mut p2 = String::new();
@@ -7,7 +9,7 @@ pub fn solve(input: &str) -> Option<(String, String)> {
         p1.push(most_common as char);
         p2.push(least_common as char);
     }
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn most_and_least_common(words: &[&[u8]], i: usize) -> (u8, u8) {

@@ -30,11 +30,11 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
             items.push((i, j));
         }
         let operation =
-            if let Some(val) = line3.next_unsigned() {
+            if let Result::Ok(val) = line3.next_unsigned() {
                 match line3.as_bytes()[23] {
                     b'+' => Operation::Add(val),
                     b'*' => Operation::Multiply(val),
-                    _ => bail!("unexpected character"),
+                    c => bail!("unexpected character {}", c as char),
                 }
             } else {
                 Operation::Square

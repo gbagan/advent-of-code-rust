@@ -3,7 +3,7 @@ use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
     let (line1, line2) = input.split_once('\n')
-        .ok_or_else(|| anyhow!("Parse error"))?;
+                                .context("Parse error: missing an end of line")?;
     let times: Vec<_> = line1.iter_unsigned().collect();
     let distances: Vec<_> = line2.iter_unsigned().collect();
     let p1 = part1(&times, &distances);

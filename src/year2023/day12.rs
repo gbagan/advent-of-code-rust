@@ -2,11 +2,10 @@
 
 use anyhow::*;
 use crate::util::{grid::Grid, parser::*};
-use crate::util::parallel::*;
-use itertools::Itertools;
+use crate::util::{parallel::*, TryParseLines};
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
-    let puzzles: Vec<_> = input.lines().map(parse_line).try_collect()?;
+    let puzzles: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
     let p1 = puzzles.iter().map(|(springs, groups)| {
         let mut springs = springs.to_vec();
         springs.push(b'.');
@@ -35,7 +34,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
 
 fn parse_line(line: &str) -> Result<(&[u8], Vec<u8>)> {
     let (springs, groups) = line.split_once(' ')
-                    .ok_or_else(|| anyhow!("Parse error on line: {line}"))?;
+                    .with_context(|| format!("Parse error on line: {line}"))?;
     let springs = springs.as_bytes();
     let groups = groups.iter_unsigned().collect();
     Ok((springs, groups))

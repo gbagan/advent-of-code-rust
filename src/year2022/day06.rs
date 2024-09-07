@@ -1,8 +1,8 @@
 use anyhow::*;
 
 pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let p1 = marker(input, 4).ok_or_else(|| anyhow!("Part 1: No solution found"))?;
-    let p2 = marker(input, 14).ok_or_else(|| anyhow!("Part 2: No solution found"))?;
+    let p1 = marker(input, 4).context("Part 1: No solution found")?;
+    let p2 = marker(input, 14).context("Part 2: No solution found")?;
     Ok((p1, p2))
 }
 

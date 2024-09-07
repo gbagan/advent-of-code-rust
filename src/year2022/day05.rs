@@ -4,7 +4,7 @@ use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(String, String)> {
     let (input1, input2) = input.split_once("\n\n")
-        .ok_or_else(|| anyhow!("Parse error"))?;
+        .context("Parse error")?;
     let input1: Vec<_> = input1.lines().rev().collect();
     let width = (input1[0].len() + 1) / 4;
     let mut stacks = vec![vec!(); width];

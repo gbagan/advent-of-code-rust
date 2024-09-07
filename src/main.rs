@@ -1,3 +1,4 @@
+use anyhow::*;
 use std::path::Path;
 use std::env::args;
 use std::fs::{create_dir, read_to_string};
@@ -6,7 +7,6 @@ use std::io;
 use std::io::Write;
 use std::time::{Duration, Instant};
 use ansi_term::Color::{Red, Yellow, Green};
-use anyhow::{Result, anyhow};
 use aoc::*;
 
 struct Solution {
@@ -22,7 +22,7 @@ macro_rules! solution {
         let func = |input: &String| {
             use $year::$day::*;
 
-            let (p1, p2) = solve(input).ok_or_else(|| anyhow!("Failed"))?;
+            let (p1, p2) = solve(input).context("Failed")?;
             Ok((p1.to_string(), p2.to_string()))
         };
 
@@ -69,7 +69,7 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
         }
         
         let path = Path::new("inputs").join(year).join(day);
-        if let Ok(data) = read_to_string(&path) {
+        if let Result::Ok(data) = read_to_string(&path) {
             let instant = Instant::now();
             let res = func(&data);
             let mut elapsed = instant.elapsed();
@@ -107,8 +107,8 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
                 println!("{year} Day {day} in {text} on average over {iterations} iterations.");
             }
             match res  {
-                Err(err) => println!("{err}"),
-                Ok((part1, part2)) => { 
+                Err(err) => println!("{err:?}"),
+                Result::Ok((part1, part2)) => { 
                     if display_solution {
                         println!("    Part 1: {part1}");
                         println!("    Part 2: {part2}");
@@ -195,29 +195,29 @@ fn solutions() -> Vec<Solution> {
         solution_with_error!(year2015, day24),
         solution_with_error!(year2015, day25),
 
-        solution!(year2016, day01),
-        solution!(year2016, day02),
-        solution!(year2016, day03),
-        solution!(year2016, day04),
-        solution!(year2016, day05),
-        solution!(year2016, day06),
+        solution_with_error!(year2016, day01),
+        solution_with_error!(year2016, day02),
+        solution_with_error!(year2016, day03),
+        solution_with_error!(year2016, day04),
+        solution_with_error!(year2016, day05),
+        solution_with_error!(year2016, day06),
         solution_with_error!(year2016, day07),
-        solution!(year2016, day08),
-        solution!(year2016, day09),
-        solution!(year2016, day10),
-        solution!(year2016, day11),
-        solution!(year2016, day12),
-        solution!(year2016, day13),
+        solution_with_error!(year2016, day08),
+        solution_with_error!(year2016, day09),
+        solution_with_error!(year2016, day10),
+        solution_with_error!(year2016, day11),
+        solution_with_error!(year2016, day12),
+        solution_with_error!(year2016, day13),
         // todo
         solution_with_error!(year2016, day15),
         solution_with_error!(year2016, day16),
-        solution!(year2016, day20),
+        solution_with_error!(year2016, day20),
 
-        solution!(year2017, day01),
-        solution!(year2017, day02),
-        solution!(year2017, day03),
-        solution!(year2017, day04),
-        solution!(year2017, day05),
+        solution_with_error!(year2017, day01),
+        solution_with_error!(year2017, day02),
+        solution_with_error!(year2017, day03),
+        solution_with_error!(year2017, day04),
+        solution_with_error!(year2017, day05),
         solution!(year2017, day06),
         solution!(year2017, day07),
         solution!(year2017, day08),
