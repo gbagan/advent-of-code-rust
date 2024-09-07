@@ -1,5 +1,5 @@
+use anyhow::*;
 use itertools::Itertools;
-
 use crate::util::parser::*;
 use crate::util::permutation::Permutation;
 use crate::util::power;
@@ -9,7 +9,7 @@ use crate::util::power;
 // q represents the permutation implied by Partner
 type Dance = (Permutation, Permutation);
 
-pub fn solve(input: &str) -> Option<(String, String)> {
+pub fn solve(input: &str) -> Result<(String, String)> {
     let mut perm1 = Permutation::one(16);
     let mut perm2 = Permutation::one(16);
     let mut offset = 0;
@@ -42,7 +42,7 @@ pub fn solve(input: &str) -> Option<(String, String)> {
     let pdance = power(compose_dance, dance.clone(), 1_000_000_000);
     let p2 = (&pdance.1 >> &pdance.0).apply(programs);
     let p2 = String::from_utf8(p2).unwrap();
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn compose_dance(d1: &Dance, d2: &Dance) -> Dance {

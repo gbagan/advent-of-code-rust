@@ -6,7 +6,7 @@ use anyhow::*;
 use crate::util::grid::Grid;
 
 pub fn solve(input: &str) -> Result<(i64, i64)>{
-    let grid = Grid::parse(input);
+    let grid = Grid::parse(input)?;
     let mut galaxy_xs: Vec<i64> = Vec::new();
     let mut galaxy_ys: Vec<i64> = Vec::new();
     let mut empty_rows: Vec<i64> = Vec::new();

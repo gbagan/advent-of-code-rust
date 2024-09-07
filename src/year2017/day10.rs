@@ -1,3 +1,4 @@
+use anyhow::*;
 use crate::util::knothash::{reverse,knothash};
 use std::fmt::Write;
 
@@ -10,11 +11,11 @@ fn part2(input: &str) -> String {
     output
 }
 
-pub fn solve(input: &str) -> Option<(u64, String)> {
+pub fn solve(input: &str) -> Result<(u64, String)> {
     let input = input.trim();
     let lengths: Vec<_> = input.split(',').filter_map(|w| w.parse().ok()).collect();
     let knot = reverse(&lengths, 1);
     let p1 = knot[0] as u64 * knot[1] as u64;
     let p2 = part2(input);
-    Some((p1, p2))
+    Ok((p1, p2))
 }

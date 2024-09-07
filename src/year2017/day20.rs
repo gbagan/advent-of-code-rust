@@ -1,3 +1,4 @@
+use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
 use crate::util::{coord::Coord3, iter::*, parser::*};
@@ -17,7 +18,7 @@ impl Particle {
     }
 }
 
-pub fn solve(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Result<(usize, usize)> {
     let mut particles = Vec::new();
     for (px, py, pz, vx, vy, vz, ax, ay, az) in input.iter_signed().tuples() {
         particles.push(Particle { p: Coord3::new(px, py, pz),
@@ -28,7 +29,7 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
 
     let p1 = part1(&particles);
     let p2 = part2(&particles);
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn part1(particles: &[Particle]) -> usize {

@@ -2,6 +2,8 @@ use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
 
+use crate::util::TryParseLines;
+
 enum Op {
     And, Or, LShift, RShift
 }
@@ -17,11 +19,7 @@ enum Gate {
 type Circuit = HashMap<String,Gate>;
 
 pub fn solve(input: &str) -> Result<(u16, u16)> {
-    let mut circuit: HashMap<String, Gate> = input
-        .lines()
-        .map(|line| parse_line(line).with_context(|| format!("Parse error on line: '{line}'")))
-        .try_collect()?;
-         //input.try_parse_lines_and_collect(parse_line)?;
+    let mut circuit: HashMap<String, Gate> = input.try_parse_lines_and_collect(parse_line)?;
     let p1 = eval_circuit(&circuit);
     circuit.insert("b".to_string(), Gate::Const(Wire::Signal(p1)));
     let p2 = eval_circuit(&circuit);

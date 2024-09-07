@@ -1,3 +1,14 @@
+use anyhow::*;
+
+use crate::util::parser::*;
+
+pub fn solve(input: &str) -> Result<(usize, usize)> {
+    let n = input.next_unsigned()?;
+    let p1 = part1(n);
+    let p2 = part2(n);
+    Ok((p1, p2))
+}
+
 fn part1(n: usize) -> usize {
     let mut v = Vec::with_capacity(2018);
     v.push(0);
@@ -23,9 +34,4 @@ fn part2(steps: usize) -> usize {
         pos = (pos + skip * steps) % i;
     }
     val_after_0
-}
-
-pub fn solve(input: &str) -> Option<(usize, usize)> {
-    let n = input.trim().parse().ok()?;
-    Some((part1(n), part2(n)))
 }

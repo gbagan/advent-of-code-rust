@@ -1,3 +1,4 @@
+use anyhow::*;
 use crate::util::coord::Coord;
 use std::ops::{Index, IndexMut};
 
@@ -193,14 +194,18 @@ impl<T> IndexMut<(usize, usize)> for Grid<T> {
 }
 
 impl Grid<u8> {
-    pub fn parse(input: &str) -> Self {
+    pub fn parse(input: &str) -> Result<Self> {
         let raw: Vec<_> = input.lines().map(str::as_bytes).collect();
         let width = raw[0].len();
         let height = raw.len();
         let mut vec = Vec::with_capacity(width * height);
-        raw.iter().for_each(|slice| vec.extend_from_slice(slice));
-        assert_eq!(vec.len(), width * height);
-        Grid { width, height, vec }
+        for slice in raw {
+            ensure!(slice.len() == width, "Two rows have different lengths ({width} and {})", slice.len());
+            vec.extend_from_slice(slice);
+        }
+        ensure!(width > 0, "Grid width must be > 0");
+        ensure!(height > 0, "Height width must be > 0");
+        Ok(Grid { width, height, vec })
     }
 }
 

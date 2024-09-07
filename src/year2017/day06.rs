@@ -1,6 +1,6 @@
 use anyhow::*;
 use itertools::iterate;
-use crate::util::iter::*;
+use crate::util::{iter::*, parser::*};
 
 const SPREAD: [u64; 16] = [
     0x0000000000000000,
@@ -22,11 +22,7 @@ const SPREAD: [u64; 16] = [
 ];
 
 pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let banks: u64 = input
-        .trim()
-        .split_ascii_whitespace()
-        .filter_map(|x| x.parse().ok())
-        .fold(0, |acc, n: u64| (acc << 4) + n);
+    let banks: u64 = input.iter_unsigned().fold(0, |acc, n: u64| (acc << 4) + n);
 
     let (i, j, _) = iterate(banks, step).find_duplicate()
                             .context("No solution found")?;

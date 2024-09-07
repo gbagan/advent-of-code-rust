@@ -18,7 +18,7 @@ struct Input {
 }
 
 pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let parsed = Grid::parse(input);
+    let parsed = Grid::parse(input)?;
     let mut grid = Grid::new(parsed.width+2, parsed.height+2, b'#');
     let mut rounded = vec!();
     let mut north_cubes = vec!();

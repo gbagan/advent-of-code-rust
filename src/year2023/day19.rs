@@ -1,8 +1,7 @@
 use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
-
-use crate::util::parser::UnsignedIter;
+use crate::util::{parser::*, TryParseLines};
 
 type Workflows<'a> = HashMap<&'a str, Vec<Step<'a>>>;
 
@@ -14,18 +13,9 @@ struct Step<'a> {
 }
 
 pub fn solve(input: &str) -> Result<(u32, u64)> {
-    let mut workflows = HashMap::new();
-    let mut lines = input.lines();
-    for line in lines.by_ref() {
-        if line.is_empty() {
-            break
-        } else {
-            let (name, workflow) = parse_workflow(line)
-                                            .with_context(|| format!("Parse error on line '{line}'"))?;
-            workflows.insert(name, workflow);
-        }
-    }
-    let ratings: Vec<_> = lines.filter_map(parse_rating).collect();
+    let (input1, input2) = input.try_split_once("\n\n")?;
+    let workflows = input1.try_parse_lines_and_collect(parse_workflow)?;
+    let ratings = input2.iter_unsigned().tuples().map(|(x, y, z, t)| [x, y, z, t]).collect_vec();
     let p1 = part1(&workflows, &ratings);
     let p2 = part2(&workflows);
     Ok((p1, p2))
@@ -46,7 +36,8 @@ fn parse_workflow(line: &str) -> Result<(&str, Vec<Step>)> {
         if second.is_empty() {
             Ok(Step{test: Test::Otherwise, instr: parse_instr(first)})
         } else {
-            let (c, rel) = first.chars().collect_tuple().context("")?;
+            let (c, rel) = first.chars().next_tuple()
+                                        .with_context(|| format!("'{first}' must contains at least 2 characters"))?;
             let c = match c {
                 'x' => 0,
                 'm' => 1,
@@ -64,11 +55,6 @@ fn parse_workflow(line: &str) -> Result<(&str, Vec<Step>)> {
         }
     }).try_collect()?;
     Ok((name, workflow))
-}
-
-fn parse_rating(line: &str) -> Option<[u16; 4]> {
-    let (x, m, a, s) = line.iter_unsigned().collect_tuple()?;
-    Some([x, m, a, s])
 }
 
 fn accepts(rating: &[u16; 4], workflows: &HashMap<&str, Vec<Step>>) -> bool {

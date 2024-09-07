@@ -17,7 +17,6 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
 }
 
 fn card_score(table: &mut [u16; 100], i: u16, line: &str) -> u32 {
-    let i = i as u16;
     let mut score = 0;
     for v in line.iter_unsigned::<usize>().skip(1) {
         if table[v] == i {

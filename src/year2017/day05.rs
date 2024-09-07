@@ -28,11 +28,11 @@ fn part2(jumps: &[i32]) -> u32 {
     let mut steps = 0;
     let mut offset = 0;
     while offset < n {
-        let offset2 = jumps[offset as usize];
+        let offset2 = jumps[offset];
         if offset2 >= 3 {
-            jumps[offset as usize] -= 1;
+            jumps[offset] -= 1;
         } else {
-            jumps[offset as usize] += 1;
+            jumps[offset] += 1;
         }
         offset = offset.wrapping_add(offset2 as usize);
         steps += 1;

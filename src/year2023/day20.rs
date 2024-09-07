@@ -2,12 +2,14 @@ use anyhow::*;
 use itertools::Itertools;
 use std::collections::HashMap;
 
-fn parse_line(line: &str) -> Option<(&str, (bool, Vec<&str>))> {
-    let (key, values) = line.split_once(" -> ")?;
-    let first_char = key.chars().next()?;
+use crate::util::TryParseLines;
+
+fn parse_line(line: &str) -> Result<(&str, (bool, Vec<&str>))> {
+    let (key, values) = line.try_split_once(" -> ")?;
+    let first_char = key.chars().next().context("Nothing before ' -> '")?;
     let key = key.trim_start_matches(['%', '&']);
     let values = values.split(", ").collect();
-    Some((key, (first_char == '&', values)))
+    Ok((key, (first_char == '&', values)))
 }
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {

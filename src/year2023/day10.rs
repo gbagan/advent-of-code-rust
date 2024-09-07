@@ -6,7 +6,7 @@ use crate::util::{coord::Coord, grid::Grid};
 type Point = Coord::<i32>;
 
 pub fn solve(input: &str) -> Result<(i32,i32)> {
-    let grid = Grid::parse(input);
+    let grid = Grid::parse(input)?;
     let mut start = None;
     for y in 0..grid.height {
         for x in 0..grid.width {

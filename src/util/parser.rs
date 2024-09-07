@@ -1,4 +1,5 @@
 use anyhow::*;
+use std::iter::Enumerate;
 use std::marker::PhantomData;
 use std::str::Bytes;
 use num_integer::Integer;
@@ -96,15 +97,84 @@ fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(bytes: &mut Bytes<'_>) -
     }
 }
 
-pub trait UnsignedIter {
+
+fn next_lower_case_token<'a>(slice: &'a str, iter: &mut Enumerate<Bytes<'_>>) -> Option<&'a str> {
+    let n = loop {
+        let (i, byte) = iter.next()?;
+        if byte.is_ascii_lowercase() {
+            break i
+        }
+    };
+
+    for (i, byte) in iter.by_ref() {
+        if !byte.is_ascii_lowercase() {
+            return Some(&slice[n..i]);
+        }
+    }
+    Some(&slice[n..])
+}
+
+
+
+
+pub struct ParseLowercase<'a> {
+    slice: &'a str,
+    bytes: Enumerate<Bytes<'a>>,
+}
+
+impl<'a> Iterator for ParseLowercase<'a> {
+    type Item = &'a str;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        next_lower_case_token(self.slice, &mut self.bytes)
+    }
+}
+
+fn next_upper_case_token<'a>(slice: &'a str, iter: &mut Enumerate<Bytes<'_>>) -> Option<&'a str> {
+    let n = loop {
+        let (i, byte) = iter.next()?;
+        if byte.is_ascii_uppercase() {
+            break i
+        }
+    };
+
+    for (i, byte) in iter.by_ref() {
+        if !byte.is_ascii_uppercase() {
+            return Some(&slice[n..i]);
+        }
+    }
+    Some(&slice[n..])
+}
+
+
+
+
+pub struct ParseUppercase<'a> {
+    slice: &'a str,
+    bytes: Enumerate<Bytes<'a>>,
+}
+
+impl<'a> Iterator for ParseUppercase<'a> {
+    type Item = &'a str;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        next_upper_case_token(self.slice, &mut self.bytes)
+    }
+}
+
+
+
+
+pub trait ParserIter {
     fn next_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> Result<T>;
     fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> Result<T>;
     fn iter_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> ParseUnsigned<'_, T>;
     fn iter_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> ParseSigned<'_, T>;
-
+    fn iter_lowercase(&self) -> ParseLowercase<'_>;
+    fn iter_uppercase(&self) -> ParseUppercase<'_>;
 }
 
-impl UnsignedIter for &str {
+impl ParserIter for &str {
     fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> Result<T> {
         next_signed(&mut self.bytes()).context("No integer found")
     }
@@ -121,5 +191,21 @@ impl UnsignedIter for &str {
     fn iter_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> ParseSigned<'_, T> {
         ParseSigned { bytes: self.bytes(), phantom: PhantomData }
     }
+
+    fn iter_lowercase(&self) -> ParseLowercase<'_> {
+        ParseLowercase { slice: self, bytes: self.bytes().enumerate() }
+    }
+
+    fn iter_uppercase(&self) -> ParseUppercase<'_> {
+        ParseUppercase { slice: self, bytes: self.bytes().enumerate() }
+    }
 }
 
+
+#[test]
+
+fn test_iter_lowercase() {
+    let input = "abcXb?cdAa";
+    let output: Vec<_> = input.iter_lowercase().collect();
+    assert_eq!(output, vec!("abc", "b", "cd", "a"));
+}

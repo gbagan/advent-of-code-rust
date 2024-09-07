@@ -7,7 +7,7 @@ type Point = Coord<i32>;
 const NB_STEPS: u64 = 26_501_365;
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
-    let grid = Grid::parse(input);
+    let grid = Grid::parse(input)?;
     ensure!(grid.height == grid.width, "The grid is not square");
     
     let start = Point::new(grid.width as i32 / 2, grid.height as i32 / 2);

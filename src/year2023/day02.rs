@@ -1,5 +1,5 @@
 use anyhow::*;
-use itertools::Itertools;
+use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(usize, u32)> {
     let mut p1 = 0;
@@ -10,9 +10,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
         let mut g = 0;
         let mut b = 0;
 
-        for (n, color) in line.split(' ').skip(2).tuples() {
-            let n = n.parse()?; 
-            let color = color.trim_end_matches([',', ';']);
+        for (color, n) in line.iter_lowercase().zip(line.iter_unsigned()).skip(1) {
             match color {
                 "red" => {
                     valid = valid && n <= 12;

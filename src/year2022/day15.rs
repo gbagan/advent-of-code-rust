@@ -1,5 +1,5 @@
+use anyhow::*;
 use std::collections::HashSet;
-
 use itertools::Itertools;
 use crate::util::{coord::Coord, parser::*, range::Range};
 
@@ -9,7 +9,7 @@ struct Scan {
     distance: i32,
 }
 
-pub fn solve(input: &str) -> Option<(i32, u64)> {
+pub fn solve(input: &str) -> Result<(i32, u64)> {
     let scans: Vec<_> = input
         .iter_signed()
         .tuples()
@@ -22,8 +22,8 @@ pub fn solve(input: &str) -> Option<(i32, u64)> {
         .collect();
 
     let p1 = part1(&scans);
-    let p2 = part2(&scans)?;
-    Some((p1, p2))
+    let p2 = part2(&scans).context("Part 2: No solution found")?;
+    Ok((p1, p2))
     
 }
 

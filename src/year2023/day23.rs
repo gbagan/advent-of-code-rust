@@ -12,7 +12,7 @@ struct GridGraph {
 }
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let grid = Grid::parse(input);
+    let grid = Grid::parse(input)?;
     let graph = compress_grid(&grid);
     let grid = graph_to_grid(&graph);
     let p1 = part1(&grid);

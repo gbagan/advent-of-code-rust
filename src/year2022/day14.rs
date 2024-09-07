@@ -1,3 +1,4 @@
+use anyhow::*;
 use itertools::Itertools;
 use crate::util::{grid::Grid, parser::*};
 
@@ -9,7 +10,7 @@ fn parse_line(line: &str) -> Vec<(usize, usize)> {
 #[repr(u8)]
 enum Kind {Empty, Rock, Falling, Sand}
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let coords: Vec<_> = input
         .lines()
         .map(parse_line)
@@ -41,7 +42,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
     fall(&mut grid, &mut p1, height);
     let p2 = p1 + part2(&mut grid);
 
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn fall(grid: &mut Grid<Kind>, counter: &mut u32, index: usize) -> Kind {

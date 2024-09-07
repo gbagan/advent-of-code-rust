@@ -6,6 +6,20 @@ use crate::util::coord::Coord;
 
 type Point = Coord<i32>;
 
+pub fn solve(input: &str) -> Result<(i64, i64)> {
+    let mut instrs1 = vec!();
+    let mut instrs2 = vec!();
+    for line in input.lines() {
+        let (t1, t2) =  parse_line(line).with_context(|| format!("Parse error on line: '{line}'"))?;
+        instrs1.push(t1);
+        instrs2.push(t2);
+    }
+    let p1 = lava(&instrs1);
+    let p2 = lava(&instrs2);
+    Ok((p1, p2))
+}
+
+
 fn parse_line(line: &str) -> Result<((Point, i32), (Point, i32))> {
     let (dir1, len1, hex) = line.split_ascii_whitespace().next_tuple()
                                             .context("Missing space characters")?;
@@ -28,19 +42,6 @@ fn parse_line(line: &str) -> Result<((Point, i32), (Point, i32))> {
     };
     let len2 = i32::from_str_radix(&hex, 16)?;
     Ok(((dir1, len1), (dir2, len2)))
-}
-
-pub fn solve(input: &str) -> Result<(i64, i64)> {
-    let mut instrs1 = vec!();
-    let mut instrs2 = vec!();
-    for line in input.lines() {
-        let (t1, t2) =  parse_line(line).with_context(|| format!("Parse error on line: '{line}'"))?;
-        instrs1.push(t1);
-        instrs2.push(t2);
-    }
-    let p1 = lava(&instrs1);
-    let p2 = lava(&instrs2);
-    Ok((p1, p2))
 }
 
 

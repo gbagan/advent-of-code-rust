@@ -1,8 +1,9 @@
+use anyhow::*;
 use std::collections::VecDeque;
 use crate::util::grid::Grid;
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
-    let mut grid = Grid::parse(input);
+pub fn solve(input: &str) -> Result<(u32, u32)> {
+    let mut grid = Grid::parse(input)?;
     let start = grid.vec.iter().position(|&c| c == b'E').unwrap();
     grid[start] = b'z';
     let mut p2 = u32::MAX;
@@ -31,7 +32,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
             }
         })
     } 
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn can_climb(c1: u8, c2: u8) -> bool {

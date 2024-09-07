@@ -1,12 +1,15 @@
 // connected components
 
-fn parse_node(line: &str) -> Option<Vec<usize>> {
-    let (_, nbors) = line.split_once("<-> ")?;
-    Some(nbors.split(", ").filter_map(|v| v.parse().ok()).collect())
+use anyhow::*;
+use crate::util::parser::*;
+use itertools::Itertools;
+
+fn parse_node(line: &str) -> Vec<usize> {
+    line.iter_unsigned().skip(1).collect()
 }
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
-    let graph: Vec<_> = input.lines().filter_map(parse_node).collect();
+pub fn solve(input: &str) -> Result<(u32, u32)> {
+    let graph = input.lines().map(parse_node).collect_vec();
     let n = graph.len();
     let mut p1 = 0;
     let mut p2 = 0;
@@ -32,5 +35,5 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
         }
 
     }
-    Some((p1, p2))
+    Ok((p1, p2))
 }

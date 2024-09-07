@@ -29,7 +29,7 @@ fn next_directions (c: u8, dir: u8) -> Vec<u8> {
 }
 
 pub fn solve(input: &str) -> Result<(u64, u64)>{
-    let grid = Grid::parse(input);
+    let grid = Grid::parse(input)?;
     let mut north = grid.map(|_| 0);
     let mut south = grid.map(|_| 0);
     let mut west = grid.map(|_| 0);

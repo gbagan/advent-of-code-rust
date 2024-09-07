@@ -1,4 +1,5 @@
-use crate::util::iter::*;
+use anyhow::*;
+use crate::util::{iter::*, TryParseLines};
 
 struct Pattern {
     three: u32,
@@ -7,7 +8,7 @@ struct Pattern {
     nine: [usize; 9],
 }
 
-pub fn solve(input: &str) -> Option<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut block_three_index = [0usize; 16]; 
     let mut two_to_three = [[false; 9]; 16]; 
     let mut three_to_four = [[false; 16]; 512]; 
@@ -16,7 +17,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
     let mut blocks_three = vec!(start);
     let mut i = 1;
     for line in input.lines() {
-        let (left, right) = line.split_once(" => ")?;
+        let (left, right) = line.try_split_once(" => ")?;
         let left: Vec<_> = left.bytes().filter(|&c| c != b'/').map(|c| c == b'#').collect();
         let right = right.as_bytes();
         match left.len() {
@@ -38,7 +39,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
                     three_to_four[j] = right;
                 }
             }
-            _ => panic!("invalid input")
+            _ => bail!("invalid input")
         }
     }
 
@@ -96,7 +97,7 @@ pub fn solve(input: &str) -> Option<(u32, u32)> {
     }
     let p1 = count[5];
     let p2 = count[18];
-    Some((p1, p2))
+    Ok((p1, p2))
 }
 
 fn orientations_two(block: &[bool]) -> [usize; 8] {

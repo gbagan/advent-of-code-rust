@@ -1,3 +1,4 @@
+use anyhow::*;
 use crate::util::parser::*;
 use itertools::Itertools;
 
@@ -17,7 +18,7 @@ struct State {
     weight: usize,
 }
 
-pub fn solve(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Result<(usize, usize)> {
     let edges: Vec<_> = input
         .iter_unsigned()
         .tuples()
@@ -80,5 +81,5 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
             }
         }
     }
-    Some((p1, p2.1))
+    Ok((p1, p2.1))
 }

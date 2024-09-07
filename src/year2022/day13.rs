@@ -1,8 +1,8 @@
+use anyhow::*;
 use itertools::Itertools;
-
 use crate::util::iter::put_many_back;
 
-pub fn solve(input: &str) -> Option<(usize, usize)> {
+pub fn solve(input: &str) -> Result<(usize, usize)> {
     let lines: Vec<_> = input.lines().filter(|line| !line.is_empty()).collect();  
     
     let p1 = lines
@@ -24,7 +24,7 @@ pub fn solve(input: &str) -> Option<(usize, usize)> {
     }
     let p2 = position1 * position2;
 
-    Some((p1, p2))
+    Ok((p1, p2))
 
 }
 
@@ -41,7 +41,7 @@ fn less_than(line1: &str, line2: &str) -> bool {
             _ => return c1 < c2
         }
     }
-    unreachable!()
+    false
 }
 
 

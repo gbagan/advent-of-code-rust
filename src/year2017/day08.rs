@@ -1,5 +1,8 @@
+use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
+
+use crate::util::parser::ParserIter;
 
 struct Instr<'a> {
     var1: &'a str,
@@ -10,29 +13,11 @@ struct Instr<'a> {
     val2: i32,
 }
 
-fn parse_line(line: &str) -> Option<Instr> {
-    let (var1, cmd, val1, _, var2, cmp, val2) = line.split_ascii_whitespace().next_tuple()?;
-    let val1 = val1.parse().ok()?;
-    let val2 = val2.parse().ok()?;
-    Some(Instr {var1, cmd, val1, var2, cmp, val2})
-}
-
-fn compare(a: i32, cmp: &str, b: i32) -> bool {
-    match cmp {
-        "==" => a == b,
-        "!=" => a != b,
-        "<=" => a <= b,
-        ">=" => a >= b,
-        "<" => a < b,
-        ">" => a > b,
-        _ => panic!("unexcepted character {cmp}") 
-    }
-}
-
-pub fn solve(input: &str) -> Option<(i32, i32)> {
+pub fn solve(input: &str) -> Result<(i32, i32)> {
     let mut vars: HashMap<&str, i32> = HashMap::new();
     let mut max_value = 0;
-    for instr in input.lines().filter_map(parse_line) {
+    // todo
+    for instr in input.lines().flat_map(parse_line) {
         let var2 = *vars.get(instr.var2).unwrap_or(&0);
         if compare(var2, instr.cmp, instr.val2) {
             let var1 = *vars.get(instr.var1).unwrap_or(&0);
@@ -46,5 +31,26 @@ pub fn solve(input: &str) -> Option<(i32, i32)> {
         }
     }
     let max_final_value = *vars.values().max().unwrap();
-    Some((max_final_value, max_value))
+    Ok((max_final_value, max_value))
+}
+
+
+fn parse_line(line: &str) -> Result<Instr> {
+    let (var1, cmd, val1, _, var2, cmp, val2) = 
+        line.split_ascii_whitespace().collect_tuple().context("Not enough token")?;
+    let val1 = val1.next_signed()?;
+    let val2 = val2.next_signed()?;
+    Ok(Instr {var1, cmd, val1, var2, cmp, val2})
+}
+
+fn compare(a: i32, cmp: &str, b: i32) -> bool {
+    match cmp {
+        "==" => a == b,
+        "!=" => a != b,
+        "<=" => a <= b,
+        ">=" => a >= b,
+        "<" => a < b,
+        ">" => a > b,
+        _ => panic!("unexcepted character {cmp}") 
+    }
 }

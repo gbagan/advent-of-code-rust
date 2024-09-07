@@ -13,7 +13,7 @@ fn diff1(line: &str) -> Result<u32> {
                     count += 3;
                 }
                 Some(_) => count += 1,
-                None => return Err(anyhow!("part1: unexpected end of input: {line}")),
+                None => bail!("part1: unexpected end of input: {line}"),
             }
         }
     }

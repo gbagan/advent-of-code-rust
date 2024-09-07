@@ -13,7 +13,7 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
 }
 
 fn parse_grid(input: &str) -> Result<(usize, usize)> {
-    let grid = Grid::parse(input);
+    let grid = Grid::parse(input)?;
     let mut rows: Vec<u32> = vec![0; grid.height];
     let mut columns: Vec<u32> = vec![0; grid.width];
     for x in 0..grid.width {

@@ -1,14 +1,15 @@
+use anyhow::*;
 use std::mem;
 use itertools::Itertools;
 use num_integer::Integer;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Option<(i32, i32)> {
+pub fn solve(input: &str) -> Result<(i32, i32)> {
     let mut pairs: Vec<(i32, i32)> = input.iter_unsigned().tuples().collect();
     pairs.sort_unstable_by_key(|p| p.1);
     let p1 = part1(&pairs);
-    let p2 = part2(&pairs)?;
-    Some((p1, p2))
+    let p2 = part2(&pairs).context("No solution found")?;
+    Ok((p1, p2))
 }
 
 #[inline]

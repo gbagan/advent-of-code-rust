@@ -17,7 +17,7 @@ pub fn solve(input: &str) -> Result<(i64, i64)> {
         let mut map = vec!();
         for line in lines.by_ref() {
             if line.is_empty() { break }
-            let (destination, source, length) = line.iter_unsigned().next_tuple()
+            let (destination, source, length) = line.iter_unsigned().collect_tuple()
                                                             .context("Parse error")?;
             let range = Range{lower: source, upper: source+length-1};
             map.push(ShiftRange {range, shift: destination - source});

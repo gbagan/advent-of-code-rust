@@ -20,7 +20,7 @@ fn next_index(index: usize, width: usize, c: u8) -> usize {
 }
 
 fn simulate(input: &[&str], grid: &str) -> String {
-    let grid = Grid::parse(grid);
+    let grid = Grid::parse(grid).unwrap();
     let width = grid.width;
     let grid = grid.vec;
     let mut index = grid.iter().position(|&c| c == b'5').unwrap();
