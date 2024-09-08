@@ -1,5 +1,5 @@
 use anyhow::*;
-use crate::util::{iter::*, TryParseLines};
+use crate::util::{iter::*, parser::*};
 
 struct Pattern {
     three: u32,

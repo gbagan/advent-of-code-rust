@@ -1,12 +1,11 @@
 use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
-use crate::util::TryParseLines;
+use crate::util::parser::*;
 
 fn parse_line(s: &str) -> Result<(&str, i32, &str)> {
     let s = s.trim_end_matches('.');
-    let (name1, _, g, gain, _, _, _, _, _, _, name2) =
-        s.split(' ').collect_tuple().context("The number of tokens does not match")?;
+    let (name1, _, g, gain, _, _, _, _, _, _, name2) = s.try_split_into_tuple(' ')?;
     let gain: i32 = gain.parse()?;
     let gain = if g == "gain" {gain} else {-gain};
     Ok((name1, gain, name2))

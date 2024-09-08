@@ -1,5 +1,5 @@
 use anyhow::*;
-use crate::util::{iter::*, parser::*, TryParseLines};
+use crate::util::{iter::*, parser::*};
 
 type Hand<'a> = (&'a [u8], usize);
 

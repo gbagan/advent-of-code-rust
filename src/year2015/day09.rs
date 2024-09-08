@@ -1,7 +1,7 @@
 use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
-use crate::util::{parser::*, TryParseLines};
+use crate::util::parser::*;
 
 fn parse_line(s: &str) -> Result<(&str, &str, u32)> {
     let (city1, _, city2, _, dist) = s.split(' ').next_tuple().context("No space character found")?;

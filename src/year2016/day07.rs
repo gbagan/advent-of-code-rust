@@ -1,5 +1,4 @@
 use anyhow::*;
-use itertools::Itertools;
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
     let p1 = part1(input);
@@ -13,8 +12,8 @@ fn part1(input: &str) -> u32 {
     let mut inside_contains_abba = false;
     let mut outside_contains_abba = false;
     let mut counter = 0;
-    for (a, b, c, d) in input.trim().bytes().tuple_windows() {
-        if  a == d && b == c && a != b {
+    for &[a, b, c, d] in input.trim().as_bytes().array_windows() {
+        if a == d && b == c && a != b {
             if inside {
                 inside_contains_abba = true;
             } else {
@@ -46,7 +45,7 @@ fn part2(input: &str) -> u32 {
     let mut line_no = 1;
     let mut counter = 0;
     let mut found = false;
-    for (a, b, c) in input.trim().bytes().tuple_windows() {
+    for &[a, b, c] in input.trim().as_bytes().array_windows() {
         if a.is_ascii_lowercase() {
             if a == c && a != b &&  b.is_ascii_lowercase() {
                 let i = (a - b'a') as usize;

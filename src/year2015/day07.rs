@@ -1,8 +1,7 @@
 use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
-
-use crate::util::TryParseLines;
+use crate::util::parser::*;
 
 enum Op {
     And, Or, LShift, RShift

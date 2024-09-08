@@ -29,7 +29,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut grid = Grid::new(width, height, Kind::Empty);
 
     for row in &coords {
-        for (&(x1, y1), &(x2, y2)) in row.iter().tuple_windows() {
+        for &[(x1, y1), (x2, y2)] in row.array_windows() {
             for x in x1.min(x2)..x1.max(x2)+1 {
                 for y in y1.min(y2)..y1.max(y2)+1 {
                     grid[(x + height - 500, y)] = Kind::Rock;

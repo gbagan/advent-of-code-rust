@@ -16,7 +16,7 @@ pub fn part1(bytes: &[u8]) -> usize {
             b'>' => acc.0 += 1,
             b'^' => acc.1 -= 1,
             b'v' => acc.1 += 1,
-            _ => panic!("invalid direction: {dir}"),
+            _ => panic!("Unexpected character: {}", *dir as char),
         }
         Some(*acc)
     });

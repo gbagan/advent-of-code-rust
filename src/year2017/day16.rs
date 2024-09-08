@@ -28,7 +28,7 @@ pub fn solve(input: &str) -> Result<(String, String)> {
                 let (a, b) = symbols.next_tuple().unwrap();
                 perm2.indices.swap((a - b'a') as usize, (b - b'a') as usize);
             }
-            _ => panic!("invalid character {c}")
+            _ => bail!("Unexpected character {}", c as char)
         }
     }
     perm1.indices.rotate_left(offset % 16);

@@ -1,3 +1,4 @@
+#![feature(array_windows)]
 #![feature(get_many_mut)]
 #![feature(int_roundings)]
 #![feature(iter_map_windows)]
@@ -81,6 +82,10 @@ pub mod year2017 {
 }
 
 pub mod year2020 {
+    pub mod day01;
+    pub mod day02;
+    pub mod day03;
+    pub mod day04;
     pub mod day18;
 }
 

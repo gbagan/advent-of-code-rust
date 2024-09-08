@@ -1,7 +1,7 @@
 use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
-use crate::util::{parser::*, TryParseLines};
+use crate::util::parser::*;
 
 type Workflows<'a> = HashMap<&'a str, Vec<Step<'a>>>;
 

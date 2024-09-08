@@ -1,9 +1,8 @@
 use anyhow::*;
-use itertools::Itertools;
 
 fn no_duplicate(words: &mut [Vec<u8>]) -> bool {
     words.sort_unstable();
-    words.iter().tuple_windows().all(|(w1, w2)| w1 != w2)
+    words.windows(2).all(|w| w[0] != w[1])
 }
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {

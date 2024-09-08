@@ -1,5 +1,5 @@
 use anyhow::*;
-use crate::util::TryParseLines;
+use crate::util::parser::*;
 
 pub enum Instr {
     Hlf(bool),

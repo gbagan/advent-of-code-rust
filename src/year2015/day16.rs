@@ -2,7 +2,7 @@ use anyhow::*;
 use itertools::Itertools;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
-use crate::util::{parser::*, TryParseLines};
+use crate::util::parser::*;
 
 pub struct Aunt<'a> {
     number: u32,

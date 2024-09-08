@@ -1,6 +1,6 @@
 use anyhow::*;
 use itertools::Itertools;
-use crate::util::{boxes::Box, parser::*, TryParseLines};
+use crate::util::{boxes::Box, parser::*};
 
 #[derive(Clone, Copy)]
 enum Command {

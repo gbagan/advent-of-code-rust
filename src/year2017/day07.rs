@@ -1,7 +1,7 @@
 use anyhow::*;
 use std::collections::HashMap;
 use itertools::{Itertools, MinMaxResult};
-use crate::util::{parser::*, TryParseLines};
+use crate::util::parser::*;
 
 struct Node<'a> {
     id: &'a str,

@@ -1,5 +1,4 @@
 use anyhow::*;
-use itertools::Itertools;
 use crate::util::parser::*;
 
 struct Room<'a> {
@@ -9,7 +8,7 @@ struct Room<'a> {
 }
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let rooms: Vec<_> = input.lines().map(parse_room).collect();
+    let rooms: Vec<_> = input.try_parse_lines_and_collect(parse_room)?;
     
     let p1 = rooms
         .iter()
@@ -26,12 +25,12 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
 
 
 
-fn parse_room(line: &str) -> Room {
+fn parse_room(line: &str) -> Result<Room> {
     let len = line.len();
     let encrypted = &line[..len-11]; 
-    let sector_id = (&line[len-10..len-7]).next_unsigned().unwrap();
+    let sector_id = (&line[len-10..len-7]).next_unsigned()?;
     let checksum = &line[len-6..len-1];
-    Room { encrypted, sector_id, checksum }
+    Ok(Room { encrypted, sector_id, checksum })
 }
 
 fn is_real_room(room: &Room) -> bool {
@@ -55,7 +54,7 @@ fn is_real_room(room: &Room) -> bool {
         return false;
     }
 
-    for (&c1, &c2) in checksum.iter().tuple_windows() {
+    for &[c1, c2] in checksum.array_windows() {
         let freq_c1 = freqs[(c1 - b'a') as usize];
         let freq_c2 = freqs[(c2 - b'a') as usize];
         if freq_c1 < freq_c2 || freq_c1 == freq_c2 && c1 >= c2 {

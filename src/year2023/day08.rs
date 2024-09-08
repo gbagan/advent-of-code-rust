@@ -2,7 +2,7 @@ use anyhow::*;
 use itertools::Itertools;
 use std::collections::HashMap;
 use num_integer::Integer;
-use crate::util::{parser::*, TryParseLines};
+use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(usize, usize)> {
     let (directions, rest) = input.try_split_once("\n\n")?;

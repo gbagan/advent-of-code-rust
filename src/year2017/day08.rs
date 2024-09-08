@@ -1,8 +1,6 @@
 use anyhow::*;
 use std::collections::HashMap;
-use itertools::Itertools;
-
-use crate::util::parser::ParserIter;
+use crate::util::parser::*;
 
 struct Instr<'a> {
     var1: &'a str,
@@ -24,7 +22,7 @@ pub fn solve(input: &str) -> Result<(i32, i32)> {
             let var1 = match instr.cmd {
                 "inc" => var1 + instr.val1,
                 "dec" => var1 - instr.val1,
-                _ => panic!("unexcepted characters {}", instr.cmd),
+                _ => bail!("Unexpeced characters {}", instr.cmd),
             };
             max_value = max_value.max(var1);
             vars.insert(instr.var1, var1);
@@ -36,8 +34,7 @@ pub fn solve(input: &str) -> Result<(i32, i32)> {
 
 
 fn parse_line(line: &str) -> Result<Instr> {
-    let (var1, cmd, val1, _, var2, cmp, val2) = 
-        line.split_ascii_whitespace().collect_tuple().context("Not enough token")?;
+    let (var1, cmd, val1, _, var2, cmp, val2) = line.try_split_into_tuple(' ')?;
     let val1 = val1.next_signed()?;
     let val2 = val2.next_signed()?;
     Ok(Instr {var1, cmd, val1, var2, cmp, val2})
@@ -51,6 +48,6 @@ fn compare(a: i32, cmp: &str, b: i32) -> bool {
         ">=" => a >= b,
         "<" => a < b,
         ">" => a > b,
-        _ => panic!("unexcepted character {cmp}") 
+        _ => panic!("unexpected character {cmp}") 
     }
 }

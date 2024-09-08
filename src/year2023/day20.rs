@@ -1,8 +1,7 @@
 use anyhow::*;
 use itertools::Itertools;
 use std::collections::HashMap;
-
-use crate::util::TryParseLines;
+use crate::util::parser::*;
 
 fn parse_line(line: &str) -> Result<(&str, (bool, Vec<&str>))> {
     let (key, values) = line.try_split_once(" -> ")?;

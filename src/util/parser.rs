@@ -1,7 +1,11 @@
 use anyhow::*;
+use itertools::traits::HomogeneousTuple;
+use std::fmt::Debug;
 use std::iter::Enumerate;
 use std::marker::PhantomData;
+use std::str::pattern::Pattern;
 use std::str::Bytes;
+use itertools::Itertools;
 use num_integer::Integer;
 use num_traits::Signed;
 
@@ -201,6 +205,97 @@ impl ParserIter for &str {
     }
 }
 
+pub trait TryParseLines {
+    fn try_parse_lines_and_collect<A, C, F>(self, f: F) -> Result<C>
+    where
+        Self: Sized,
+        F: Fn(Self) -> Result<A>,
+        Result<C>: FromIterator<Result<A>>;
+
+    fn try_split_once<P>(self, delim: P) -> Result<(Self, Self)>
+    where
+        Self: Sized,
+        P: Pattern + Debug + Copy;
+
+    fn try_split_into_tuple<P, T>(self, delim: P) -> Result<T>
+    where 
+        Self: Sized,
+        P: Pattern + Debug + Copy,
+        T: HomogeneousTuple<Item=Self>;
+
+    /* 
+    fn try_rsplit_once<'a, P>(self, delim: P) -> Result<(Self, Self)>
+    where
+        Self: Sized,
+        P: Pattern + Debug + Copy,
+        <P as Pattern>::Searcher<'a>: ReverseSearcher<'a>;
+    */
+
+    fn try_unsigned_tuple<U, T>(self) -> Result<T>
+    where 
+        Self: Sized,
+        T: HomogeneousTuple<Item=U>,
+        U: Integer + Ten<U> + From<u8>;
+}
+
+impl TryParseLines for &str {
+    #[inline]
+    fn try_parse_lines_and_collect<A, C, F>(self, f: F) -> Result<C>
+    where
+        Self: Sized,
+        F: Fn(Self) -> Result<A>,
+        Result<C>: FromIterator<Result<A>>
+    {
+        self
+            .lines()
+            .map(|line| f(line).with_context(|| format!("Parse error on line: '{line}'")))
+            .try_collect()
+    }
+
+    #[inline]
+    fn try_split_once<'a, P>(self, delimiter: P) -> Result<(Self, Self)>
+        where
+            Self: Sized,
+            P: Pattern + Debug + Copy
+    {
+        self.split_once(delimiter).with_context(|| format!("No delimiter '{delimiter:?}' found in string '{self}'"))
+    }
+    /* 
+    fn try_rsplit_once<'a, P>(self, delimiter: P) -> Result<(Self, Self)>
+        where
+            Self: Sized,
+            P: Pattern + Debug + Copy,
+            <P as Pattern>::Searcher<'a>: ReverseSearcher<'a>,
+    {
+        self.rsplit_once(delimiter).with_context(|| format!("No delimiter '{delimiter:?}' found in string '{self}'"))
+    } */
+
+    #[inline]
+    fn try_split_into_tuple<P, T>(self, delimiter: P) -> Result<T>
+    where 
+        Self: Sized,
+        P: Pattern + Debug + Copy,
+        T: HomogeneousTuple<Item=Self>
+    {
+        self.split(delimiter)
+            .collect_tuple()
+            .with_context(|| format!("'{delimiter:?}' must split the string in exactly {} tokens'", T::num_items()))
+    }
+
+    #[inline]
+    fn try_unsigned_tuple<U, T>(self) -> Result<T>
+    where 
+        Self: Sized,
+        T: HomogeneousTuple<Item=U>,
+        U: Integer + Ten<U> + From<u8>
+    {
+        self.iter_unsigned()
+            .collect_tuple()
+            .with_context(|| format!("String must contains exaactly {} integers", T::num_items()))
+    }
+
+
+}   
 
 #[test]
 

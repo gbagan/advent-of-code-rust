@@ -1,9 +1,6 @@
-use anyhow::*;
-use std::fmt::Debug;
 use std::mem;
-use std::str::pattern::Pattern;
 use core::hash::Hash;
-use itertools::{Itertools, iterate};
+use itertools::iterate;
 use crate::util::iter::*;
 
 pub mod boxes;
@@ -77,56 +74,3 @@ fn power_test() {
     let n = power(|&x, &y| x* y, 2, 6);
     assert_eq!(n, 64);
 }
-
-pub trait TryParseLines {
-    fn try_parse_lines_and_collect<A, C, F>(self, f: F) -> Result<C>
-    where
-        Self: Sized,
-        F: Fn(Self) -> Result<A>,
-        Result<C>: FromIterator<Result<A>>;
-
-    fn try_split_once<P>(self, delim: P) -> Result<(Self, Self)>
-    where
-        Self: Sized,
-        P: Pattern + Debug + Copy;
-
-    /* 
-    fn try_rsplit_once<'a, P>(self, delim: P) -> Result<(Self, Self)>
-    where
-        Self: Sized,
-        P: Pattern + Debug + Copy,
-        <P as Pattern>::Searcher<'a>: ReverseSearcher<'a>;
-    */
-}
-
-impl TryParseLines for &str {
-    #[inline]
-    fn try_parse_lines_and_collect<A, C, F>(self, f: F) -> Result<C>
-    where
-        Self: Sized,
-        F: Fn(Self) -> Result<A>,
-        Result<C>: FromIterator<Result<A>>
-    {
-        self
-            .lines()
-            .map(|line| f(line).with_context(|| format!("Parse error on line: '{line}'")))
-            .try_collect()
-    }
-
-    fn try_split_once<'a, P>(self, delimiter: P) -> Result<(Self, Self)>
-        where
-            Self: Sized,
-            P: Pattern + Debug + Copy
-    {
-        self.split_once(delimiter).with_context(|| format!("No delimiter '{delimiter:?}' found in string '{self}'"))
-    }
-    /* 
-    fn try_rsplit_once<'a, P>(self, delimiter: P) -> Result<(Self, Self)>
-        where
-            Self: Sized,
-            P: Pattern + Debug + Copy,
-            <P as Pattern>::Searcher<'a>: ReverseSearcher<'a>,
-    {
-        self.rsplit_once(delimiter).with_context(|| format!("No delimiter '{delimiter:?}' found in string '{self}'"))
-    } */
-}   

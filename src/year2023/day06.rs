@@ -1,5 +1,5 @@
 use anyhow::*;
-use crate::util::{parser::*, TryParseLines};
+use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
     let (line1, line2) = input.try_split_once('\n')?;

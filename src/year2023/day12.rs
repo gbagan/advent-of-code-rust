@@ -1,8 +1,7 @@
 // dynamic programming
 
 use anyhow::*;
-use crate::util::{grid::Grid, parser::*};
-use crate::util::{parallel::*, TryParseLines};
+use crate::util::{grid::Grid, parallel::*, parser::*};
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
     let puzzles: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
