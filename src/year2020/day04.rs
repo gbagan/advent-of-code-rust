@@ -7,14 +7,6 @@ type Passport<'a> = HashMap<&'a str, &'a str>;
 
 const MANDATORY_FIELDS: [&str; 7] =  ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
 
-fn parse_passport(input: &str) -> Result<Passport> {
-    input
-        .split_ascii_whitespace()
-        .map(|token| token.try_split_once(':'))
-        .try_collect()
-}
-
-
 pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut p1 = 0;
     let mut p2 = 0;
@@ -32,6 +24,13 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     Ok((p1, p2))
 }
 
+fn parse_passport(input: &str) -> Result<Passport> {
+    input
+        .split_ascii_whitespace()
+        .map(|token| token.try_split_once(':'))
+        .try_collect()
+}
+
 fn check1(passport: &Passport) -> bool {
     MANDATORY_FIELDS.iter().all(|field| passport.contains_key(field))
 }
@@ -47,7 +46,7 @@ fn check2(passport: &Passport) -> bool {
 }
 
 fn check_range(field: &str, min: u32, max: u32) -> bool {
-    if let Some(year) = field.next_unsigned::<u32>().ok() {
+    if let Result::Ok(year) = field.next_unsigned::<u32>() {
         if year >= min && year <= max {
             return true;
         } 

@@ -45,8 +45,8 @@ fn crosses_inside_test_area(start: i64, end: i64, h1: &Hailstone, h2: &Hailstone
 }
 
 fn part1(hailstones: &[Hailstone]) -> u32 {
-    let start = 200_000_000_000_000i64;
-    let end = 400_000_000_000_000i64;
+    let start = 200_000_000_000_000;
+    let end = 400_000_000_000_000;
     let mut counter = 0;
     for (i, h1) in hailstones.iter().enumerate() {
         for h2 in &hailstones[i+1..] {

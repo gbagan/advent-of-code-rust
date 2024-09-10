@@ -18,8 +18,7 @@ struct Input {
 }
 
 pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let parsed = Grid::parse(input)?;
-    let mut grid = Grid::new(parsed.width+2, parsed.height+2, b'#');
+    let grid = Grid::parse_with_padding(input, b'#')?;
     let mut rounded = vec!();
     let mut north_cubes = vec!();
     let mut west_cubes = vec!();
@@ -29,12 +28,6 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
     let mut next_cube_west = Grid::new(grid.width, grid.height, 0);
     let mut next_cube_south = Grid::new(grid.width, grid.height, 0);
     let mut next_cube_east = Grid::new(grid.width, grid.height, 0);
-
-    for y in 0..parsed.height {
-        for x in 0..parsed.width {
-            grid[(x+1, y+1)] = parsed[(x, y)];
-        }
-    }
     
     for (i, &tile) in grid.vec.iter().enumerate() {
         if tile == b'O' {

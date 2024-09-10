@@ -207,6 +207,29 @@ impl Grid<u8> {
         ensure!(height > 0, "Height width must be > 0");
         Ok(Grid { width, height, vec })
     }
+
+    pub fn parse_with_padding(input: &str, fill: u8) -> Result<Self> {
+        let raw: Vec<_> = input.lines().map(str::as_bytes).collect();
+        let width = raw[0].len()+2;
+        let height = raw.len()+2;
+        let mut vec = Vec::with_capacity(width * height);
+        for _ in 0..width {
+            vec.push(fill)
+        }
+        
+        for slice in raw {
+            vec.push(fill);
+            ensure!(slice.len()+2 == width, "Two rows have different lengths ({width} and {})", slice.len());
+            vec.extend_from_slice(slice);
+            vec.push(fill);
+        }
+
+        for _ in 0..width {
+            vec.push(fill)
+        }
+
+        Ok(Grid { width, height, vec })
+    }
 }
 
 impl Grid<char> {

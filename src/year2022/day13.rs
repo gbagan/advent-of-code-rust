@@ -1,6 +1,5 @@
 use anyhow::*;
-use itertools::Itertools;
-use crate::util::iter::put_many_back;
+use itertools::{Itertools, put_back_n};
 
 pub fn solve(input: &str) -> Result<(usize, usize)> {
     let lines: Vec<_> = input.lines().filter(|line| !line.is_empty()).collect();  
@@ -29,8 +28,8 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
 }
 
 fn less_than(line1: &str, line2: &str) -> bool {
-    let mut it1 = put_many_back(PacketIterator::new(line1));
-    let mut it2 = put_many_back(PacketIterator::new(line2));
+    let mut it1 = put_back_n(PacketIterator::new(line1));
+    let mut it2 = put_back_n(PacketIterator::new(line2));
     while let (Some (c1), Some(c2)) = (it1.next(), it2.next()) {
         match (c1, c2) {
             _ if c1 == c2 => (),

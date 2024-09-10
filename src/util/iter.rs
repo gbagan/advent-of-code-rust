@@ -83,30 +83,3 @@ pub trait AOCIter: Iterator {
 }
 
 impl<I: Iterator> AOCIter for I {}
-
-pub struct PutManyBack<I> where
-    I: Iterator,
-{
-    top: Vec<I::Item>,
-    iter: I,
-}
-
-impl<I> PutManyBack<I> where I: Iterator {
-    #[inline]
-    pub fn put_back(&mut self, c: I::Item) {
-        self.top.push(c);
-    }
-}
-
-impl<I> Iterator for PutManyBack<I> where I: Iterator
-{
-    type Item = I::Item;
-    #[inline]
-    fn next(&mut self) -> Option<I::Item> {
-        self.top.pop().or_else(|| self.iter.next())
-    }
-}
-
-pub fn put_many_back<A, I> (iter: I) -> PutManyBack<I> where I: Iterator<Item=A> {
-    PutManyBack { top: vec!(), iter } 
-}
