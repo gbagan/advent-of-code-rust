@@ -1,43 +1,37 @@
 use anyhow::*;
-use crate::util::coord::Coord;
 use crate::util::grid::Grid;
 use std::collections::{HashSet, HashMap};
-
-type Point = Coord<i32>;
+use lazy_static::lazy_static;
 
 struct GridGraph {
     extremities: u32,
     horizontal: [[u32; 5]; 6],
-    vertical: [[u32; 6]; 5],
+    vertical: [[u32; 6]; 6],
 }
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let grid = Grid::parse(input)?;
+    let grid = Grid::parse_with_padding(input, b'#')?;
     let graph = compress_grid(&grid);
     let grid = graph_to_grid(&graph);
     let p1 = part1(&grid);
-    let p2 = part2(&grid);
+    let p2 = part2(&grid).context("Part 2: No solution found")?;
     Ok((p1, p2))
 }
 
-
-// todo
-fn neighbors2 (grid: &Grid<u8>, c: Point) -> Vec<Point> {
-    if grid[c] == b'#' {
+fn neighbors2 (grid: &Grid<u8>, idx: usize) -> Vec<usize> {
+    if grid[idx] == b'#' {
         vec!()
     } else {
-        c.adjacent()
+        [idx-1, idx+1, idx-grid.width, idx+grid.width]
         .iter()
-        .filter(|&n| grid.contains(*n) && grid[*n] != b'#')
+        .filter(|&&n| grid[n] != b'#')
         .copied()
         .collect()
     }
 }
 
-fn follow_path(grid: &Grid<u8>, pos: Point, pred: Point, goal: Point) -> Option<(Point, u32)>
+fn follow_path(grid: &Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) -> Option<(usize, u32)>
 {
-    let mut pred = pred;
-    let mut pos = pos;
     let mut len = 1;
     loop {
         let nbors = neighbors2(grid, pos);
@@ -69,30 +63,30 @@ fn follow_path(grid: &Grid<u8>, pos: Point, pred: Point, goal: Point) -> Option<
 
 fn compress_grid(grid: &Grid<u8>) -> Vec<Vec<(usize, u32)>>
 {
-    let h = grid.height as i32;
-    let w = grid.width as i32;
-    let start = Coord::new(1, 0);
-    let goal = Coord::new(w-2, h-1);
+    let h = grid.height;
+    let w = grid.width;
+    let start = w+2;
+    let goal = w * (h-1) - 3;
     let mut junctions = vec!();
     let mut n = 0;
-    let grid2 = grid.map_with_indices(|c, _| {
-        let nbors = neighbors2(grid, c);
-        if c == start || c == goal || nbors.len() > 2 {
+    let grid2: Vec<_> = (0..h*w).map(|idx| {
+        let nbors = neighbors2(grid, idx);
+        if idx == start || idx == goal || nbors.len() > 2 {
             let m = n;
             n += 1;
             let nbors2 = nbors
                 .iter()
-                .filter_map(|&next| follow_path(grid, next, c, goal))
+                .filter_map(|&next| follow_path(grid, next, idx, goal))
                 .collect();
-            junctions.push(c);
+            junctions.push(idx);
             (m, nbors2)
         } else {
             (n, vec!())
         }
-    });
-    junctions.iter().map(|&c| {
-        let nbors = &grid2[c];
-        nbors.1.iter().map(|&(c2, len)| (grid2[c2].0, len)).collect()
+    }).collect();
+    junctions.iter().map(|&idx| {
+        let nbors = &grid2[idx];
+        nbors.1.iter().map(|&(idx2, len)| (grid2[idx2].0, len)).collect()
     }).collect()
 }
 
@@ -104,7 +98,7 @@ fn graph_to_grid(graph: &[Vec<(usize, u32)>]) -> GridGraph {
 
     let mut nodes = [[0; 6]; 6];
     let mut horizontal = [[0; 5]; 6];
-    let mut vertical = [[0; 6]; 5];
+    let mut vertical = [[0; 6]; 6];
     let mut visited = HashSet::new();
     nodes[0][0] = next_to_start;
     let mut current = next_to_start;
@@ -178,99 +172,214 @@ fn part1(grid: &GridGraph) -> u32 {
     dist[5][5] + grid.extremities
 }
 
+const N: usize = 76;
 
-fn part2(grid: &GridGraph) -> u32 {
-    let mut state = HashMap::new();
-    state.insert(vec!(0), 0);
-    for y in 0..6 {
-        for x in 0..6 {
-            if x == 0 && y == 0 {
-                continue
+const STATES: [[u8; 6]; N] = [
+    [0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0],
+
+    [1, 1, 2, 0, 0, 0],
+    [1, 1, 0, 2, 0, 0],
+    [1, 1, 0, 0, 2, 0],
+    [1, 1, 0, 0, 0, 2],
+    [1, 0, 1, 2, 0, 0],
+    [1, 0, 1, 0, 2, 0],
+    [1, 0, 1, 0, 0, 2],
+    [1, 0, 0, 1, 2, 0],
+    [1, 0, 0, 1, 0, 2],
+    [1, 0, 0, 0, 1, 2],
+    [0, 1, 1, 2, 0, 0],
+    [0, 1, 1, 0, 2, 0],
+    [0, 1, 1, 0, 0, 2],
+    [0, 1, 0, 1, 2, 0],
+    [0, 1, 0, 1, 0, 2],
+    [0, 1, 0, 0, 1, 2],
+    [0, 0, 1, 1, 2, 0],
+    [0, 0, 1, 1, 0, 2],
+    [0, 0, 1, 0, 1, 2],
+    [0, 0, 0, 1, 1, 2],
+
+    [2, 1, 1, 0, 0, 0],
+    [2, 1, 0, 1, 0, 0],
+    [2, 1, 0, 0, 1, 0],
+    [2, 1, 0, 0, 0, 1],
+    [2, 0, 1, 1, 0, 0],
+    [2, 0, 1, 0, 1, 0],
+    [2, 0, 1, 0, 0, 1],
+    [2, 0, 0, 1, 1, 0],
+    [2, 0, 0, 1, 0, 1],
+    [2, 0, 0, 0, 1, 1],
+    [0, 2, 1, 1, 0, 0],
+    [0, 2, 1, 0, 1, 0],
+    [0, 2, 1, 0, 0, 1],
+    [0, 2, 0, 1, 1, 0],
+    [0, 2, 0, 1, 0, 1],
+    [0, 2, 0, 0, 1, 1],
+    [0, 0, 2, 1, 1, 0],
+    [0, 0, 2, 1, 0, 1],
+    [0, 0, 2, 0, 1, 1],
+    [0, 0, 0, 2, 1, 1],
+
+    [1, 1, 2, 2, 3, 0],
+    [1, 1, 2, 2, 0, 3],
+    [1, 1, 0, 2, 2, 3],
+    [1, 1, 2, 0, 2, 3],
+    [0, 1, 1, 2, 2, 3],
+    [1, 0, 1, 2, 2, 3],
+    [3, 1, 1, 2, 2, 0],
+    [3, 1, 1, 2, 0, 2],
+    [3, 1, 1, 0, 2, 2],
+    [3, 0, 1, 1, 2, 2],
+    [3, 1, 0, 1, 2, 2],
+    [0, 3, 1, 1, 2, 2],
+    [1, 1, 3, 0, 2, 2],
+    [1, 1, 0, 3, 2, 2],
+    [1, 1, 3, 2, 0, 2],
+    [1, 1, 3, 2, 2, 0],
+    [0, 1, 1, 3, 2, 2],
+    [1, 0, 1, 3, 2, 2],
+
+    [1, 2, 2, 1, 3, 0],
+    [1, 2, 2, 1, 0, 3],
+    [1, 2, 0, 2, 1, 3],
+    [1, 2, 2, 0, 1, 3],
+    [1, 0, 2, 2, 1, 3],
+    [0, 1, 2, 2, 1, 3],
+    [3, 1, 2, 2, 1, 0],
+    [3, 0, 1, 2, 2, 1],
+    [3, 1, 2, 2, 0, 1],
+    [3, 1, 2, 0, 2, 1],
+    [3, 1, 0, 2, 2, 1],
+    [0, 3, 1, 2, 2, 1],
+];
+
+lazy_static! {
+    static ref STATE_INDEX: HashMap<[u8; 6], usize> = {
+        let perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+        let mut m = HashMap::new();
+        for (i, state) in STATES.iter().enumerate() {
+            for perm in perms {
+                let state2 = state.map(|v| if v == 0 {0} else {perm[v as usize -1]+1});
+                m.insert(state2, i);
             }
-            let v = y * 6 + x;
-            state = add_vertex(&state, v);
-            if x > 0 {
-                state = add_edge(&state, v-1, v, grid.horizontal[y][x-1]);
-            }
-            if y > 0 {
-                state = add_edge(&state, v-6, v, grid.vertical[y-1][x]);
-                state = delete_vertex(&state, v-6);
-            }
-            state = filter_isolated_paths(&state);
         }
-    }
-    state[&vec!(35)] + grid.extremities
+        m
+    };
 }
 
+fn part2(grid: &GridGraph) -> Option<u32> {
+    let h_edges = vec!(
+        vec!((0, 1)),
+        vec!((0, 2)),
+        vec!((0, 3)),
+        vec!((0, 4)),
+        vec!((0, 5)),
+        vec!((1, 2)),
+        vec!((1, 3)),
+        vec!((1, 4)),
+        vec!((1, 5)),
+        vec!((2, 3)),
+        vec!((2, 4)),
+        vec!((2, 5)),
+        vec!((3, 4)),
+        vec!((3, 5)),
+        vec!((4, 5)),
 
-type State = HashMap<Vec<usize>, u32>;
+        vec!((0, 1), (2, 3)),
+        vec!((0, 1), (2, 4)),
+        vec!((0, 1), (2, 5)),
+        vec!((0, 1), (3, 4)),
+        vec!((0, 1), (3, 5)),
+        vec!((0, 1), (4, 5)),
+        vec!((0, 2), (3, 4)),
+        vec!((0, 2), (3, 5)),
+        vec!((0, 2), (4, 5)),
+        vec!((1, 2), (3, 4)),
+        vec!((1, 2), (3, 5)),
+        vec!((1, 2), (4, 5)),
+        vec!((0, 3), (4, 5)),
+        vec!((1, 3), (4, 5)),
+        vec!((2, 3), (4, 5)),
+    );
 
-fn remove_isolated_path(paths: &[usize]) -> Vec<usize> {
-    if paths.is_empty() {
-        return vec!();
-    }
-    let mut i = 0;
-    let n = paths.len()-1;
-    let mut res = vec!();
-    while i < n {
-        if paths[i] == paths[i+1]{
-            i += 2;
-        } else {
-            res.push(paths[i]);
-            i += 1;
-        }
-    }
-    res.push(paths[n]);
-    res
-}
-
-fn filter_isolated_paths(state: &State) -> State {
-    let mut res = HashMap::new();
-    for (paths, &weight) in state {
-        let paths = remove_isolated_path(paths);
-        if res.get(&paths).copied() < Some(weight) {
-            res.insert(paths, weight);
-        }
-    }
-    res
-}
-
-fn add_vertex(state: &State, v: usize) -> State {
-    let mut res = HashMap::new();
-    for (paths, &value) in state {
-        let mut paths = paths.clone();
-        paths.push(v);
-        paths.push(v);
-        res.insert(paths, value);
-    }
-    res
-}
-
-fn delete_vertex(state: &State, v: usize) -> State {
-    let mut res = HashMap::new();
-    for (paths, &weight) in state {
-        if !paths.contains(&v) {
-            res.insert(paths.clone(), weight);
-        }
-    }
-    res
-}
-
-fn add_edge(state: &State, u: usize, v: usize, weight: u32) -> State {
-    let mut res = HashMap::new();
-    for (paths, &value) in state {
-        res.insert(paths.clone(), value);
-        if paths.contains(&u) {
-            if let Some(i) = paths.iter().position(|&a| a == v) {
-                let mut paths = paths.clone();
-                paths.remove(i);
-                let i = paths.iter().position(|&a| a == u).unwrap();
-                paths.remove(i);
-                if res.get(&paths).copied() < Some(value + weight) {
-                    res.insert(paths, value + weight);
+    let mut current = [None; N];
+    current[5] = Some(0);
+    let mut next = [None; N];
+    for i in 0..6 {
+        for (state, weight) in STATES.iter().zip(current) {
+            if let Some(weight) = weight {
+                for edges in &h_edges {
+                    if let Some(new_state) = next_state(state, edges) {
+                        let mut weight = weight;
+                        for (j, &v) in new_state.iter().enumerate() {
+                            if v > 0 {
+                                weight += grid.vertical[i][j]
+                            }
+                        }
+                        for &(start, end) in edges {
+                            for j in start..end {
+                                weight += grid.horizontal[i][j]
+                            }
+                        }
+                        let idx = STATE_INDEX[&new_state];
+                        if next[idx] < Some(weight) {
+                            next[idx] = Some(weight);
+                        }
+                    }
                 }
             }
         }
+        std::mem::swap(&mut current, &mut next);
+        next = [None; N];
     }
-    res
+    let v = current[0]?;
+    Some(grid.extremities + v) 
+
+}
+
+fn next_state(state: &[u8; 6], h_edges: &[(usize, usize)]) -> Option<[u8; 6]> {
+    let mut next = *state;
+    for &(start, end) in h_edges {
+        if next[start] != 0 && next[start] == next[end] || (start+1..end).any(|i| next[i] != 0) {
+            return None
+        }
+        if next[start] == next[end] { // == 0
+            let v = 1 + next.iter().max().unwrap();
+            next[start] = v;
+            next[end] = v;
+        } else if next[start] == 0 {
+            next[start] = next[end];
+            next[end] = 0;
+        } else if next[end] == 0 {
+            next[end] = next[start];
+            next[start] = 0;
+        } else {
+            let min = next[start].min(next[end]);
+            let max = next[start].max(next[end]);
+            for c in next.iter_mut() {
+                if *c == max {
+                    *c = min
+                }
+            }
+            next[start] = 0;
+            next[end] = 0;
+        }
+    }
+
+    Some(next)
+}
+
+
+#[test]
+fn next_state_test() {
+    assert_eq!(next_state(&[0, 1, 0, 0, 0, 0], &[(1, 3)]), Some([0, 0, 0, 1, 0, 0]));
+    //assert_eq!(next_state(&[1, 0, 0, 0, 0, 0], &[(1, 3)]), None);
+    assert_eq!(next_state(&[0, 1, 1, 0, 0, 2], &[(0, 1), (2, 3)]), Some([1, 0, 0, 1, 0, 2]));
+    assert_eq!(next_state(&[2, 1, 1, 2, 0, 3], &[(0, 1), (3, 4)]), Some([0, 0, 1, 0, 1, 3]));
+    assert_eq!(next_state(&[2, 1, 1, 2, 0, 3], &[(0, 1), (2, 3)]), None);
+    assert_eq!(next_state(&[1, 0, 0, 0, 0, 0], &[(2, 3)]), Some([1, 0, 2, 2, 0, 0]));
 }
