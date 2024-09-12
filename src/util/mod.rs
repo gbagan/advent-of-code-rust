@@ -71,6 +71,6 @@ pub fn power<A,F>(mul: F, x: A, n: usize) -> A
 
 #[test]
 fn power_test() {
-    let n = power(|&x, &y| x* y, 2, 6);
+    let n = power(|&x, &y| x * y, 2, 6);
     assert_eq!(n, 64);
 }

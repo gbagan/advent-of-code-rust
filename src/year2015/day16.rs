@@ -12,11 +12,11 @@ pub struct Aunt<'a> {
 fn parse_aunt(line: &str) -> Result<Aunt> {
     let mut words = line.split(' ');
     let (_, number) = words.next_tuple().context("no ' ' found")?;
-    let number = number.next_unsigned()?;
+    let number = number.try_unsigned()?;
     let mut compounds = Vec::new();
     while let Some((compound, nbr)) = words.next_tuple() {
         let compound = compound.trim_end_matches(':');
-        let nbr = nbr.next_unsigned()?;
+        let nbr = nbr.try_unsigned()?;
         compounds.push((compound, nbr));
     }
     Ok(Aunt {number, compounds})

@@ -5,7 +5,7 @@ use crate::util::parser::*;
 
 fn parse_line(s: &str) -> Result<(&str, &str, u32)> {
     let (city1, _, city2, _, dist) = s.split(' ').next_tuple().context("No space character found")?;
-    let dist = dist.next_unsigned()?;
+    let dist = dist.try_unsigned()?;
     Ok((city1, city2, dist))
 }
 

@@ -5,7 +5,7 @@ use crate::util::{coord::Coord, parser::*};
 type Point = Coord<i32>;
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let n = input.next_unsigned()?;
+    let n = input.try_unsigned()?;
     let p1 = part1(n);
     let p2 = part2(n);
     Ok((p1, p2))

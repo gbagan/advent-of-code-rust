@@ -106,7 +106,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
         if let Some((attr1, attr2, _, _)) = it.next() {
             let index = perfect_hash(attr1, attr2);
             for (amount, attr1, attr2, _) in it {
-                let amount: u32 = amount.next_unsigned()?;
+                let amount: u32 = amount.try_unsigned()?;
                 let index2 = perfect_hash(attr1, attr2);
                 bags[index].push(Contents {amount, bag_index: index2})
             }
@@ -128,7 +128,7 @@ fn part1(bags: &[Bag], shinygold: usize) -> usize {
 
 fn contains_shinygold(index: usize, bags: &[Bag], shinygold: usize, cache: &mut [Option<bool>]) -> bool {
     if let Some(res) = cache[index] {
-        return res
+        res
     } else {
         let res = bags[index].iter().any(|contents|
             contents.bag_index == shinygold || contains_shinygold(contents.bag_index, bags, shinygold, cache)
@@ -145,7 +145,7 @@ fn part2(bags: &[Bag], shinygold: usize) -> u32 {
 
 fn contained(amount: u32, index: usize, bags: &[Bag], cache: &mut [Option<u32>]) -> u32 {
     if let Some(res) = cache[index] {
-        return amount * res
+        amount * res
     } else {
         let res = 1 + bags[index].iter().map(|contents|
             contained(contents.amount, contents.bag_index, bags, cache)

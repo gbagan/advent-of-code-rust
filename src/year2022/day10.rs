@@ -7,7 +7,7 @@ pub fn solve(input: &str) -> Result<(i32, String)> {
     let it = input.split_ascii_whitespace().scan(1, |acc, token| {
         match token {
             "noop" | "addx" => (),
-            _ => *acc += token.next_signed::<i32>().ok()?,
+            _ => *acc += token.try_signed::<i32>().ok()?,
         };
         Some(*acc)
     }).take(240);

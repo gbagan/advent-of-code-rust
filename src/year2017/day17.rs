@@ -3,7 +3,7 @@ use anyhow::*;
 use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let n = input.next_unsigned()?;
+    let n = input.try_unsigned()?;
     let p1 = part1(n);
     let p2 = part2(n);
     Ok((p1, p2))

@@ -27,7 +27,7 @@ fn part1(numbers: &[usize]) -> u32 {
 }
 
 fn part2(numbers: &[usize]) -> u64 {
-    let largest = numbers[numbers.len()-1] as usize;
+    let largest = numbers[numbers.len()-1];
     let n = largest + 1;
     let mut count = vec![0; n];
     count[0] = 1;

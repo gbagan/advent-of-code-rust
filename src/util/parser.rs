@@ -7,16 +7,16 @@ use std::str::pattern::Pattern;
 use std::str::Bytes;
 use itertools::Itertools;
 use num_integer::Integer;
-use num_traits::Signed;
+use num_traits::{ConstZero, Signed};
 
 
-pub trait Ten<T> {
-    const TEN: T;
+pub trait Ten {
+    const TEN: Self;
 }
 
 macro_rules! ten {
     ($($t:ty)*) => ($(
-        impl Ten<$t> for $t {
+        impl Ten for $t {
             const TEN: $t = 10;
         }
     )*)
@@ -29,7 +29,7 @@ pub struct ParseUnsigned<'a, T> {
     phantom: PhantomData<&'a T>,
 }
 
-impl<T: Integer + Ten<T> + From<u8>> Iterator for ParseUnsigned<'_, T> {
+impl<T: Integer + Ten + From<u8>> Iterator for ParseUnsigned<'_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -42,16 +42,16 @@ pub struct ParseSigned<'a, T> {
     phantom: PhantomData<&'a T>,
 }
 
-impl<T: Integer + Signed + Ten<T> + From<u8>> Iterator for ParseSigned<'_, T> {
+impl<T: Integer + Signed + ConstZero + Ten + From<u8>> Iterator for ParseSigned<'_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        next_signed(&mut self.bytes)
+        try_signed(&mut self.bytes)
     }
 }
 
 
-fn next_unsigned<T: Integer + Ten<T> + From<u8>>(bytes: &mut Bytes<'_>) -> Option<T> {
+fn next_unsigned<T: Integer + Ten + From<u8>>(bytes: &mut Bytes<'_>) -> Option<T> {
     let mut n = loop {
         let byte = bytes.next()?;
         let digit = byte.wrapping_sub(b'0');
@@ -74,14 +74,13 @@ fn next_unsigned<T: Integer + Ten<T> + From<u8>>(bytes: &mut Bytes<'_>) -> Optio
 }
 
 
-fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(bytes: &mut Bytes<'_>) -> Option<T> {
+fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(bytes: &mut Bytes<'_>) -> Option<T> {
     let (mut n, negative) = loop {
         let byte = bytes.next()?;
-        let digit = byte.wrapping_sub(b'0');
-
-        if digit == 253 {
-            break (T::zero(), true);
+        if byte == b'-' {
+            break (T::ZERO, true);
         }
+        let digit = byte.wrapping_sub(b'0');
         if digit < 10 {
             break (T::from(digit), false);
         }
@@ -166,33 +165,30 @@ impl<'a> Iterator for ParseUppercase<'a> {
     }
 }
 
-
-
-
 pub trait ParserIter {
-    fn next_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> Result<T>;
-    fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> Result<T>;
-    fn iter_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> ParseUnsigned<'_, T>;
-    fn iter_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> ParseSigned<'_, T>;
+    fn try_unsigned<T: Integer + Ten + From<u8>>(&self) -> Result<T>;
+    fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Result<T>;
+    fn iter_unsigned<T: Integer + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T>;
+    fn iter_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> ParseSigned<'_, T>;
     fn iter_lowercase(&self) -> ParseLowercase<'_>;
     fn iter_uppercase(&self) -> ParseUppercase<'_>;
 }
 
 impl ParserIter for &str {
-    fn next_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> Result<T> {
-        next_signed(&mut self.bytes()).context("No integer found")
+    fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Result<T> {
+        try_signed(&mut self.bytes()).context("No integer found")
     }
     
-    fn next_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> Result<T> {
+    fn try_unsigned<T: Integer + Ten + From<u8>>(&self) -> Result<T> {
         next_unsigned(&mut self.bytes()).context("No integer found")
     }
 
 
-    fn iter_unsigned<T: Integer + Ten<T> + From<u8>>(&self) -> ParseUnsigned<'_, T> {
+    fn iter_unsigned<T: Integer + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T> {
         ParseUnsigned { bytes: self.bytes(), phantom: PhantomData }
     }
 
-    fn iter_signed<T: Integer + Signed + Ten<T> + From<u8>>(&self) -> ParseSigned<'_, T> {
+    fn iter_signed<T: Integer + Signed + Ten + From<u8>>(&self) -> ParseSigned<'_, T> {
         ParseSigned { bytes: self.bytes(), phantom: PhantomData }
     }
 
@@ -235,7 +231,7 @@ pub trait TryParseLines {
     where 
         Self: Sized,
         T: HomogeneousTuple<Item=U>,
-        U: Integer + Ten<U> + From<u8>;
+        U: Integer + Ten + From<u8>;
 }
 
 impl TryParseLines for &str {
@@ -287,7 +283,7 @@ impl TryParseLines for &str {
     where 
         Self: Sized,
         T: HomogeneousTuple<Item=U>,
-        U: Integer + Ten<U> + From<u8>
+        U: Integer + Ten + From<u8>
     {
         self.iter_unsigned()
             .collect_tuple()

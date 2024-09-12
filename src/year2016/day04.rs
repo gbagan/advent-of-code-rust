@@ -28,7 +28,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
 fn parse_room(line: &str) -> Result<Room> {
     let len = line.len();
     let encrypted = &line[..len-11]; 
-    let sector_id = (&line[len-10..len-7]).next_unsigned()?;
+    let sector_id = (&line[len-10..len-7]).try_unsigned()?;
     let checksum = &line[len-6..len-1];
     Ok(Room { encrypted, sector_id, checksum })
 }

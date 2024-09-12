@@ -13,7 +13,7 @@ fn is_wall(p: Point, n: u32) -> bool {
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut p2 = 0;
-    let n = input.next_unsigned()?;
+    let n = input.try_unsigned()?;
     let end = Point::new(31, 39);
     let mut seen = Grid::new(52, 52, false);
     let mut queue = VecDeque::new();

@@ -13,7 +13,7 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
 fn parse_hand(line: &str) -> Result<Hand> {
     let (cards, bid) = line.split_once(' ')
                     .with_context(|| format!("Parse error on line: {line}"))?;
-    let bid = bid.next_unsigned()?;
+    let bid = bid.try_unsigned()?;
     let cards = cards.as_bytes();
     Ok((cards, bid))
 }

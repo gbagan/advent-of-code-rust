@@ -27,7 +27,7 @@ const TABLE_SIZE: usize = 1 << (2 * N);
 pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut lines = input.lines();
     let (_, line2) = lines.next_tuple().context("The input must contains at least 2 lines")?;
-    let steps = line2.next_unsigned()?;
+    let steps = line2.try_unsigned()?;
 
     let transitions: Vec<_> = lines.tuples().map(|(_, _, _, write0, move0, next0, _, write1, move1, next1)| {
         let write0 = write0.ends_with("1.");

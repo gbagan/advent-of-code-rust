@@ -20,8 +20,8 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
 
 fn parse_line(line: &str) -> Result<Password> {
     let (token1, token2, token3, token4) = line.try_split_into_tuple(&[' ', '-'])?;
-    let value1 = token1.next_unsigned()?;
-    let value2 = token2.next_unsigned()?;
+    let value1 = token1.try_unsigned()?;
+    let value2 = token2.try_unsigned()?;
     let letter = token3.as_bytes()[0];
     let pwd = token4.as_bytes();
     Ok(Password{value1, value2, letter, pwd})

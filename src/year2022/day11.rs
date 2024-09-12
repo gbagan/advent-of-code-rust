@@ -30,7 +30,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
             items.push((i, j));
         }
         let operation =
-            if let Result::Ok(val) = line3.next_unsigned() {
+            if let Result::Ok(val) = line3.try_unsigned() {
                 match line3.as_bytes()[23] {
                     b'+' => Operation::Add(val),
                     b'*' => Operation::Multiply(val),
@@ -39,9 +39,9 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
             } else {
                 Operation::Square
             };
-        let divided_by = line4.next_unsigned().unwrap();
-        let if_true = line5.next_unsigned().unwrap();
-        let if_false = line6.next_unsigned().unwrap();
+        let divided_by = line4.try_unsigned().unwrap();
+        let if_true = line5.try_unsigned().unwrap();
+        let if_false = line6.try_unsigned().unwrap();
         monkeys.push(Monkey{operation, divided_by, if_true, if_false});
         i += 1;
         lines.next();

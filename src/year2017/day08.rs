@@ -35,8 +35,8 @@ pub fn solve(input: &str) -> Result<(i32, i32)> {
 
 fn parse_line(line: &str) -> Result<Instr> {
     let (var1, cmd, val1, _, var2, cmp, val2) = line.try_split_into_tuple(' ')?;
-    let val1 = val1.next_signed()?;
-    let val2 = val2.next_signed()?;
+    let val1 = val1.try_signed()?;
+    let val2 = val2.try_signed()?;
     Ok(Instr {var1, cmd, val1, var2, cmp, val2})
 }
 

@@ -18,7 +18,7 @@ fn parse_line(line: &str) -> Result<(&str, u32, Vec<&str>)> {
             (line, vec!())
         };
     let (id, weight) = node.split_once(" (").context("No delimiter ' (' found")?;
-    let weight = weight.trim_end_matches(')').next_unsigned()?;
+    let weight = weight.trim_end_matches(')').try_unsigned()?;
     Ok((id, weight, children))
 }
 
