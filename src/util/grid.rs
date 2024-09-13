@@ -30,11 +30,26 @@ impl<T: Copy> Grid<T> {
     }
 
     pub fn map_with_indices<F,U>(&self, mut f: F) -> Grid<U> 
-        where F: FnMut(Coord<i32>, &T) -> U
+        where F: FnMut(usize, &T) -> U
     {
         let mut vec = Vec::with_capacity(self.width * self.height);
         for (i, v) in self.vec.iter().enumerate() {
-            let c = Coord::new((i % self.width) as i32, (i / self.width) as i32);
+            vec.push(f(i, v));
+        }
+
+        Grid {
+            width: self.width,
+            height: self.height,
+            vec,
+        }
+    }
+
+    pub fn map_with_positions<F,U>(&self, mut f: F) -> Grid<U> 
+        where F: FnMut(Coord<usize>, &T) -> U
+    {
+        let mut vec = Vec::with_capacity(self.width * self.height);
+        for (i, v) in self.vec.iter().enumerate() {
+            let c = Coord::new(i % self.width, i / self.width);
             vec.push(f(c, v));
         }
 

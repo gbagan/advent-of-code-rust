@@ -57,5 +57,5 @@ fn part2(particles: &[Particle]) -> usize {
         }
         positions.clear();
     }
-    exploded.iter().count_if(|&t| t == u32::MAX)
+    exploded.iter().count_if(|&&t| t == u32::MAX)
 }

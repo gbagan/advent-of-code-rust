@@ -51,7 +51,7 @@ fn part1(grid: &Grid<i8>) -> usize {
             }
         }
     }
-    visible.vec.iter().count_if(|&v| v)
+    visible.vec.iter().count_if(|&&v| v)
 }
 
 const ONES: u128 = 0x0101_0101_0101_0101_0101;

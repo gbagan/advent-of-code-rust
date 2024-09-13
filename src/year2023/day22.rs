@@ -100,5 +100,5 @@ fn part1(dominator: &Dominators) -> usize {
     for (v, _) in dominator {
         safe[*v] = false;
     }
-    safe.iter().count_if(|&n| n)
+    safe.iter().count_if(|&&n| n)
 }

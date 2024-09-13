@@ -7,18 +7,12 @@ use num_traits::ConstZero;
 
 pub trait AOCIter: Iterator {
     #[inline]
-    fn count_if<P>(self, mut predicate: P) -> usize
+    fn count_if<P>(self, predicate: P) -> usize
     where
         Self: Sized,
-        P: FnMut(Self::Item) -> bool,
+        P: FnMut(&Self::Item) -> bool,
     {
-        let mut counter = 0;
-        for x in self {
-            if predicate(x) {
-                counter += 1;
-            }
-        }
-        counter
+        self.filter(predicate).count()
     }
 
     fn all_distinct(self) -> bool 

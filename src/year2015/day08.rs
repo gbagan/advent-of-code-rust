@@ -21,7 +21,7 @@ fn diff1(line: &str) -> Result<u32> {
 }
 
 fn diff2(s: &str) -> u32 {
-    2 + s.bytes().count_if(|c| c == b'\\' || c == b'"') as u32
+    2 + s.bytes().count_if(|&c| c == b'\\' || c == b'"') as u32
 }
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {

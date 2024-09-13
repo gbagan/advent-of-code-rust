@@ -123,7 +123,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
 
 fn part1(bags: &[Bag], shinygold: usize) -> usize {
     let mut cache = [None; 594];
-    (0..594).count_if(|index| contains_shinygold(index, bags, shinygold, &mut cache))
+    (0..594).count_if(|&index| contains_shinygold(index, bags, shinygold, &mut cache))
 }
 
 fn contains_shinygold(index: usize, bags: &[Bag], shinygold: usize, cache: &mut [Option<bool>]) -> bool {

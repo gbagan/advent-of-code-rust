@@ -12,8 +12,8 @@ struct Password<'a> {
 pub fn solve(input: &str) -> Result<(usize, usize)> {
     let passwords: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
 
-    let p1 = passwords.iter().count_if(check1);
-    let p2 = passwords.iter().count_if(check2);
+    let p1 = passwords.iter().count_if(|&pwd| check1(pwd));
+    let p2 = passwords.iter().count_if(|&pwd| check2(pwd));
 
     Ok((p1, p2))
 }
@@ -28,7 +28,7 @@ fn parse_line(line: &str) -> Result<Password> {
 }
 
 fn check1(p: &Password) -> bool {
-    let freq = p.pwd.iter().count_if(|&c| c == p.letter);
+    let freq = p.pwd.iter().count_if(|&&c| c == p.letter);
     p.value1 <= freq && freq <= p.value2
 }
 

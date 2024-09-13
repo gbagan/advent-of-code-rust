@@ -8,7 +8,7 @@ pub fn solve(input: &str) -> Result<(i32, usize)> {
     
     let b = x * y - z;
     let c = b - t;
-    let p2 = (b..c+1).step_by(17).count_if(|x| !is_prime(x));
+    let p2 = (b..c+1).step_by(17).count_if(|&x| !is_prime(x));
     Ok((p1, p2))
 }
 
