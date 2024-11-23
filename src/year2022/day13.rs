@@ -56,7 +56,7 @@ impl<'a> PacketIterator<'a> {
     }
 }
 
-impl<'a> Iterator for PacketIterator<'a>
+impl Iterator for PacketIterator<'_>
 {
     type Item = u8;
     fn next(&mut self) -> Option<u8> {
