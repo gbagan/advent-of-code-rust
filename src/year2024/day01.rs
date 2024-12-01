@@ -3,12 +3,9 @@ use itertools::Itertools;
 use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let mut list1 = Vec::new();
-    let mut list2 = Vec::new();
-    for (x, y) in input.iter_unsigned::<u32>().tuples() {
-        list1.push(x);
-        list2.push(y);
-    }    
+    let (mut list1, mut list2): (Vec<_>, Vec<_>) =
+        input.iter_unsigned::<u32>().tuples().unzip();
+
     list1.sort_unstable();
     list2.sort_unstable();
 
