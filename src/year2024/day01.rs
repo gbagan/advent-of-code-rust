@@ -5,9 +5,9 @@ use crate::util::parser::*;
 pub fn solve(input: &str) -> Result<(u32, u32)> {
     let (mut list1, mut list2): (Vec<_>, Vec<_>) =
         input.iter_unsigned::<u32>().tuples().unzip();
-
-    list1.sort_unstable();
-    list2.sort_unstable();
+    
+    radsort::sort(&mut list1);
+    radsort::sort(&mut list2);
 
     let p1 = list1.iter().zip(list2.iter())
         .map(|(x, y)| x.abs_diff(*y))
