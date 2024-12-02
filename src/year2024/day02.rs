@@ -19,44 +19,55 @@ fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
             None => return Safety::Safe
         };
 
-    let (mut inc_safe, mut largest) =
+    let (mut inc_safe, mut largest, mut largest2) =
         if is_safe_pair(first, second) {
             if is_safe_pair(second, third) {
-                (Safety::Safe, third)
+                (Safety::Safe, third, second)
             } else {
-                (Safety::QuasiSafe, second)
+                (Safety::QuasiSafe, second, second)
             }
-        } else if is_safe_pair(first, third)  || is_safe_pair(second, third) {
-            (Safety::QuasiSafe, third)
+        } else if is_safe_pair(second, third) {
+            (Safety::QuasiSafe, third, third)
+        } else if is_safe_pair(first, third) {
+            (Safety::QuasiSafe, third, third)
         } else {
-            (Safety::Unsafe, 0)
+            (Safety::Unsafe, 0, 0)
         };
 
-    let (mut dec_safe, mut lowest) =
+    let (mut dec_safe, mut lowest, mut lowest2) =
         if is_safe_pair(second, first) {
             if is_safe_pair(third, second) {
-                (Safety::Safe, third)
+                (Safety::Safe, third, second)
             } else {
-                (Safety::QuasiSafe, second)
+                (Safety::QuasiSafe, second, second)
             }
-        } else if is_safe_pair(third, first)  || is_safe_pair(third, second) {
-            (Safety::QuasiSafe, third)
+        } else if is_safe_pair(third, first) {
+            (Safety::QuasiSafe, third, third)
+        } else if is_safe_pair(third, second) {
+            (Safety::QuasiSafe, third, third)
         } else {
-            (Safety::Unsafe, 0)
+            (Safety::Unsafe, 0, 0)
         };
     
     for next in it {
         match inc_safe {
             Safety::Safe => {
                 if is_safe_pair(largest, next) {
+                    largest2 = largest;
                     largest = next;
+                } else if is_safe_pair(largest2, next) {
+                    //largest = next;
+                    largest2 = next;
+                    inc_safe = Safety::QuasiSafe;
                 } else {
+                    largest2 = largest;
                     inc_safe = Safety::QuasiSafe;
                 }
             }
             Safety::QuasiSafe => {
-                if is_safe_pair(largest, next) {
+                if is_safe_pair(largest, next) || is_safe_pair(largest2, next) {
                     largest = next;
+                    largest2 = next;
                 } else {
                     inc_safe = Safety::Unsafe;
                 }
@@ -66,14 +77,21 @@ fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
         match dec_safe {
             Safety::Safe => {
                 if is_safe_pair(next, lowest) {
+                    lowest2 = lowest;
                     lowest = next;
+                } else if is_safe_pair(next, lowest2) {
+                    //lowest = next;
+                    lowest2 = next;
+                    dec_safe = Safety::QuasiSafe;
                 } else {
+                    lowest2 = lowest;
                     dec_safe = Safety::QuasiSafe;
                 }
             }
             Safety::QuasiSafe => {
-                if is_safe_pair(next, lowest) {
+                if is_safe_pair(next, lowest) || is_safe_pair(next, lowest2) {
                     lowest = next;
+                    lowest2 = next;
                 } else {
                     dec_safe = Safety::Unsafe;
                 }
@@ -90,7 +108,6 @@ fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
         Safety::Unsafe
     }
 }
-
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut p1 = 0;
