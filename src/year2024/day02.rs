@@ -26,9 +26,7 @@ fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
             } else {
                 (Safety::QuasiSafe, second, second)
             }
-        } else if is_safe_pair(second, third) {
-            (Safety::QuasiSafe, third, third)
-        } else if is_safe_pair(first, third) {
+        } else if is_safe_pair(second, third) || is_safe_pair(first, third) {
             (Safety::QuasiSafe, third, third)
         } else {
             (Safety::Unsafe, 0, 0)
@@ -41,9 +39,7 @@ fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
             } else {
                 (Safety::QuasiSafe, second, second)
             }
-        } else if is_safe_pair(third, first) {
-            (Safety::QuasiSafe, third, third)
-        } else if is_safe_pair(third, second) {
+        } else if is_safe_pair(third, first) || is_safe_pair(third, second) {
             (Safety::QuasiSafe, third, third)
         } else {
             (Safety::Unsafe, 0, 0)
@@ -56,7 +52,6 @@ fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
                     largest2 = largest;
                     largest = next;
                 } else if is_safe_pair(largest2, next) {
-                    //largest = next;
                     largest2 = next;
                     inc_safe = Safety::QuasiSafe;
                 } else {
@@ -80,7 +75,6 @@ fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
                     lowest2 = lowest;
                     lowest = next;
                 } else if is_safe_pair(next, lowest2) {
-                    //lowest = next;
                     lowest2 = next;
                     dec_safe = Safety::QuasiSafe;
                 } else {
