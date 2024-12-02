@@ -13,7 +13,6 @@ fn is_safe_pair(a: u8, b: u8) -> bool {
 }
 
 fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
-    //let mut it = list.iter();
     let (first, second, third) =
         match it.next_tuple() {
             Some(x) => x,
