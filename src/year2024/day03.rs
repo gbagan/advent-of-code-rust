@@ -11,7 +11,9 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut i = 0;
 
     while i < n {
-        if input[i..].starts_with(b"do()") {
+        if input[i] != b'd' && input[i] != b'm' {
+            i += 1;
+        } else if input[i..].starts_with(b"do()") {
             i += 4;
             enabled = true;
         } else if input[i..].starts_with(b"don't()") {
