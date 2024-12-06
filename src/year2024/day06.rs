@@ -3,6 +3,7 @@ use crate::util::{parallel::*, grid::*};
 
 pub fn solve(input: &str) -> Result<(usize, u32)> {
     let grid = Grid::parse(input)?;
+    
     let mut start = (0, 0);
     'outer: for i in 0..grid.height {
         for j in 0..grid.width {
@@ -12,6 +13,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             }       
         }
     }
+    let grid = grid.map(|&c| if c == b'#' {16} else {0});
 
     let mut seen = Grid::new(grid.width, grid.height, false);
 
@@ -25,7 +27,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             if nexty >= grid.height {
                 break 'outer;
             }
-            if grid[(currentx, nexty)] == b'#' {
+            if grid[(currentx, nexty)] != 0 {
                 break;
             }
             currenty = nexty;
@@ -37,7 +39,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             if nextx >= grid.width {
                 break 'outer;
             }
-            if grid[(nextx, currenty)] == b'#' {
+            if grid[(nextx, currenty)] != 0 {
                 break;
             }
             currentx = nextx;
@@ -48,7 +50,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             if nexty >= grid.height {
                 break 'outer;
             }
-            if grid[(currentx, nexty)] == b'#' {
+            if grid[(currentx, nexty)] != 0 {
                 break;
             }
             currenty = nexty;
@@ -60,7 +62,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             if nextx >= grid.width {
                 break 'outer;
             }
-            if grid[(nextx, currenty)] == b'#' {
+            if grid[(nextx, currenty)] != 0 {
                 break;
             }
             currentx = nextx;
@@ -92,11 +94,12 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
 }
 
 fn has_cycle(grid: &Grid<u8>, start: (usize, usize), obsx: usize, obsy: usize) -> bool {
-    let mut seen = Grid::new(grid.width, grid.height, 0u8);
+    let mut grid = grid.clone();
 
     let (mut currentx, mut currenty) = start;
 
-    seen[(currentx, currenty)] = 1;
+    grid[(currentx, currenty)] = 1;
+    grid[(obsx, obsy)] = 16;
 
     loop {
         loop {
@@ -104,14 +107,15 @@ fn has_cycle(grid: &Grid<u8>, start: (usize, usize), obsx: usize, obsy: usize) -
             if nexty >= grid.height {
                 return false;
             }
-            if grid[(currentx, nexty)] == b'#' || (currentx, nexty) == (obsx, obsy) {
+            let c = grid[(currentx, nexty)];
+            if c & 16 != 0 {
                 break;
             }
             currenty = nexty;
-            if seen[(currentx, currenty)] & 1 != 0 {
+            if c & 1 != 0 {
                 return true;
             }
-            seen[(currentx, currenty)] |= 1;
+            grid[(currentx, currenty)] |= 1;
         }
 
         loop {
@@ -119,28 +123,30 @@ fn has_cycle(grid: &Grid<u8>, start: (usize, usize), obsx: usize, obsy: usize) -
             if nextx >= grid.width {
                 return false;
             }
-            if grid[(nextx, currenty)] == b'#' || (nextx, currenty) == (obsx, obsy) {
+            let c = grid[(nextx, currenty)];
+            if c & 16 != 0 {
                 break;
             }
             currentx = nextx;
-            if seen[(currentx, currenty)] & 2 != 0 {
+            if c & 2 != 0 {
                 return true;
             }
-            seen[(currentx, currenty)] |= 2;
+            grid[(currentx, currenty)] |= 2;
         }
         loop {
             let nexty = currenty + 1;
             if nexty >= grid.height {
                 return false;
             }
-            if grid[(currentx, nexty)] == b'#' || (currentx, nexty) == (obsx, obsy) {
+            let c = grid[(currentx, nexty)];
+            if c & 16 != 0 {
                 break;
             }
             currenty = nexty;
-            if seen[(currentx, currenty)] & 4 != 0 {
+            if c & 4 != 0 {
                 return true;
             }
-            seen[(currentx, currenty)] |= 4;
+            grid[(currentx, currenty)] |= 4;
         }
 
         loop {
@@ -148,14 +154,15 @@ fn has_cycle(grid: &Grid<u8>, start: (usize, usize), obsx: usize, obsy: usize) -
             if nextx >= grid.width {
                 return false;
             }
-            if grid[(nextx, currenty)] == b'#' || (nextx, currenty) == (obsx, obsy) {
+            let c = grid[(nextx, currenty)];
+            if c & 16 != 0 {
                 break;
             }
             currentx = nextx;
-            if seen[(currentx, currenty)] & 8 != 0 {
+            if c & 8 != 0 {
                 return true;
             }
-            seen[(currentx, currenty)] |= 8;
+            grid[(currentx, currenty)] |= 8;
         }
     }
 }
