@@ -15,7 +15,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
         }
     }
 
-    let p2= rows
+    let p2 = rows
         .into_par_iter()
         .map(|row|
             if solve_p2(&row, row[1], 2) {
@@ -59,9 +59,6 @@ pub fn solve_p2(row: &[u64], acc: u64, idx: usize) -> bool {
 }
 
 fn concat_numbers(x: u64, y: u64) -> u64 {
-    if x == 0 {
-        return y;
-    }
     let n = y.ilog10();
     10u64.pow(n+1) * x + y
 }
