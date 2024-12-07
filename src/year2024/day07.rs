@@ -19,31 +19,31 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
     Ok((p1, p2))
 }
 
-pub fn solve_p1(row: &[u64], acc: u64, idx: usize) -> bool {
+pub fn solve_p1(row: &[u64], goal: u64, idx: usize) -> bool {
     let current = row[idx];
     if idx == 1 {
-        return acc == current
+        return goal == current
     }
-    if acc % current == 0 && solve_p1(row, acc / current, idx - 1) {
+    if goal % current == 0 && solve_p1(row, goal / current, idx - 1) {
         return true;
     }
-    acc >= current && solve_p1(row, acc - current, idx - 1)
+    goal >= current && solve_p1(row, goal - current, idx - 1)
 }
 
-pub fn solve_p2(row: &[u64], acc: u64, idx: usize) -> bool {
+pub fn solve_p2(row: &[u64], goal: u64, idx: usize) -> bool {
     let current = row[idx];
     if idx == 1 {
-        return acc == current
+        return goal == current
     }
-    if let Some(acc2) = truncate_number(acc, current) {
-        if solve_p2(row, acc2, idx - 1) {
+    if let Some(goal2) = truncate_number(goal, current) {
+        if solve_p2(row, goal2, idx - 1) {
             return true;
         }
     }
-    if acc % current == 0 && solve_p2(row, acc / current, idx - 1) {
+    if goal % current == 0 && solve_p2(row, goal / current, idx - 1) {
         return true;
     }
-    acc >= current && solve_p2(row, acc - current, idx - 1)
+    goal >= current && solve_p2(row, goal - current, idx - 1)
 }
 
 fn truncate_number(x: u64, y: u64) -> Option<u64> {
