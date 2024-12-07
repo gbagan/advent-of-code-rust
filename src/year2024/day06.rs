@@ -1,5 +1,6 @@
 use anyhow::*;
 use crate::util::{parallel::*, grid::*};
+use std::collections::HashSet;
 
 pub fn solve(input: &str) -> Result<(usize, u32)> {
     let grid = Grid::parse(input)?;
@@ -10,10 +11,9 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             if grid[(j, i)] == b'^' {
                 start = (j, i);
                 break 'outer;
-            }       
+            }
         }
     }
-    let grid = grid.map(|&c| if c == b'#' {16} else {0});
 
     let mut seen = Grid::new(grid.width, grid.height, false);
 
@@ -27,7 +27,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             if nexty >= grid.height {
                 break 'outer;
             }
-            if grid[(currentx, nexty)] != 0 {
+            if grid[(currentx, nexty)] == b'#' {
                 break;
             }
             currenty = nexty;
@@ -39,7 +39,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             if nextx >= grid.width {
                 break 'outer;
             }
-            if grid[(nextx, currenty)] != 0 {
+            if grid[(nextx, currenty)] == b'#' {
                 break;
             }
             currentx = nextx;
@@ -50,7 +50,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             if nexty >= grid.height {
                 break 'outer;
             }
-            if grid[(currentx, nexty)] != 0 {
+            if grid[(currentx, nexty)] == b'#' {
                 break;
             }
             currenty = nexty;
@@ -62,7 +62,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             if nextx >= grid.width {
                 break 'outer;
             }
-            if grid[(nextx, currenty)] != 0 {
+            if grid[(nextx, currenty)] == b'#' {
                 break;
             }
             currentx = nextx;
@@ -82,10 +82,12 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
     
     let p1 = vseen.len();
 
+    let slide = Slide::new(&grid);
+
     let p2 = vseen
         .into_par_iter()
         .map(|(obsx, obsy)| {
-            has_cycle(&grid, start, *obsx, *obsy) as u32 
+            has_cycle(&grid, &slide, (start.0 as i32, start.1 as i32), *obsx as i32, *obsy as i32) as u32 
         })
         .sum();
 
@@ -93,76 +95,122 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
     Ok((p1, p2))
 }
 
-fn has_cycle(grid: &Grid<u8>, start: (usize, usize), obsx: usize, obsy: usize) -> bool {
-    let mut grid = grid.clone();
-
+fn has_cycle(grid: &Grid<u8>, slide: &Slide, start: (i32, i32), obsx: i32, obsy: i32) -> bool {
+    let width = grid.width as i32;
+    let height = grid.height as i32;
     let (mut currentx, mut currenty) = start;
-
-    grid[(currentx, currenty)] = 1;
-    grid[(obsx, obsy)] = 16;
+    let mut seen: HashSet<(i32, i32)> = HashSet::new();
 
     loop {
-        loop {
-            let nexty = currenty.wrapping_sub(1);
-            if nexty >= grid.height {
-                return false;
-            }
-            let c = grid[(currentx, nexty)];
-            if c & 16 != 0 {
-                break;
-            }
-            currenty = nexty;
-            if c & 1 != 0 {
-                return true;
-            }
-            grid[(currentx, currenty)] |= 1;
+        let nexty = slide.up[(currentx, currenty)];
+        currenty =
+            if currentx == obsx && currenty > obsy && obsy >= nexty {
+                obsy + 1
+            } else {
+                nexty
+            };
+        if nexty < 0 {
+            return false;
         }
 
-        loop {
-            let nextx = currentx + 1;
-            if nextx >= grid.width {
-                return false;
-            }
-            let c = grid[(nextx, currenty)];
-            if c & 16 != 0 {
-                break;
-            }
-            currentx = nextx;
-            if c & 2 != 0 {
-                return true;
-            }
-            grid[(currentx, currenty)] |= 2;
-        }
-        loop {
-            let nexty = currenty + 1;
-            if nexty >= grid.height {
-                return false;
-            }
-            let c = grid[(currentx, nexty)];
-            if c & 16 != 0 {
-                break;
-            }
-            currenty = nexty;
-            if c & 4 != 0 {
-                return true;
-            }
-            grid[(currentx, currenty)] |= 4;
+        let nextx = slide.right[(currentx, currenty)];
+        currentx =
+            if currenty == obsy && currentx < obsx && obsx <= nextx {
+                obsx - 1
+            } else {
+                nextx
+            };
+        if currentx >= width {
+            return false;
         }
 
-        loop {
-            let nextx = currentx.wrapping_sub(1);
-            if nextx >= grid.width {
-                return false;
-            }
-            let c = grid[(nextx, currenty)];
-            if c & 16 != 0 {
-                break;
-            }
-            currentx = nextx;
-            if c & 8 != 0 {
-                return true;
-            }
-            grid[(currentx, currenty)] |= 8;
+        let nexty = slide.down[(currentx, currenty)];
+
+        currenty =
+            if currentx == obsx && currenty < obsy && obsy <= nexty {
+                obsy - 1
+            } else {
+                nexty
+            };
+        if currenty >= height {
+            return false;
         }
+    
+        let nextx = slide.left[(currentx, currenty)];
+        currentx =
+            if currenty == obsy && nextx <= obsx && obsx < currentx {
+                obsx + 1
+            } else {
+                nextx
+            };
+        if currentx < 0 {
+            return false;
+        }
+
+
+        if !seen.insert((currentx, currenty)) {
+            return true;
+        }
+    }
+}
+
+
+struct Slide {
+    up: Grid<i32>,
+    down: Grid<i32>,
+    left: Grid<i32>,
+    right: Grid<i32>,
+}
+
+impl Slide {
+    fn new(grid: &Grid<u8>) -> Self {
+        let width = grid.width as i32;
+        let height = grid.height as i32;
+        let mut up = Grid::new(grid.width, grid.height, 0i32);
+        let mut down = up.clone();
+        let mut left = up.clone();
+        let mut right = up.clone();
+
+        for x in 0..width {
+            let mut last = -1;
+
+            for y in 0..height {
+                if grid[(x, y)] == b'#' {
+                    last = y + 1;
+                }
+                up[(x, y)] = last;
+            }
+
+            last = i32::MAX;
+
+            for y in (0..height).rev() {
+                if grid[(x, y)] == b'#' {
+                    last = y - 1;
+                }
+                down[(x, y)] = last;
+            }
+        }
+
+        for y in 0..height {
+            let mut last = -1;
+
+            for x in 0..width {
+                if grid[(x, y)] == b'#' {
+                    last = x + 1;
+                }
+                left[(x, y)] = last;
+            }
+
+            last = i32::MAX;
+
+            for x in (0..width).rev() {
+                if grid[(x, y)] == b'#' {
+                    last = x - 1;
+                }
+                right[(x, y)] = last;
+            }
+        }
+
+        Self { up, down, left, right}
     }
 }
