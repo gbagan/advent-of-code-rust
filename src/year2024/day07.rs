@@ -22,7 +22,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
 pub fn solve_p1(row: &[u64], acc: u64, idx: usize) -> bool {
     let current = row[idx];
     if idx == 1 {
-        acc == row[1]
+        acc == current
     } else {
         if acc % current == 0 && solve_p1(row, acc / current, idx - 1) {
             return true;
@@ -34,7 +34,7 @@ pub fn solve_p1(row: &[u64], acc: u64, idx: usize) -> bool {
 pub fn solve_p2(row: &[u64], acc: u64, idx: usize) -> bool {
     let current = row[idx];
     if idx == 1 {
-        acc == row[1]
+        acc == current
     } else {
         if let Some(acc2) = truncate_number(acc, current) {
             if solve_p2(row, acc2, idx - 1) {
