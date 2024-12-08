@@ -21,8 +21,8 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
         if freq.len() < 2 {
             continue;
         }
-        for (i, &antenna1) in freq[0..freq.len()-1].iter().enumerate() {
-            for &antenna2 in freq[i + 1 ..].iter() {
+        for (i, &antenna1) in freq[1..].iter().enumerate() {
+            for &antenna2 in freq[..i+1].iter() {
                 let diff = antenna2 - antenna1;
                 let pos1 = antenna1 - diff;
                 if grid.contains(pos1) {
@@ -46,8 +46,8 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
             grid[antenna] = b'#';
         }
         
-        for (i, &antenna1) in freq[0..freq.len()-1].iter().enumerate() {
-            for &antenna2 in freq[i + 1 ..].iter() {
+        for (i, &antenna1) in freq[1..].iter().enumerate() {
+            for &antenna2 in freq[..i+1].iter() {
                 let diff = antenna2 - antenna1;
                 
                 let mut pos1 = antenna1 - diff - diff;
