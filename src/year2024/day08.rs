@@ -6,10 +6,11 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
     let width = grid.width as i32;
     let height = grid.height as i32;
 
-    let mut antennas: Vec<Vec<Coord<i32>>> = vec![Vec::new(); 256];
+    let mut antennas: Vec<Vec<Coord<i32>>> = vec![Vec::new(); 128];
+
     for y in 0..height {
         for x in 0..width {
-            let c = grid[Coord::new(x, y)];
+            let c = grid[(x, y)];
             if c != b'.' {
                 antennas[c as usize].push(Coord::new(x, y))
             }

@@ -213,4 +213,4 @@ impl Slide {
 
         Self { up, down, left, right}
     }
-}
+}   
