@@ -20,14 +20,14 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
         if freq.len() < 2 {
             continue;
         }
-        for (i, antenna1) in freq[0..freq.len()-1].iter().enumerate() {
-            for antenna2 in freq[i + 1 ..].iter() {
-                let diff = *antenna2 - *antenna1;
-                let pos1 = *antenna1 - diff;
+        for (i, &antenna1) in freq[0..freq.len()-1].iter().enumerate() {
+            for &antenna2 in freq[i + 1 ..].iter() {
+                let diff = antenna2 - antenna1;
+                let pos1 = antenna1 - diff;
                 if grid.contains(pos1) {
                     grid[pos1] = b'#';
                 }
-                let pos2 = *antenna2 + diff;
+                let pos2 = antenna2 + diff;
                 if grid.contains(pos2) {
                     grid[pos2] = b'#';
                 }
@@ -45,12 +45,12 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
             grid[antenna] = b'#';
         }
         
-        for (i, antenna1) in freq[0..freq.len()-1].iter().enumerate() {
-            for antenna2 in freq[i + 1 ..].iter() {
-                let diff = *antenna2 - *antenna1;
+        for (i, &antenna1) in freq[0..freq.len()-1].iter().enumerate() {
+            for &antenna2 in freq[i + 1 ..].iter() {
+                let diff = antenna2 - antenna1;
                 
-                let mut pos1 = *antenna1 - diff - diff;
-                let mut pos2 = *antenna2 + diff + diff;
+                let mut pos1 = antenna1 - diff - diff;
+                let mut pos2 = antenna2 + diff + diff;
                 while grid.contains(pos1) {
                     grid[pos1] = b'#';
                     pos1 = pos1 - diff;
@@ -63,7 +63,7 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
         }
     }
 
-    let p2= grid.vec.iter().filter(|&&c| c == b'#').count();
+    let p2 = grid.vec.iter().filter(|&&c| c == b'#').count();
 
     Ok((p1, p2))
 
