@@ -18,19 +18,14 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
     }
 
     for freq in &antennas {
-        if freq.len() < 2 {
-            continue;
-        }
-        for (i, &antenna1) in freq[1..].iter().enumerate() {
-            for &antenna2 in freq[..i+1].iter() {
-                let diff = antenna2 - antenna1;
-                let pos1 = antenna1 - diff;
-                if grid.contains(pos1) {
-                    grid[pos1] = b'#';
-                }
-                let pos2 = antenna2 + diff;
-                if grid.contains(pos2) {
-                    grid[pos2] = b'#';
+        for &antenna1 in freq {
+            for &antenna2 in freq {
+                if antenna1 != antenna2 {
+                    let diff = antenna2 - antenna1;
+                    let pos = antenna1 + diff;
+                    if grid.contains(pos) {
+                        grid[pos] = b'#';
+                    }
                 }
             }
         }
@@ -38,27 +33,17 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
 
     let p1 = grid.vec.iter().filter(|&&c| c == b'#').count();
 
-    for freq in &antennas {
-        if freq.len() < 2 {
-            continue;
-        }
-        for &antenna in freq {
-            grid[antenna] = b'#';
-        }
-        
-        for (i, &antenna1) in freq[1..].iter().enumerate() {
-            for &antenna2 in freq[..i+1].iter() {
-                let diff = antenna2 - antenna1;
-                
-                let mut pos1 = antenna1 - diff - diff;
-                let mut pos2 = antenna2 + diff + diff;
-                while grid.contains(pos1) {
-                    grid[pos1] = b'#';
-                    pos1 = pos1 - diff;
-                }
-                while grid.contains(pos2) {
-                    grid[pos2] = b'#';
-                    pos2 = pos2 + diff;
+    for freq in &antennas {        
+        for &antenna1 in freq {
+            grid[antenna1] = b'#';
+            for &antenna2 in freq {
+                if antenna1 != antenna2 {
+                    let diff = antenna2 - antenna1;
+                    let mut pos = antenna1 + diff + diff;
+                    while grid.contains(pos) {
+                          grid[pos] = b'#';
+                        pos = pos + diff;
+                    }
                 }
             }
         }

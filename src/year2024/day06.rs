@@ -109,7 +109,7 @@ fn has_cycle(grid: &Grid<u8>, slide: &Slide, start: (i32, i32), obsx: i32, obsy:
             } else {
                 nexty
             };
-        if nexty < 0 {
+        if currenty < 0 {
             return false;
         }
 
@@ -213,4 +213,4 @@ impl Slide {
 
         Self { up, down, left, right}
     }
-}   
+}       
