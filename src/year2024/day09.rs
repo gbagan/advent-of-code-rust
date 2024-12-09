@@ -17,11 +17,9 @@ fn part1(input: &[u8]) -> u64 {
     while left < right {
         if left % 2 == 0 {
             let id = (left / 2) as u64;
-            let n = input[left] - b'0';
-            for _ in 0..n {
-                checksum += id * left_pos;
-                left_pos += 1;
-            }
+            let n = (input[left] - b'0') as u64;
+            checksum += id * n * (2 * left_pos + (n-1)) / 2;
+            left_pos += n;
             left += 1;
             available = input[left] - b'0';
         } if right % 2 == 1 {
@@ -29,10 +27,9 @@ fn part1(input: &[u8]) -> u64 {
             to_copy = input[right] - b'0';
         } else if to_copy <= available {
             let id = (right / 2) as u64;
-            for _ in 0..to_copy {
-                checksum += id * left_pos;
-                left_pos += 1;
-            }
+            let n = to_copy as u64;
+            checksum += id * n * (2 * left_pos + (n-1)) / 2;
+            left_pos += n;
             available -= to_copy;
             right -= 1;
             if available == 0 {
