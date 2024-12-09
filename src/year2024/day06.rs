@@ -2,7 +2,7 @@ use anyhow::*;
 use crate::util::{parallel::*, grid::*};
 use std::collections::HashSet;
 
-pub fn solve(input: &str) -> Result<(usize, u32)> {
+pub fn solve(input: &str) -> Result<(usize, usize)> {
     let grid = Grid::parse(input)?;
     
     let mut start = (0, 0);
@@ -83,14 +83,26 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
     let p1 = vseen.len();
 
     let slide = Slide::new(&grid);
-
+    /* 
     let p2 = vseen
         .into_par_iter()
         .map(|(obsx, obsy)| {
             has_cycle(&grid, &slide, (start.0 as i32, start.1 as i32), *obsx as i32, *obsy as i32) as u32 
         })
         .sum();
+    */
+    let p2 = vseen
+        .into_par_iter()
+        .chunks(32)
+        .map(|obstacles| {
+            obstacles
+                .iter()
+                .filter(|(obsx, obsy)|
+                    has_cycle(&grid, &slide, (start.0 as i32, start.1 as i32), *obsx as i32, *obsy as i32)
+                ).count()
 
+        })
+        .sum();
 
     Ok((p1, p2))
 }

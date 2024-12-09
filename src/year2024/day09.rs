@@ -1,0 +1,100 @@
+use anyhow::*;
+
+pub fn solve(input: &str) -> Result<(u64, u64)> {
+    let input = input.trim_ascii_end().as_bytes();
+    let p1 = part1(&input);
+    let p2 = part2(&input);
+    Ok((p1, p2))
+}
+
+fn part1(input: &[u8]) -> u64 {
+    let mut checksum = 0;
+    let mut left = 0;
+    let mut right = input.len() - 1;
+    let mut left_pos = 0;
+    let mut available = 0;
+    let mut to_copy = input.last().unwrap() - b'0';
+    while left < right {
+        if left % 2 == 0 {
+            let id = (left / 2) as u64;
+            let n = input[left] - b'0';
+            for _ in 0..n {
+                checksum += id * left_pos;
+                left_pos += 1;
+            }
+            left += 1;
+            available = input[left] - b'0';
+        } if right % 2 == 1 {
+            right -= 1;
+            to_copy = input[right] - b'0';
+        } else if to_copy <= available {
+            let id = (right / 2) as u64;
+            for _ in 0..to_copy {
+                checksum += id * left_pos;
+                left_pos += 1;
+            }
+            available -= to_copy;
+            right -= 1;
+            if available == 0 {
+                left += 1;
+            }
+        } else { // to_copy > available
+            let id = (right / 2) as u64;
+            for _ in 0..available {
+                checksum += id * left_pos;
+                left_pos += 1;
+            }
+            to_copy -= available;
+            left += 1;
+        }
+    }
+
+    checksum
+}
+
+struct Block {
+    start: u64,
+    size: u64,
+    id: u64,
+    used: u64,
+}
+
+fn part2(input: &[u8]) -> u64 {
+    let length = input.len();
+    let mut checksum = 0;
+    let mut blocks = Vec::with_capacity(input.len());
+    let mut start = 0;
+
+    for (i, n) in input.iter().enumerate() {
+        let size = (n - b'0') as u64;
+        let id = if i & 1 == 0 { (i >> 1) as u64 } else { 0 };
+        blocks.push(Block { start, size, id, used: 0 });
+        start += size;
+    }
+
+    let mut indices = [1; 10];
+
+    for pos in (0..blocks.len()).rev().step_by(2) {
+        let block = &blocks[pos];
+        let size = block.size;
+        let mut index = indices[size as usize];
+        while index < length && blocks[index].size - blocks[index].used < size {
+            index += 2;
+        }
+        indices[size as usize] = index;
+        if index >= pos {
+            for p in block.start..block.start + size {
+                checksum += block.id * p;
+            }
+        } else {
+            let freeblock = &blocks[index];
+            let start = freeblock.start + freeblock.used;
+            for p in start..start+size {
+                checksum += block.id * p;
+            }
+            blocks[index].used += size;
+        }
+    }
+
+    checksum
+}

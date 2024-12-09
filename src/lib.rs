@@ -1,3 +1,4 @@
+#![feature(array_chunks)]
 #![feature(array_windows)]
 #![feature(get_many_mut)]
 #![feature(int_roundings)]
@@ -156,4 +157,5 @@ pub mod year2024 {
     pub mod day06;
     pub mod day07;
     pub mod day08;
+    pub mod day09;
 }
