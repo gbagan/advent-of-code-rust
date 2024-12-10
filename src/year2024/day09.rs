@@ -2,6 +2,7 @@ use anyhow::*;
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
     let input = input.trim_ascii_end().as_bytes();
+    ensure!(input.len() & 1 == 1, "input length must be odd");
     let p1 = part1(&input);
     let p2 = part2(&input);
     Ok((p1, p2))
@@ -22,16 +23,14 @@ fn part1(input: &[u8]) -> u64 {
             left_pos += n;
             left += 1;
             available = input[left] - b'0';
-        } if right % 2 == 1 {
-            right -= 1;
-            to_copy = input[right] - b'0';
         } else if to_copy <= available {
             let id = (right / 2) as u64;
             let n = to_copy as u64;
             checksum += id * n * (2 * left_pos + (n-1)) / 2;
             left_pos += n;
             available -= to_copy;
-            right -= 1;
+            right -= 2;
+            to_copy = input[right] - b'0';
             if available == 0 {
                 left += 1;
             }
