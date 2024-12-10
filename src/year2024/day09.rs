@@ -49,9 +49,8 @@ fn part1(input: &[u8]) -> u64 {
 }
 
 struct Block {
-    start: u64,
-    size: u64,
-    id: u64,
+    start: u16,
+    size: u16,
 }
 
 fn part2(input: &[u8]) -> u64 {
@@ -61,9 +60,9 @@ fn part2(input: &[u8]) -> u64 {
     let mut start = 0;
 
     for (i, n) in input.iter().enumerate() {
-        let size = (n - b'0') as u64;
-        let id = if i & 1 == 0 { (i >> 1) as u64 } else { 0 };
-        blocks.push(Block { start, size, id });
+        let size = (n - b'0') as u16;
+        // let id = if i & 1 == 0 { (i >> 1) as u64 } else { 0 };
+        blocks.push(Block { start, size });
         start += size;
     }
 
@@ -77,14 +76,15 @@ fn part2(input: &[u8]) -> u64 {
             index += 2;
         }
         indices[size as usize] = index;
+        let id = pos as u64 / 2;
         if index >= pos {
             for p in block.start..block.start + size {
-                checksum += block.id * p;
+                checksum += id * (p as u64);
             }
         } else {
             let start = blocks[index].start;
             for p in start..start+size {
-                checksum += block.id * p;
+                checksum += id * (p as u64);
             }
             blocks[index].start += size;
             blocks[index].size -= size;

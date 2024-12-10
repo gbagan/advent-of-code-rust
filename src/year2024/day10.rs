@@ -17,7 +17,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
             p2 += b;
         }
     }
-
+    
     Ok((p1, p2))
 }
 
