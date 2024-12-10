@@ -59,9 +59,8 @@ fn part2(input: &[u8]) -> u64 {
     let mut blocks = Vec::with_capacity(input.len());
     let mut start = 0;
 
-    for (i, n) in input.iter().enumerate() {
+    for in input {
         let size = (n - b'0') as u16;
-        // let id = if i & 1 == 0 { (i >> 1) as u64 } else { 0 };
         blocks.push(Block { start, size });
         start += size;
     }
