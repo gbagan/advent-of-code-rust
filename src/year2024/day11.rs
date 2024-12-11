@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use ahash::{HashMap, HashMapExt};
 use anyhow::*;
 use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
-    let mut arrangement: HashMap<u64, u64> = input.iter_unsigned::<u64>().map(|x| (x, 1)).collect();
+    let mut arrangement = input.iter_unsigned::<u64>().map(|x| (x, 1)).collect();
     
     for _ in 0..25 {
         arrangement = next_arrangement(&arrangement);

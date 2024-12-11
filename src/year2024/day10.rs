@@ -1,6 +1,6 @@
 use anyhow::*;
 use crate::util::grid::Grid;
-use std::collections::HashSet;
+use ahash::{HashSet, HashSetExt};
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
     let grid = Grid::parse_with_padding(input, b'#')?;
