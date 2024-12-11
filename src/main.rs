@@ -63,15 +63,15 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
             let mut iterations = 0;
 
             if !display_solution {
-                elapsed = Duration::ZERO;
-                iterations = if microseconds < 5000 {100} else {10};
+                let mut elapsed_vec = Vec::new();
+                iterations = if microseconds < 5000 {100} else {20};
                 for _ in 0..iterations {
                     let data = data.clone();
                     let instant = Instant::now();
                     let _ = func(&data);
-                    elapsed += instant.elapsed();
+                    elapsed_vec.push(instant.elapsed());
                 }
-                elapsed /= iterations;
+                elapsed = *elapsed_vec.select_nth_unstable(iterations/2-1).1;
             }
 
             solved += 1;
@@ -89,7 +89,7 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
             if display_solution {
                 println!("{year} Day {day} in {text}.");
             } else {
-                println!("{year} Day {day} in {text} on average over {iterations} iterations.");
+                println!("{year} Day {day} in {text}, median over {iterations} iterations.");
             }
             match res  {
                 Err(err) => println!("{err:?}"),

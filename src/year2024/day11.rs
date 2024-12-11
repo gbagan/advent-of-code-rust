@@ -6,13 +6,13 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
     let mut arrangement = input.iter_unsigned::<u64>().map(|x| (x, 1)).collect();
     
     for _ in 0..25 {
-        arrangement = next_arrangement(&arrangement);
+        arrangement = blink(&arrangement);
     }
 
     let p1 = arrangement.values().sum();
     
     for _ in 0..50 {
-        arrangement = next_arrangement(&arrangement);
+        arrangement = blink(&arrangement);
     }
 
     let p2 = arrangement.values().sum();
@@ -20,7 +20,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
     Ok((p1, p2))
 }
 
-pub fn next_arrangement(current: &HashMap<u64, u64>) -> HashMap<u64, u64> {
+pub fn blink(current: &HashMap<u64, u64>) -> HashMap<u64, u64> {
     let mut next = HashMap::with_capacity(2*current.len());
     for (&value, &occurences) in current {
         if value == 0 {
