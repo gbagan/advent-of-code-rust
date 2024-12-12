@@ -157,7 +157,7 @@ where
     }
 
     fn end(&self) -> usize {
-        self.slice.len() / self.size
+        self.slice.len().div_ceil(self.size)
     }
 }
 
