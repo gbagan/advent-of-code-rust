@@ -2,9 +2,9 @@ use anyhow::*;
 use crate::util::grid::*;
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let mut grid = Grid::parse_with_padding(input, b'.')?;
+    let grid = Grid::parse_with_padding(input, b'.')?;
     let width = grid.width;
-    let grid = &mut grid.vec;
+    let mut grid = grid.vec;
     let mut stack = Vec::with_capacity(500);
     let mut p1 = 0;
     let mut p2 = 0;
