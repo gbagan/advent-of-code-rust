@@ -41,8 +41,8 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
                     let diff = antenna2 - antenna1;
                     let mut pos = antenna1 + diff + diff;
                     while grid.contains(pos) {
-                          grid[pos] = b'#';
-                        pos = pos + diff;
+                        grid[pos] = b'#';
+                        pos += diff;
                     }
                 }
             }

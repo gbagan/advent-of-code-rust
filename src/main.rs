@@ -76,7 +76,8 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
 
             solved += 1;
             duration += elapsed;
-            
+            let microseconds = elapsed.as_micros();
+
             let text = format!("{microseconds} μs");
             let text =
                 if microseconds < 1000 {
@@ -107,7 +108,7 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
     }
 
     println!("Solved: {solved}");
-    println!("Duration: {} ms", duration.as_millis());
+    println!("Duration: {} μs", duration.as_micros());
 }
 
 fn download(arg_year: &Option<String>, arg_day: &Option<String>) {
