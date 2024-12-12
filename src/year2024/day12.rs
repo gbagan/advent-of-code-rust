@@ -20,15 +20,15 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
                 if grid[current] != start {
                     continue;
                 }
-                grid[current] += 32;
+                grid[current] |= 128;
                 area += 1;
                 for (next, side) in [(current-1, width), (current+1, width), (current-width, 1), (current+width, 1)] {
                     stack.push(next);
-                    if grid[next] != start && grid[next] != start + 32 {
+                    if grid[next] & 127 != start {
                         perimeter += 1;
                         let c1 = grid[current+side];
                         let c2 = grid[next+side];
-                        if c1 != start && c1 != start + 32 || c2 == start || c2 == start + 32 {
+                        if c1 & 127 != start || c2 & 127 == start {
                             sides += 1;
                         }
                     }
