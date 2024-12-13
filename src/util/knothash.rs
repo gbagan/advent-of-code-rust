@@ -1,5 +1,4 @@
 use itertools::Itertools;
-
 pub fn reverse(lengths: &Vec<usize>, nb_rounds: u32) -> Vec<u8> {
     let mut knot: Vec<u8> = (0..=255).collect();
     let mut pos = 0;

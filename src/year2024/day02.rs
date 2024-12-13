@@ -1,5 +1,4 @@
 use anyhow::*;
-use itertools::Itertools;
 use crate::util::parser::*;
 
 #[derive(PartialEq, Eq)]
@@ -13,10 +12,10 @@ fn is_safe_pair(a: u8, b: u8) -> bool {
 }
 
 fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
-    let (first, second, third) =
-        match it.next_tuple() {
-            Some(x) => x,
-            None => return Safety::Safe
+    let [first, second, third] =
+        match it.next_chunk() {
+            std::result::Result::Ok(x) => x,
+            _ => return Safety::Safe
         };
 
     let (mut inc_safe, mut largest, mut largest2) =

@@ -2,7 +2,9 @@
 #![feature(array_windows)]
 #![feature(get_many_mut)]
 #![feature(int_roundings)]
+#![feature(iter_array_chunks)]
 #![feature(iter_map_windows)]
+#![feature(iter_next_chunk)]
 #![feature(pattern)]
 #![feature(portable_simd)]
 
@@ -161,4 +163,5 @@ pub mod year2024 {
     pub mod day10;
     pub mod day11;
     pub mod day12;
+    pub mod day13;
 }
