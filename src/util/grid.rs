@@ -20,7 +20,7 @@ impl<T: Copy> Grid<T> {
         Grid { width, height, vec }
     }
 
-    pub fn map<A>(&self, f: fn(&T) -> A) -> Grid<A> {
+    pub fn map<A, F>(&self, f: F) -> Grid<A> where F: FnMut(&T) -> A{
         let vec = self.vec.iter().map(f).collect();
         Grid {
             width: self.width,

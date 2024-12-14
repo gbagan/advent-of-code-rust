@@ -41,7 +41,7 @@ fn nth_b(n: usize, x: u64) -> u64 {
 fn part1(a: u64, b: u64) -> usize {
     let n = 40_000_000usize / 64;
     (0..64).into_par_iter().map(|i| {
-        let iter_a = iterate(nth_a(i*n, a), next_a);
+        let  iter_a = iterate(nth_a(i*n, a), next_a);
         let iter_b = iterate(nth_b(i*n, b), next_b);
         iter_a.zip(iter_b).take(n).count_if(|(a, b)| a & 0xffff == b & 0xffff)
     }).sum()

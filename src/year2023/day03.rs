@@ -6,7 +6,7 @@ use std::str;
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
     let grid = Grid::parse(input)?;
-    let mut number_grid = grid.map::<Option<u32>>(|_| None);
+    let mut number_grid: Grid<Option<u32>> = grid.map(|_| None);
     let mut i = 0;
     let mut first_digit = None;
     let mut p1 = 0;
