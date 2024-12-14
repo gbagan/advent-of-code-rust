@@ -74,15 +74,15 @@ fn part2(robots: &[Robot]) -> i32 {
     shared.p2.load(Ordering::Relaxed)
 }
 
-const N: i32 = 20;
+const N: u8 = 20;
 
 fn worker(robots: &[Robot], shared: &Shared) {
     while !shared.done.load(Ordering::Relaxed) {
-        let counter = shared.counter.fetch_add(N, Ordering::Relaxed);
-        let mut grid = [0i32; 101*103];
-        for i in counter..counter+N {        
-            if all_distinct(&robots, &mut grid, i) {
-                shared.p2.fetch_min(i, Ordering::Relaxed);
+        let counter = shared.counter.fetch_add(N as i32, Ordering::Relaxed);
+        let mut grid = [u8::MAX; 101*103];
+        for i in 0..N {        
+            if all_distinct(&robots, &mut grid, i, counter + i as i32) {
+                shared.p2.fetch_min(counter + i as i32, Ordering::Relaxed);
                 shared.done.store(true, Ordering::Relaxed);
                 return
             }
@@ -91,10 +91,10 @@ fn worker(robots: &[Robot], shared: &Shared) {
 }
 
 #[inline]
-fn all_distinct(robots: &[Robot], grid: &mut [i32], i: i32) -> bool {
+fn all_distinct(robots: &[Robot], grid: &mut [u8], i: u8, seconds: i32) -> bool {
     for robot in robots {
-        let px = (robot.px + i * robot.vx).mod_floor(&101);
-        let py = (robot.py + i * robot.vy).mod_floor(&103);
+        let px = (robot.px + seconds * robot.vx).mod_floor(&101);
+        let py = (robot.py + seconds * robot.vy).mod_floor(&103);
         let index = (py * 101 + px) as usize;
         if grid[index] == i {
             return false;

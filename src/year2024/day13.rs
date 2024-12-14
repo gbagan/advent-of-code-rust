@@ -18,12 +18,12 @@ fn tokens(ax: i64, ay: i64, bx: i64, by: i64, px: i64, py: i64) -> i64 {
     if det1 % det2 != 0 {
         return 0;
     }
-        let x = det1 / det2;
-    let p2 = px - x * ax;
-    if p2 % bx != 0 {
+    let x = det1 / det2;
+    let p = px - x * ax;
+    if p % bx != 0 {
         return 0;
     }
-    let y = p2 / bx;
+    let y = p / bx;
     if x < 0 || y < 0 {
         return 0;
     }
