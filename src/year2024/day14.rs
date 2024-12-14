@@ -81,23 +81,25 @@ fn worker(robots: &[Robot], shared: &Shared) {
         let counter = shared.counter.fetch_add(N, Ordering::Relaxed);
         let mut grid = [0i32; 101*103];
         for i in counter..counter+N {        
-            let mut distinct = true;
-            for robot in robots {
-                let px = (robot.px + i * robot.vx).mod_floor(&101);
-                let py = (robot.py + i * robot.vy).mod_floor(&103);
-                let index = (py * 101 + px) as usize;
-                if grid[index] == i {
-                    distinct = false;
-                    break;
-                }
-                grid[index] = i;
-            }
-        
-            if distinct {
+            if all_distinct(&robots, &mut grid, i) {
                 shared.p2.fetch_min(i, Ordering::Relaxed);
                 shared.done.store(true, Ordering::Relaxed);
                 return
             }
         }    
     }
+}
+
+#[inline]
+fn all_distinct(robots: &[Robot], grid: &mut [i32], i: i32) -> bool {
+    for robot in robots {
+        let px = (robot.px + i * robot.vx).mod_floor(&101);
+        let py = (robot.py + i * robot.vy).mod_floor(&103);
+        let index = (py * 101 + px) as usize;
+        if grid[index] == i {
+            return false;
+        }
+        grid[index] = i;
+    }
+    true
 }
