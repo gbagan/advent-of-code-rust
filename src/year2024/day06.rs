@@ -86,25 +86,26 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
 
     let p2 = vseen
         .into_par_iter()
-        .chunks(32)
+        .chunks(100)
         .map(|obstacles| {
+            let mut seen: HashSet<(i32, i32)> = HashSet::new();
             obstacles
                 .iter()
                 .filter(|(obsx, obsy)|
-                    has_cycle(&grid, &slide, (start.0 as i32, start.1 as i32), *obsx as i32, *obsy as i32)
+                    has_cycle(&grid, &mut seen, &slide, (start.0 as i32, start.1 as i32), *obsx as i32, *obsy as i32)
                 ).count()
-
         })
         .sum();
 
     Ok((p1, p2))
 }
 
-fn has_cycle(grid: &Grid<u8>, slide: &Slide, start: (i32, i32), obsx: i32, obsy: i32) -> bool {
+fn has_cycle(grid: &Grid<u8>, seen: &mut HashSet<(i32, i32)>, slide: &Slide, start: (i32, i32), obsx: i32, obsy: i32) -> bool {
     let width = grid.width as i32;
     let height = grid.height as i32;
     let (mut currentx, mut currenty) = start;
-    let mut seen: HashSet<(i32, i32)> = HashSet::new();
+    seen.clear();
+
 
     loop {
         let nexty = slide.up[(currentx, currenty)];
