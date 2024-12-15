@@ -52,30 +52,30 @@ fn part2(robots: &[[i32; 4]]) -> Option<i32> {
         let mut right = 0;  
         for [px, _, vx, _] in robots {
             let index = (px + t * vx).mod_floor(&101);
-            if index < 33 {
+            if index < 25 {
                 left += 1;
-            } else if index > 101-33 {
+            } else if index > 101-25 {
                 right += 1;
             }
         }
-        let max = left.max(right).max(robots.len() - left - right);
+        let max = left.min(right);
         (t, max)
-    }).max_by_key(|x| x.1)?.0;
+    }).min_by_key(|x| x.1)?.0;
 
     let ty = (0..103).map(|t| {
         let mut top = 0;
         let mut bot = 0;  
         for [_, py, _, vy] in robots {
             let index = (py + t * vy).mod_floor(&103);
-            if index < 34 {
+            if index < 25 {
                 top += 1;
-            } else if index > 103-34 {
+            } else if index > 103-25 {
                 bot += 1;
             }
         }
-        let max = top.max(bot).max(robots.len() - top - bot);
+        let max = top.min(bot);
         (t, max)
-    }).max_by_key(|x| x.1)?.0;
+    }).min_by_key(|x| x.1)?.0;
 
     // we search for the moment t such that t = tx [mod 101] and t = ty [mod 103] 
     

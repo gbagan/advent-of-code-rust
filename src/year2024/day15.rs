@@ -66,9 +66,7 @@ fn part2(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
     let width = grid.width;
     let height = grid.height;
     let mut grid = large_grid(&grid.vec);
-    let (startx, starty) = (start % width, start / width);
-    let start = 2 * width * starty + 2 * startx;
-    let mut position = start;
+    let mut position = 2 * start;
     let width = 2 * width;
     let up = 0usize.wrapping_sub(width);
 
