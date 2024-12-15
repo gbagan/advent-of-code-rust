@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 use anyhow::*;
 use crate::util::{grid::*, parser::*};
 
@@ -73,13 +71,12 @@ fn part2(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
     let up = 0usize.wrapping_sub(width);
 
     let mut seen = vec![0u16; grid.len()];
-    let mut todo = VecDeque::with_capacity(16);
-    let mut tomove = Vec::with_capacity(16);
+    let mut todo = Vec::with_capacity(16);
 
     for (i, &direction) in directions.iter().enumerate() {
         position = match direction {
-            b'^' => push_vertical(&mut grid, &mut seen, &mut todo, &mut tomove, i as u16 + 1, position, up),
-            b'v' => push_vertical(&mut grid, &mut seen, &mut todo, &mut tomove, i as u16 + 1, position, width),
+            b'^' => push_vertical(&mut grid, &mut seen, &mut todo, i as u16 + 1, position, up),
+            b'v' => push_vertical(&mut grid, &mut seen, &mut todo, i as u16 + 1, position, width),
             b'<' => push_horizontal(&mut grid, position, usize::MAX),
             b'>' => push_horizontal(&mut grid, position, 1),
             _ => continue,
@@ -130,8 +127,7 @@ fn push_horizontal(grid: &mut [u8], position: usize, direction: usize) -> usize 
 fn push_vertical(
     grid: &mut [u8],
     seen: &mut [u16],
-    todo: &mut VecDeque<usize>,
-    tomove: &mut Vec<usize>,
+    todo: &mut Vec<usize>,
     iter: u16,
     position: usize,
     direction: usize) -> usize {
@@ -139,27 +135,33 @@ fn push_vertical(
     match grid[next] {
         b'.' => return next,
         b'#' => return position,
-        b'[' => { todo.clear(); todo.push_back(next); todo.push_back(next+1) },
-        b']' => { todo.clear(); todo.push_back(next); todo.push_back(next-1) },
+        b'[' => { todo.clear(); todo.push(next); todo.push(next+1) },
+        b']' => { todo.clear(); todo.push(next); todo.push(next-1) },
         _ => unreachable!()
     }
-    tomove.clear();
-    while let Some(pos) = todo.pop_front() {
-        if seen[pos] == iter {
-            continue;
-        }
-        seen[pos] = iter;
-        tomove.push(pos);
+
+    let mut index = 0;
+
+    while let Some(&pos) = todo.get(index) {
+        index += 1;
         let next = pos.wrapping_add(direction);
-        match grid[next] {
+        let next1 = match grid[next] {
             b'#' => return position,
-            b'.' => {},
-            b'[' => { todo.push_back(next); todo.push_back(next+1) },
-            b']' => { todo.push_back(next); todo.push_back(next-1) },
+            b'.' => continue,
+            b'[' => next+1,
+            b']' => next-1,
             _ => unreachable!(),
+        };
+        if seen[next] != iter {
+            seen[next] = iter;
+            todo.push(next);
+        }
+        if seen[next1] != iter {
+            seen[next1] = iter;
+            todo.push(next1);
         }
     }
-    for &pos in tomove.iter().rev() {
+    for &pos in todo.iter().rev() {
         grid[pos.wrapping_add(direction)] = grid[pos];
         grid[pos] = b'.';
     }
