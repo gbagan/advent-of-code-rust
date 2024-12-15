@@ -258,3 +258,9 @@ impl Grid<char> {
         output
     }
 }
+
+impl Grid<u8> {
+    pub fn draw(&self) -> String {
+        self.map(|&c| c as char).draw()
+    }
+}
