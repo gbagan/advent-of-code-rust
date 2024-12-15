@@ -14,7 +14,6 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
 }
 
 fn part1(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
-    let height = grid.height;
     let width = grid.width;
     let mut grid = grid.vec.clone();
     let mut position = start;
@@ -29,19 +28,23 @@ fn part1(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
         };
         position = push(&mut grid, position, direction);
     }
+    score(&grid, width, b'O')
+}
 
-    let mut score = 0;
+fn score(grid: &[u8], width: usize, c: u8) -> usize {
+    let mut sum = 0;
     let mut i = 0;
+    let height = grid.len() / width;
 
     for y in 0..height {
         for x in 0..width {
-            if grid[i] == b'O' {
-                score += 100 * y + x;
+            if grid[i] == c {
+                sum += 100 * y + x;
             }
             i += 1;
         }
     }
-    score
+    sum
 }
 
 
@@ -64,7 +67,6 @@ fn push(grid: &mut [u8], position: usize, direction: usize) -> usize {
 
 fn part2(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
     let width = grid.width;
-    let height = grid.height;
     let mut grid = large_grid(&grid.vec);
     let mut position = 2 * start;
     let width = 2 * width;
@@ -84,18 +86,7 @@ fn part2(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
         };
     }
 
-    let mut score = 0;
-    let mut i = 0;
-
-    for y in 0..height {
-        for x in 0..width {
-            if grid[i] == b'[' {
-                score += 100 * y + x;
-            }
-            i += 1;
-        }
-    }
-    score
+    score(&grid, width, b'[')
 }
 
 
@@ -113,6 +104,7 @@ fn large_grid(grid: &[u8]) -> Vec<u8> {
     res
 }
 
+#[inline]
 fn push_horizontal(grid: &mut [u8], position: usize, direction: usize) -> usize {
     let next = position.wrapping_add(direction);
     let mut x = next;
@@ -134,6 +126,7 @@ fn push_horizontal(grid: &mut [u8], position: usize, direction: usize) -> usize 
     }
 }
 
+#[inline]
 fn push_vertical(
     grid: &mut [u8],
     seen: &mut [u16],
@@ -167,8 +160,7 @@ fn push_vertical(
         }
     }
     for &pos in tomove.iter().rev() {
-        let next = pos.wrapping_add(direction);
-        grid[next] = grid[pos];
+        grid[pos.wrapping_add(direction)] = grid[pos];
         grid[pos] = b'.';
     }
     next
