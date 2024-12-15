@@ -26,10 +26,10 @@ fn part1(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
         };
         position = push(&mut grid, position, direction);
     }
-    score(&grid, width, b'O')
+    gps(&grid, width, b'O')
 }
 
-fn score(grid: &[u8], width: usize, c: u8) -> usize {
+fn gps(grid: &[u8], width: usize, c: u8) -> usize {
     let mut sum = 0;
     let mut i = 0;
     let height = grid.len() / width;
@@ -65,7 +65,7 @@ fn push(grid: &mut [u8], position: usize, direction: usize) -> usize {
 
 fn part2(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
     let width = grid.width;
-    let mut grid = large_grid(&grid.vec);
+    let mut grid = part2_grid(&grid.vec);
     let mut position = 2 * start;
     let width = 2 * width;
     let up = 0usize.wrapping_sub(width);
@@ -83,11 +83,11 @@ fn part2(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
         };
     }
 
-    score(&grid, width, b'[')
+    gps(&grid, width, b'[')
 }
 
 
-fn large_grid(grid: &[u8]) -> Vec<u8> {
+fn part2_grid(grid: &[u8]) -> Vec<u8> {
     let mut res = Vec::with_capacity(2*grid.len());
     for c in grid {
         let (c1, c2) = match c {
