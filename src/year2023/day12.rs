@@ -32,8 +32,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
 }
 
 fn parse_line(line: &str) -> Result<(&[u8], Vec<u8>)> {
-    let (springs, groups) = line.split_once(' ')
-                    .with_context(|| format!("Parse error on line: {line}"))?;
+    let (springs, groups) = line.try_split_once(' ')?;
     let springs = springs.as_bytes();
     let groups = groups.iter_unsigned().collect();
     Ok((springs, groups))

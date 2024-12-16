@@ -19,6 +19,7 @@ fn part1(grid: &Grid<u8>, distances: &mut [(u32, u32)], start: usize, end: usize
     let up = 0usize.wrapping_sub(width);
     let mut queue = MinHeap::with_capacity(1024);
     queue.push(1, (start, 1));
+    distances[start] = (1, u32::MAX);
         
     while let Some((dist, (node, direction))) = queue.pop() {
         let is_horizontal = direction == 1 || direction == usize::MAX;
@@ -30,21 +31,15 @@ fn part1(grid: &Grid<u8>, distances: &mut [(u32, u32)], start: usize, end: usize
             }
             return Some(dist-1);
         }
-        if is_horizontal {
-            if distances[node].0 != u32::MAX {
-                continue;
-            }
-            distances[node].0 = dist;
-        } else {
-            if distances[node].1 != u32::MAX {
-                continue;
-            }
-            distances[node].1 = dist;
+        if is_horizontal && distances[node].0 != dist || !is_horizontal && distances[node].1 != dist {
+            continue;
         }
-
-        if direction != usize::MAX && grid[node+1] != b'#' {
+       
+        let next = node + 1;
+        if direction != usize::MAX && grid[next] != b'#' {
             let nextdist = dist + if direction == 1 { 1 } else { 1001 };
-            if nextdist < distances[node+1].0 {
+            if nextdist < distances[next].0 {
+                distances[next].0 = nextdist;
                 queue.push(nextdist, (node + 1, 1));
             }
         }
@@ -53,6 +48,7 @@ fn part1(grid: &Grid<u8>, distances: &mut [(u32, u32)], start: usize, end: usize
         if direction != 1 && grid[next] != b'#' {
             let nextdist = dist + if direction == usize::MAX { 1 } else { 1001 };
             if nextdist < distances[next].0 {
+                distances[next].0 = nextdist;
                 queue.push(nextdist, (next, usize::MAX));
             }
         }
@@ -60,6 +56,7 @@ fn part1(grid: &Grid<u8>, distances: &mut [(u32, u32)], start: usize, end: usize
         if direction != up && grid[next] != b'#' {
             let nextdist = dist + if direction == width { 1 } else { 1001 };
             if nextdist < distances[next].1 {
+                distances[next].1 = nextdist;
                 queue.push(nextdist, (next, width));
             }
         }
@@ -67,6 +64,7 @@ fn part1(grid: &Grid<u8>, distances: &mut [(u32, u32)], start: usize, end: usize
         if direction != width && grid[next] != b'#' {
             let nextdist = dist + if direction == up { 1 } else { 1001 };
             if nextdist < distances[next].1 {
+                distances[next].1 = nextdist;
                 queue.push(nextdist, (next, up));
             }
         }
