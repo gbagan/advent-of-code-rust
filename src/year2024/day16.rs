@@ -18,18 +18,18 @@ fn part1(grid: &Grid<u8>, distances: &mut [(u32, u32)], start: usize, end: usize
     let grid = &grid.vec;
     let up = 0usize.wrapping_sub(width);
     let mut queue = MinHeap::with_capacity(1024);
+    let mut mindist = u32::MAX;
+
     queue.push(1, (start, 1));
-    distances[start] = (1, u32::MAX);
-        
+    distances[start] = (1, u32::MAX);    
+    
     while let Some((dist, (node, direction))) = queue.pop() {
         let is_horizontal = direction == 1 || direction == usize::MAX;
+        if dist > mindist {
+            return Some(mindist - 1)
+        }
         if node == end {
-            if is_horizontal {
-                distances[node].0 =  dist;
-            } else {
-                distances[node].1 =  dist;
-            }
-            return Some(dist-1);
+            mindist = dist;
         }
         if is_horizontal && distances[node].0 != dist || !is_horizontal && distances[node].1 != dist {
             continue;
