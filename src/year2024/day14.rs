@@ -1,5 +1,4 @@
 use anyhow::*;
-use num_integer::Integer;
 use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(u32, i32)> {
@@ -7,6 +6,7 @@ pub fn solve(input: &str) -> Result<(u32, i32)> {
         input
         .iter_signed::<i32>()
         .array_chunks()
+        .map(|[px, py, vx, vy]| [px, py, vx+101, vy+103])
         .collect();
 
     let p1 = part1(&robots);
@@ -22,8 +22,8 @@ fn part1(robots: &[[i32; 4]]) -> u32 {
     let mut quadrant4 = 0;
 
     for [px, py, vx, vy] in robots {
-        let px = (px + 100 * vx).mod_floor(&101);
-        let py = (py + 100 * vy).mod_floor(&103);
+        let px = (px + 100 * vx) % 101;
+        let py = (py + 100 * vy) % 103;
         if px < 50 {
             if py < 51 {
                 quadrant1 += 1;
@@ -51,7 +51,7 @@ fn part2(robots: &[[i32; 4]]) -> Option<i32> {
         let mut left = 0;
         let mut right = 0;  
         for [px, _, vx, _] in robots {
-            let index = (px + t * vx).mod_floor(&101);
+            let index = (px + t * vx) % 101;
             if index < 25 {
                 left += 1;
             } else if index > 101-25 {
@@ -66,7 +66,7 @@ fn part2(robots: &[[i32; 4]]) -> Option<i32> {
         let mut top = 0;
         let mut bot = 0;  
         for [_, py, _, vy] in robots {
-            let index = (py + t * vy).mod_floor(&103);
+            let index = (py + t * vy) % 103;
             if index < 25 {
                 top += 1;
             } else if index > 103-25 {

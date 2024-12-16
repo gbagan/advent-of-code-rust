@@ -1,7 +1,7 @@
 use anyhow::*;
 use crate::util::{grid::*, parser::*};
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let (grid, directions) = input.trim().try_split_once("\n\n")?;
     let grid = Grid::parse(grid)?;
     let start = grid.vec.iter().position(|&c| c == b'@').context("No start symbol found")?;
@@ -11,7 +11,7 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
     Ok((p1, p2))
 }
 
-fn part1(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
+fn part1(grid: &Grid<u8>, start: usize, directions: &[u8]) -> u32 {
     let width = grid.width;
     let mut grid = grid.vec.clone();
     let mut position = start;
@@ -26,13 +26,13 @@ fn part1(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
         };
         position = push(&mut grid, position, direction);
     }
-    gps(&grid, width, b'O')
+    gps(&grid, width as u32, b'O')
 }
 
-fn gps(grid: &[u8], width: usize, c: u8) -> usize {
+fn gps(grid: &[u8], width: u32, c: u8) -> u32 {
     let mut sum = 0;
     let mut i = 0;
-    let height = grid.len() / width;
+    let height = grid.len() as u32 / width;
 
     for y in 0..height {
         for x in 0..width {
@@ -63,7 +63,7 @@ fn push(grid: &mut [u8], position: usize, direction: usize) -> usize {
     }
 }
 
-fn part2(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
+fn part2(grid: &Grid<u8>, start: usize, directions: &[u8]) -> u32 {
     let width = grid.width;
     let mut grid = part2_grid(&grid.vec);
     let mut position = 2 * start;
@@ -83,7 +83,7 @@ fn part2(grid: &Grid<u8>, start: usize, directions: &[u8]) -> usize {
         };
     }
 
-    gps(&grid, width, b'[')
+    gps(&grid, width as u32, b'[')
 }
 
 
