@@ -17,7 +17,7 @@ fn part1(grid: &Grid<u8>, distances: &mut [(u32, u32)], start: usize, end: usize
     let width = grid.width;
     let grid = &grid.vec;
     let up = 0usize.wrapping_sub(width);
-    let mut queue = MinHeap::new();
+    let mut queue = MinHeap::with_capacity(1024);
     queue.push(1, (start, 1));
         
     while let Some((dist, (node, direction))) = queue.pop() {
@@ -43,20 +43,32 @@ fn part1(grid: &Grid<u8>, distances: &mut [(u32, u32)], start: usize, end: usize
         }
 
         if direction != usize::MAX && grid[node+1] != b'#' {
-            let weight = if direction == 1 { 1 } else { 1001 };
-            queue.push(dist + weight, (node + 1, 1));
+            let nextdist = dist + if direction == 1 { 1 } else { 1001 };
+            if nextdist < distances[node+1].0 {
+                queue.push(nextdist, (node + 1, 1));
+            }
         }
-        if direction != 1 && grid[node.wrapping_add(usize::MAX)] != b'#' {
-            let weight = if direction == usize::MAX { 1 } else { 1001 };
-            queue.push(dist + weight, (node.wrapping_add(usize::MAX), usize::MAX));
+
+        let next = node.wrapping_add(usize::MAX);
+        if direction != 1 && grid[next] != b'#' {
+            let nextdist = dist + if direction == usize::MAX { 1 } else { 1001 };
+            if nextdist < distances[next].0 {
+                queue.push(nextdist, (next, usize::MAX));
+            }
         }
-        if direction != up && grid[node + width] != b'#' {
-            let weight = if direction == width { 1 } else { 1001 };
-            queue.push(dist + weight, (node + width, width));
+        let next = node + width;
+        if direction != up && grid[next] != b'#' {
+            let nextdist = dist + if direction == width { 1 } else { 1001 };
+            if nextdist < distances[next].1 {
+                queue.push(nextdist, (next, width));
+            }
         }
-        if direction != width && grid[node.wrapping_add(up)] != b'#' {
-            let weight = if direction == up { 1 } else { 1001 };
-            queue.push(dist + weight, (node.wrapping_add(up), up));
+        let next = node.wrapping_add(up);
+        if direction != width && grid[next] != b'#' {
+            let nextdist = dist + if direction == up { 1 } else { 1001 };
+            if nextdist < distances[next].1 {
+                queue.push(nextdist, (next, up));
+            }
         }
     }
     None
