@@ -7,33 +7,30 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     let start = grid.width * (grid.height-2) + 1;
     let end = grid.width * 2 - 2;
 
-    let mut distances = vec![(u32::MAX, u32::MAX); grid.vec.len()];
+    let mut distances = vec![[u32::MAX; 2]; grid.vec.len()];
 
     let p1 = part1(&grid, &mut distances, start, end).context("Part 1: No solution found")?;
     let p2 = part2(grid.width, &distances, end);
     Ok((p1, p2))
 }
 
-fn part1(grid: &Grid<u8>, distances: &mut [(u32, u32)], start: usize, end: usize) -> Option<u32> {
+fn part1(grid: &Grid<u8>, distances: &mut [[u32; 2]], start: usize, end: usize) -> Option<u32> {
     let width = grid.width;
     let grid = &grid.vec;
     let up = 0usize.wrapping_sub(width);
     
-    let mut queue = VecDeque::with_capacity(1024);
+    let mut queue: VecDeque<(u32, usize, usize)> = VecDeque::with_capacity(1024);
     let mut todo = Vec::new();
     let mut next_todo = Vec::new();
 
     todo.push((1, start, 1));
     
+    let directions = [1, usize::MAX, width, up];
+
     loop {
-        let mut index = 0;        
-        if todo.is_empty() {
-            break;
-        }
-
-
+        let mut index = 0;
         loop {
-            let (dist, node, direction) = 
+            let (dist, node, direction) =
                 if index >= todo.len() {
                     match queue.pop_front() {
                         Some(n) => n,
@@ -41,81 +38,52 @@ fn part1(grid: &Grid<u8>, distances: &mut [(u32, u32)], start: usize, end: usize
                     }
                 } else {
                     match queue.front() {
-                        Some(&n) if n <= todo[index] => {
+                        Some(&tuple) if tuple.0 <= todo[index].0 => {
                             queue.pop_front();
-                            n
+                            tuple
                         },
                         _ => {
+                            let tuple= todo[index];
                             index += 1;
-                            todo[index-1]
+                            tuple
                         }
                     }
                 };
             let is_horizontal = direction == 1 || direction == usize::MAX;
-            if node == end {
-                if is_horizontal {
-                    distances[node].0 = dist;
-                } else {
-                    distances[node].1 = dist;
+            if is_horizontal {
+                if distances[node][0] != u32::MAX {
+                    continue;
                 }
+                distances[node][0] = dist;
+            } else {
+                if distances[node][1] != u32::MAX {
+                    continue;
+                }
+                distances[node][1] = dist;
+            }
+            if node == end {
                 return Some(dist-1);
             }
-            if is_horizontal {
-                if distances[node].0 != u32::MAX {
-                    continue;
-                }
-                distances[node].0 = dist;
-            } else {
-                if distances[node].1 != u32::MAX {
-                    continue;
-                }
-                distances[node].1 = dist;
-            }
-            let next = node + 1;
-            if direction != usize::MAX && grid[next] != b'#' {
-                if direction == 1 {
-                    queue.push_back((dist + 1, next, 1));
-                } else {
-                    next_todo.push((dist + 1001, next, 1));
-                }
-            }
-    
-            let next = node.wrapping_add(usize::MAX);
-            if direction != 1 && grid[next] != b'#' {
-                if direction == usize::MAX {
-                    queue.push_back((dist + 1, next, usize::MAX));
-                } else {
-                    next_todo.push((dist + 1001, next, usize::MAX));
-                }
-            }
 
-            let next = node + width;
-            if direction != up && grid[next] != b'#' {
-                if direction == width {
-                    queue.push_back((dist + 1, next, width));
+            for next_direction in directions {
+                let next = node + next_direction;
+                if direction + next_direction == 0 || grid[next] == b'#' {
+                    continue
+                } else if direction == next_direction {
+                    queue.push_back((dist + 1, next, next_direction));
                 } else {
-                    next_todo.push((dist + 1001, next, width));
-                }
-            }
-
-            let next = node.wrapping_add(up);
-            if direction != width && grid[next] != b'#' {
-                if direction == up {
-                    queue.push_back((dist + 1, next, up));
-                } else {
-                    next_todo.push((dist + 1001, next, up));
+                    next_todo.push((dist + 1001, next, next_direction));
                 }
             }
         }
         (todo, next_todo) = (next_todo, todo);
         next_todo.clear();
     }
-    None
 }
 
-fn part2(width: usize, distances: & [(u32, u32)], end: usize) -> u32 {
+fn part2(width: usize, distances: & [[u32; 2]], end: usize) -> u32 {
     let mut stack = Vec::new();
-    let (d1, d2) = distances[end];
+    let [d1, d2] = distances[end];
     if d1 <= d2 {
         stack.push((end, true));
     }
@@ -135,18 +103,18 @@ fn part2(width: usize, distances: & [(u32, u32)], end: usize) -> u32 {
             let dist = distances[node];
             
             let next = node + 1;
-            if distances[next].0 + 1 == dist.0 {
+            if distances[next][0] + 1 == dist[0] {
                 stack.push((next, true))
             }
-            if distances[next].1 + 1001 == dist.0 {
+            if distances[next][1] + 1001 == dist[0] {
                 stack.push((next, false))
             }
             
             let next = node - 1;
-            if distances[next].0 + 1 == dist.0 {
+            if distances[next][0] + 1 == dist[0] {
                 stack.push((next, true))
             }
-            if distances[next].1 + 1001 == dist.0 {
+            if distances[next][1] + 1001 == dist[0] {
                 stack.push((next, false))
             }
         } else { // vertical
@@ -158,18 +126,18 @@ fn part2(width: usize, distances: & [(u32, u32)], end: usize) -> u32 {
             let dist = distances[node];
             
             let next = node + width;
-            if distances[next].1 + 1 == dist.1 {
+            if distances[next][1] + 1 == dist[1] {
                 stack.push((next, false))
             }
-            if distances[next].0 + 1001 == dist.1 {
+            if distances[next][0] + 1001 == dist[1] {
                 stack.push((next, true))
             }
             
             let next = node - width;
-            if distances[next].1 + 1 == dist.1 {
+            if distances[next][1] + 1 == dist[1] {
                 stack.push((next, false))
             }
-            if distances[next].0 + 1001 == dist.1 {
+            if distances[next][0] + 1001 == dist[1] {
                 stack.push((next, true))
             }
         }
