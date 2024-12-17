@@ -8,7 +8,7 @@ pub fn solve(input: &str) -> Result<(String, u64)> {
     
     let p1 = run(&program, a, b, c);
     let p1: Vec<u8> = p1.iter().map(|&i| b'0' + i as u8).intersperse(b',').collect();
-    let p1 = std::str::from_utf8(&p1).unwrap().to_string();
+    let p1 = std::str::from_utf8(&p1).unwrap().to_owned();
 
     let p2 = quine(&program, 0, program.len()).context("Part 2: No solution found")?;
 
@@ -19,6 +19,7 @@ fn run(program: &[u64], mut a: u64, mut b: u64, mut c: u64) -> Vec<u64> {
     let mut output = Vec::new();
 
     let mut ip = 0;
+    
     while ip < program.len() {
         let literal = program[ip+1];
         let combo = match literal {

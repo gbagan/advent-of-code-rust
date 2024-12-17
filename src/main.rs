@@ -12,7 +12,7 @@ use aoc::*;
 struct Solution {
     year: String,
     day: String,
-    func: fn(&String) -> Result<(String, String)>,
+    func: fn(&String) -> Result<(String, String, Duration)>,
 }
 
 macro_rules! solution {
@@ -20,10 +20,10 @@ macro_rules! solution {
         let year = stringify!($year).trim_matches(char::is_alphabetic).to_string(); 
         let day = stringify!($day).trim_matches(char::is_alphabetic).to_string();
         let func = |input: &String| {
-            use $year::$day::*;
-
-            let (p1, p2) = solve(input)?;
-            Ok((p1.to_string(), p2.to_string()))
+            let instant = Instant::now();
+            let (p1, p2) = $year::$day::solve(input)?;
+            let elapsed = instant.elapsed();
+            Ok((p1.to_string(), p2.to_string(), elapsed))
         };
 
         Solution { year, day, func }
@@ -55,49 +55,49 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
         
         let path = Path::new("inputs").join(year).join(day);
         if let Result::Ok(data) = read_to_string(&path) {
-            let instant = Instant::now();
-            let res = func(&data);
-            let mut elapsed = instant.elapsed();
-            let microseconds = elapsed.as_micros();
+            //let instant = Instant::now();
+            match func(&data) {
+                Err(err) => {
+                    eprintln!("{err:?}");
+                    eprintln!("{year} Day {day:02}");
+                },
+                std::result::Result::Ok((p1, p2, mut elapsed)) => {
+                    //let mut elapsed = instant.elapsed();
+                    let microseconds = elapsed.as_micros();
+                    let mut iterations = 0;
 
-            let mut iterations = 0;
+                    if !display_solution {
+                        let mut elapsed_vec = Vec::new();
+                        iterations = if microseconds < 5000 {100} else {20};
+                        for _ in 0..iterations {
+                            let data = data.clone();
+                            //let instant = Instant::now();
+                            elapsed_vec.push(func(&data).unwrap().2);
+                        }
+                        elapsed = *elapsed_vec.select_nth_unstable(iterations/2-1).1;
+                    }
 
-            if !display_solution {
-                let mut elapsed_vec = Vec::new();
-                iterations = if microseconds < 5000 {100} else {20};
-                for _ in 0..iterations {
-                    let data = data.clone();
-                    let instant = Instant::now();
-                    let _ = func(&data);
-                    elapsed_vec.push(instant.elapsed());
-                }
-                elapsed = *elapsed_vec.select_nth_unstable(iterations/2-1).1;
-            }
+                    solved += 1;
+                    duration += elapsed;
+                    let microseconds = elapsed.as_micros();
 
-            solved += 1;
-            duration += elapsed;
-            let microseconds = elapsed.as_micros();
-
-            let text = format!("{microseconds} μs");
-            let text =
-                if microseconds < 1000 {
-                    Green.paint(text)
-                } else if microseconds < 100_000 {
-                    Yellow.bold().paint(text)
-                } else {
-                Red.bold().paint(text)
-                };
-            if display_solution {
-                println!("{year} Day {day} in {text}.");
-            } else {
-                println!("{year} Day {day} in {text}, median over {iterations} iterations.");
-            }
-            match res  {
-                Err(err) => println!("{err:?}"),
-                Result::Ok((part1, part2)) => { 
+                    let text = format!("{microseconds} μs");
+                    let text =
+                        if microseconds < 1000 {
+                            Green.paint(text)
+                        } else if microseconds < 100_000 {
+                            Yellow.bold().paint(text)
+                        } else {
+                            Red.bold().paint(text)
+                        };
                     if display_solution {
-                        println!("    Part 1: {part1}");
-                        println!("    Part 2: {part2}");
+                        println!("{year} Day {day} in {text}.");
+                    } else {
+                        println!("{year} Day {day} in {text}, median over {iterations} iterations.");
+                    }
+                    if display_solution {
+                        println!("    Part 1: {p1}");
+                        println!("    Part 2: {p2}");
                     }
                 }
             }
