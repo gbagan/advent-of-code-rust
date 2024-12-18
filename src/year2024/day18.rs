@@ -1,3 +1,5 @@
+// part 1: BFS, part 2: DFS
+
 use anyhow::*;
 use crate::util::parser::*;
 use std::collections::VecDeque;
@@ -30,17 +32,16 @@ fn part1(bytes: &[[u8; 2]]) -> Option<u32> {
 
     let mut queue = VecDeque::with_capacity(1000);
     queue.push_back((0, START));
+    grid[START] = b'#';
 
     while let Some((dist, node)) = queue.pop_front() {
         if node == END {
             return Some(dist);
         }
-        if grid[node] == b'#' {
-            continue;
-        }
         grid[node] = b'#';
         for next in [node + 1, node - 1, node + 73, node - 73] {
             if grid[next] == b'.' {
+                grid[next] = b'#';
                 queue.push_back((dist+1, next));
             }
         }
@@ -73,18 +74,17 @@ fn part2(bytes: &[[u8; 2]]) -> Option<String> {
 }
 
 #[inline]
-fn dfs_aux(grid: &mut [u8], stack: &mut Vec<usize>, node: usize) -> bool {
-    stack.push(node);
+fn dfs_aux(grid: &mut [u8], stack: &mut Vec<usize>, start: usize) -> bool {
+    stack.push(start);
+    grid[start] = b'$';
     while let Some(node) = stack.pop() {
         if node == END {
             return true;
         }
-        if grid[node] != b'.' {
-            continue;
-        }
         grid[node] = b'$';
         for next in [node + 1, node - 1, node + SIZE, node - SIZE] {
             if grid[next] == b'.' {
+                grid[node] = b'$';
                 stack.push(next);
             }
         }
