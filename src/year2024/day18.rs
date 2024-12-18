@@ -1,5 +1,3 @@
-// BFS and union-find
-
 use anyhow::*;
 use crate::util::parser::*;
 use std::collections::VecDeque;
@@ -63,10 +61,28 @@ fn part2(bytes: &[[u8; 2]]) -> String {
         grid[(y as usize + 1) * SIZE + x as usize + 1] = b'#';
     }
 
-    let mut stack = Vec::with_capacity(200);
-    stack.push(START);
+    let mut stack = Vec::with_capacity(1000);
+    dfs_aux(&mut grid, &mut stack, START);
 
+    for &[x, y] in bytes.iter().rev() {
+        let node = (y as usize + 1) * SIZE + x as usize + 1;
+        grid[node] = b'.';
+        if grid[node-1] == b'$' || grid[node+1] == b'$' || grid[node-SIZE] == b'$' || grid[node+SIZE] == b'$' {
+            if dfs_aux(&mut grid, &mut stack, node) {
+                return format!("{x},{y}");
+            }
+        }
+    }
+    unreachable!();
+}
+
+#[inline]
+fn dfs_aux(grid: &mut [u8], stack: &mut Vec<usize>, node: usize) -> bool {
+    stack.push(node);
     while let Some(node) = stack.pop() {
+        if node == END {
+            return true;
+        }
         if grid[node] != b'.' {
             continue;
         }
@@ -77,27 +93,5 @@ fn part2(bytes: &[[u8; 2]]) -> String {
             }
         }
     }
-
-    for &[x, y] in bytes.iter().rev() {
-        let node = (y as usize + 1) * SIZE + x as usize + 1;
-        grid[node] = b'.';
-        if grid[node-1] == b'$' || grid[node+1] == b'$' ||  grid[node-SIZE] == b'$' ||  grid[node+SIZE] == b'$' {
-            stack.push(node);
-            while let Some(node) = stack.pop() {
-                if node == END {
-                    return format!("{x},{y}");
-                }
-                if grid[node] != b'.' {
-                    continue;
-                }
-                grid[node] = b'$';
-                for next in [node + 1, node - 1, node + SIZE, node - SIZE] {
-                    if grid[next] == b'.' {
-                        stack.push(next);
-                    }
-                }
-            }
-        }
-    }
-    unreachable!();
+    false
 }
