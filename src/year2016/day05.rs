@@ -67,16 +67,16 @@ fn worker(input: &str, shared: &Shared, mutex: &Mutex<Exclusive>) {
 
 fn check<const N: usize>(buffers: &mut [[u8; 64]], len: usize, counter: u32, offset: u32, shared: &Shared, mutex: &Mutex<Exclusive>)
 where LaneCount<N>: SupportedLaneCount {
-    for i in 0..N {
+    for (i, buffer) in buffers.iter_mut().enumerate() {
         let n = offset + i as u32;
-        buffers[i][len - 3] = b'0' + (n / 100) as u8;
-        buffers[i][len - 2] = b'0' + ((n / 10) % 10) as u8;
-        buffers[i][len - 1] = b'0' + (n % 10) as u8;
+        buffer[len - 3] = b'0' + (n / 100) as u8;
+        buffer[len - 2] = b'0' + ((n / 10) % 10) as u8;
+        buffer[len - 1] = b'0' + (n % 10) as u8;
     }
     let result = multiple_hash::<N>(buffers, len).0;
 
-    for i in 0..N {
-        if result[i] & 0xfffff000 == 0 {
+    for (i, res) in result.iter().enumerate() {
+        if res & 0xfffff000 == 0 {
             let mut exclusive = mutex.lock().unwrap();
             let sixth = ((result[i] >> 8) & 0xf) as u8;
             let seventh = ((result[i] >> 4) & 0xf) as u8;

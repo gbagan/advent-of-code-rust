@@ -54,16 +54,16 @@ fn check_hash<const N: usize>(
     offset: u32,
     shared: &Shared
 ) where LaneCount<N>: SupportedLaneCount {
-    for i in 0..N {
+    for (i, buffer) in buffers.iter_mut().enumerate() {
         let n = offset + i as u32;
-        buffers[i][len - 3] = b'0' + (n / 100) as u8;
-        buffers[i][len - 2] = b'0' + ((n / 10) % 10) as u8;
-        buffers[i][len - 1] = b'0' + (n % 10) as u8;
+        buffer[len - 3] = b'0' + (n / 100) as u8;
+        buffer[len - 2] = b'0' + ((n / 10) % 10) as u8;
+        buffer[len - 1] = b'0' + (n % 10) as u8;
     }
     let result = multiple_hash::<N>(buffers, len).0;
 
-    for i in 0..N {
-        if result[i] & 0xffffff00 == 0 {
+    for (i, res) in result.iter().enumerate() {
+        if res & 0xffffff00 == 0 {
             shared.p2.fetch_min(counter + offset + i as u32, Ordering::Relaxed);
             shared.done.store(true, Ordering::Relaxed);
         } else if result[i] & 0xfffff000 == 0 {

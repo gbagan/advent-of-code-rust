@@ -67,10 +67,8 @@ fn part2(bytes: &[[u8; 2]]) -> String {
     for &[x, y] in bytes.iter().rev() {
         let node = (y as usize + 1) * SIZE + x as usize + 1;
         grid[node] = b'.';
-        if grid[node-1] == b'$' || grid[node+1] == b'$' || grid[node-SIZE] == b'$' || grid[node+SIZE] == b'$' {
-            if dfs_aux(&mut grid, &mut stack, node) {
-                return format!("{x},{y}");
-            }
+        if (grid[node-1] == b'$' || grid[node+1] == b'$' || grid[node-SIZE] == b'$' || grid[node+SIZE] == b'$') && dfs_aux(&mut grid, &mut stack, node) {
+            return format!("{x},{y}");
         }
     }
     unreachable!();
