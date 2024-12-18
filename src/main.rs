@@ -80,8 +80,13 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
                     solved += 1;
                     duration += elapsed;
                     let microseconds = elapsed.as_micros();
+                    let nanoseconds = elapsed.as_nanos();
 
-                    let text = format!("{microseconds} μs");
+                    let text = if microseconds <= 5 {
+                        format!("{nanoseconds} ns")
+                    } else {
+                        format!("{microseconds} μs")
+                    };
                     let text =
                         if microseconds < 1000 {
                             Green.paint(text)
@@ -300,5 +305,6 @@ fn solutions() -> Vec<Solution> {
         solution!(year2024, day15),
         solution!(year2024, day16),
         solution!(year2024, day17),
+        solution!(year2024, day18),
     ]
 }

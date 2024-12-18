@@ -3,12 +3,12 @@ use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(String, u64)> {
     let mut it = input.iter_unsigned::<u64>();
-    let [a, b, c] = it.next_chunk().unwrap();
+    let [a, b, c] = it.next_chunk().ok().context("Invalid input")?;
     let program: Vec<_> = it.collect();
     
     let p1 = run(&program, a, b, c);
     let p1: Vec<u8> = p1.iter().map(|&i| b'0' + i as u8).intersperse(b',').collect();
-    let p1 = std::str::from_utf8(&p1).unwrap().to_owned();
+    let p1 = String::from_utf8(p1).unwrap();
 
     let p2 = quine(&program, 0, program.len()).context("Part 2: No solution found")?;
 
@@ -52,7 +52,7 @@ fn quine(program: &[u64], a: u64, idx: usize) -> Option<u64> {
         let ai = a << 3 | i;
         if let Some(output) = run_first_value(program, ai, 0, 0) {
             if output == program[idx-1] {
-                if let Some(q) = quine(program, ai,idx-1) {
+                if let Some(q) = quine(program, ai, idx-1) {
                     return Some(q)
                 }
             }
