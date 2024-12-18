@@ -1,3 +1,5 @@
+// BFS and union-find
+
 use anyhow::*;
 use crate::util::parser::*;
 use std::collections::VecDeque;
@@ -61,55 +63,41 @@ fn part2(bytes: &[[u8; 2]]) -> String {
         grid[(y as usize + 1) * SIZE + x as usize + 1] = b'#';
     }
 
-    let mut uf: [u16; SIZE*SIZE] = std::array::from_fn(|i| i as u16);
-    for i in 0..SIZE*SIZE {
-        if grid[i] == b'#' {
+    let mut stack = Vec::with_capacity(200);
+    stack.push(START);
+
+    while let Some(node) = stack.pop() {
+        if grid[node] != b'.' {
             continue;
         }
-        if i < SIZE*SIZE - 1 && grid[i+1] == b'.' {
-            union(&mut uf, i, i+1);
-        }
-        if i < SIZE*SIZE - SIZE && grid[i+SIZE] == b'.' {
-            union(&mut uf, i, i+SIZE);
+        grid[node] = b'$';
+        for next in [node + 1, node - 1, node + SIZE, node - SIZE] {
+            if grid[next] == b'.' {
+                stack.push(next);
+            }
         }
     }
 
-    for i in (0..bytes.len()).rev() {
-        if find(&mut uf, START) == find(&mut uf, END) {
-            return format!("{},{}", bytes[i+1][0], bytes[i+1][1]); 
-        }
-        let [x, y] = bytes[i];
+    for &[x, y] in bytes.iter().rev() {
         let node = (y as usize + 1) * SIZE + x as usize + 1;
-        if grid[node-1] == b'.' {
-            union(&mut uf, node, node-1);
-        }
-        if grid[node+1] == b'.' {
-            union(&mut uf, node, node+1);
-        }
-        if grid[node-SIZE] == b'.' {
-            union(&mut uf, node, node-SIZE);
-        }
-        if grid[node+SIZE] == b'.' {
-            union(&mut uf, node, node+SIZE);
-        }
         grid[node] = b'.';
+        if grid[node-1] == b'$' || grid[node+1] == b'$' ||  grid[node-SIZE] == b'$' ||  grid[node+SIZE] == b'$' {
+            stack.push(node);
+            while let Some(node) = stack.pop() {
+                if node == END {
+                    return format!("{x},{y}");
+                }
+                if grid[node] != b'.' {
+                    continue;
+                }
+                grid[node] = b'$';
+                for next in [node + 1, node - 1, node + SIZE, node - SIZE] {
+                    if grid[next] == b'.' {
+                        stack.push(next);
+                    }
+                }
+            }
+        }
     }
     unreachable!();
-}
-
-fn find(uf: &mut[u16], node: usize) -> u16 {
-    let parent = uf[node] as usize;
-    if parent != node {
-        uf[node] = find(uf, parent);
-    }
-    uf[node]
-}
-
-#[inline]
-fn union(uf: &mut [u16], x: usize, y: usize) {
-    let xroot = find(uf, x);
-    let yroot = find(uf, y);
-    if xroot != yroot {
-        uf[xroot as usize] = yroot;
-    }
 }
