@@ -10,7 +10,7 @@ pub fn solve(input: &str) -> Result<(u32, String)> {
     let bytes: Vec<_> = input.iter_unsigned().array_chunks().collect();
 
     let p1 = part1(&bytes).context("Part 1: No solution found")?;
-    let p2 = part2(&bytes);
+    let p2 = part2(&bytes).context("Part 2: No solution found")?;
 
     Ok((p1, p2))
 }
@@ -48,7 +48,7 @@ fn part1(bytes: &[[u8; 2]]) -> Option<u32> {
     None
 }
 
-fn part2(bytes: &[[u8; 2]]) -> String {
+fn part2(bytes: &[[u8; 2]]) -> Option<String> {
     let mut grid = vec![b'.'; SIZE*SIZE];
     for i in 0..SIZE {
         grid[i] = b'#';
@@ -64,14 +64,12 @@ fn part2(bytes: &[[u8; 2]]) -> String {
     let mut stack = Vec::with_capacity(1000);
     dfs_aux(&mut grid, &mut stack, START);
 
-    for &[x, y] in bytes.iter().rev() {
+    bytes.iter().rev().find(|&&[x, y]| {
         let node = (y as usize + 1) * SIZE + x as usize + 1;
         grid[node] = b'.';
-        if (grid[node-1] == b'$' || grid[node+1] == b'$' || grid[node-SIZE] == b'$' || grid[node+SIZE] == b'$') && dfs_aux(&mut grid, &mut stack, node) {
-            return format!("{x},{y}");
-        }
-    }
-    unreachable!();
+        (grid[node-1] == b'$' || grid[node+1] == b'$' || grid[node-SIZE] == b'$' || grid[node+SIZE] == b'$')
+                && dfs_aux(&mut grid, &mut stack, node)
+    }).map(|[x, y]| format!("{x},{y}"))
 }
 
 #[inline]
