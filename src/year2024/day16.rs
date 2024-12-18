@@ -83,61 +83,61 @@ fn part1(grid: &Grid<u8>, distances: &mut [[u32; 2]], start: usize, end: usize) 
 
 fn part2(width: usize, distances: & [[u32; 2]], end: usize) -> u32 {
     let mut stack = Vec::new();
+    let mut seen = vec![(false, false); distances.len()];
+
     let [d1, d2] = distances[end];
     if d1 <= d2 {
         stack.push((end, true));
+        seen[end].0 = true;
     }
     if d2 <= d1 {
         stack.push((end, false));
+        seen[end].1 = true;
     }
-
-    let mut seen = vec![(false, false); distances.len()];
 
     while let Some((node, is_horizontal)) = stack.pop() {
         if is_horizontal {
-            if seen[node].0 {
-                continue;
-            }
-            seen[node].0 = true;
-
             let dist = distances[node];
             
             let next = node + 1;
-            if distances[next][0] + 1 == dist[0] {
+            if distances[next][0] + 1 == dist[0] && !seen[next].0 {
+                seen[next].0 = true;
                 stack.push((next, true))
             }
-            if distances[next][1] + 1001 == dist[0] {
+            if distances[next][1] + 1001 == dist[0] && !seen[next].1 {
+                seen[next].1 = true;
                 stack.push((next, false))
             }
             
             let next = node - 1;
-            if distances[next][0] + 1 == dist[0] {
+            if distances[next][0] + 1 == dist[0] && !seen[next].0 {
+                seen[next].0 = true;
                 stack.push((next, true))
             }
-            if distances[next][1] + 1001 == dist[0] {
+            if distances[next][1] + 1001 == dist[0] && !seen[next].1 {
+                seen[next].1 = true;
                 stack.push((next, false))
             }
         } else { // vertical
-            if seen[node].1 {
-                continue;
-            }
-            seen[node].1 = true;
-
             let dist = distances[node];
             
             let next = node + width;
-            if distances[next][1] + 1 == dist[1] {
+            if distances[next][1] + 1 == dist[1] && !seen[next].1 {
+                seen[next].1 = true;
                 stack.push((next, false))
             }
-            if distances[next][0] + 1001 == dist[1] {
+            if distances[next][0] + 1001 == dist[1] && !seen[next].0 {
+                seen[next].0 = true;
                 stack.push((next, true))
             }
             
             let next = node - width;
-            if distances[next][1] + 1 == dist[1] {
+            if distances[next][1] + 1 == dist[1] && !seen[next].1 {
+                seen[next].1 = true;
                 stack.push((next, false))
             }
-            if distances[next][0] + 1001 == dist[1] {
+            if distances[next][0] + 1001 == dist[1] && !seen[next].0  {
+                seen[next].0 = true;
                 stack.push((next, true))
             }
         }
