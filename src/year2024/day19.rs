@@ -5,7 +5,7 @@ pub fn solve(input: &str) -> Result<(u32, u64)> {
     let patterns = &input[..split];
     let designs = &input[split+2..];
     
-    let mut trie = Trie::with_capacity(3000);
+    let mut trie = Trie::with_capacity(1000);
     for pattern in patterns.split(", ") {
         trie.insert(pattern.as_bytes());
     }
@@ -24,9 +24,10 @@ pub fn solve(input: &str) -> Result<(u32, u64)> {
 }
 
  
+#[derive(Debug)]
 struct TrieNode {
     here: bool,
-    children: Option<[usize; 5]>
+    children: [usize; 5]
 }
 
 struct Trie {
@@ -36,25 +37,22 @@ struct Trie {
 impl Trie {
     fn with_capacity(n: usize) -> Self {
         let mut nodes = Vec::with_capacity(n);
-        nodes.push(TrieNode { here: false, children: None });
+        nodes.push(TrieNode { here: false, children: [0; 5] });
         Self { nodes }
     }
 
     fn insert(&mut self, word: &[u8]) {
         let mut node_index =  0;
         for &c in word {
-            match self.nodes[node_index].children {
-                None => {
+            let idx = TABLE[c as usize];
+            match self.nodes[node_index].children[idx] { 
+                0 => {
                     let size = self.nodes.len();
-                    for _ in 0..5 {
-                        self.nodes.push(TrieNode { here: false, children: None });
-                    }
-                    self.nodes[node_index].children = Some(std::array::from_fn(|i| size + i));
-                    node_index = size + TABLE[c as usize];
+                    self.nodes.push(TrieNode { here: false, children: [0; 5] });
+                    self.nodes[node_index].children[idx] = size;
+                    node_index = size;
                 },
-                Some(children) => {
-                    node_index = children[TABLE[c as usize]];
-                }
+                n => node_index = n
             }
         }
         self.nodes[node_index].here = true;
@@ -74,11 +72,9 @@ impl Trie {
                     if index >= design.len() {
                         break;
                     }
-                    if let Some(children) = &self.nodes[node_index].children {
-                        node_index = children[TABLE[design[index] as usize]];
-                        index += 1;
-                    } else {
-                        break;
+                    match self.nodes[node_index].children[TABLE[design[index] as usize]] {
+                        0 => break,
+                        idx => { node_index = idx; index += 1 }
                     }
                 }
             }
