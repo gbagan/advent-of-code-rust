@@ -5,7 +5,7 @@ pub fn solve(input: &str) -> Result<(u32, u64)> {
     let patterns = &input[..split];
     let designs = &input[split+2..];
     
-    let mut trie = Trie::new();
+    let mut trie = Trie::with_capacity(3000);
     for pattern in patterns.split(", ") {
         trie.insert(pattern.as_bytes());
     }
@@ -19,69 +19,81 @@ pub fn solve(input: &str) -> Result<(u32, u64)> {
             p1 += 1;
         }
         p2 += score;
-
     }
     Ok((p1, p2))
 }
 
-
-#[derive(Clone)]
-struct Trie {
+ 
+struct TrieNode {
     here: bool,
-    children: Option<Vec<Trie>>
+    children: Option<[usize; 5]>
+}
+
+struct Trie {
+    nodes: Vec<TrieNode>,
 }
 
 impl Trie {
-    fn new() -> Self {
-        Self { here: false, children: None }
+    fn with_capacity(n: usize) -> Self {
+        let mut nodes = Vec::with_capacity(n);
+        nodes.push(TrieNode { here: false, children: None });
+        Self { nodes }
     }
 
-    fn insert(&mut self, prefix: &[u8]) {
-        if prefix.is_empty() {
-            self.here = true;
-        } else {
-            if self.children.is_none() {
-                self.children = Some(vec![Trie::new(); 26])
-            }
-            if let Some(children) = &mut self.children {
-                children[(prefix[0] - b'a') as usize].insert(&prefix[1..]);
+    fn insert(&mut self, word: &[u8]) {
+        let mut node_index =  0;
+        for &c in word {
+            match self.nodes[node_index].children {
+                None => {
+                    let size = self.nodes.len();
+                    for _ in 0..5 {
+                        self.nodes.push(TrieNode { here: false, children: None });
+                    }
+                    self.nodes[node_index].children = Some(std::array::from_fn(|i| size + i));
+                    node_index = size + TABLE[c as usize];
+                },
+                Some(children) => {
+                    node_index = children[TABLE[c as usize]];
+                }
             }
         }
+        self.nodes[node_index].here = true;
     }
 
     fn count(&self, design: &[u8]) -> u64 {
-        let mut cache = vec![None; design.len()];
-        self.count_aux(self, design, &mut cache, 0, true)
-    }
-
-    fn count_aux(&self, node: &Trie, design: &[u8], cache: &mut [Option<u64>], index: usize, start: bool) -> u64 {
-        if index == design.len() {
-            node.here as u64
-        } else if start {
-            if let Some(v) = cache[index] {
-                v
-            } else if let Some(children) = &self.children {
-                let v = self.count_aux(&children[(design[index] - b'a') as usize], design, cache, index + 1, false);
-                cache[index] = Some(v);
-                v
-            } else {
-                0
+        let mut cache = vec![0; design.len()+1];
+        cache[0] = 1;
+        for i in 0..design.len() {
+            if cache[i] != 0 {
+                let mut node_index = 0;
+                let mut index = i;
+                loop {
+                    if self.nodes[node_index].here {
+                        cache[index] += cache[i];
+                    }
+                    if index >= design.len() {
+                        break;
+                    }
+                    if let Some(children) = &self.nodes[node_index].children {
+                        node_index = children[TABLE[design[index] as usize]];
+                        index += 1;
+                    } else {
+                        break;
+                    }
+                }
             }
-        } else {
-            let v1 =
-                if let Some(children) = &node.children {
-                   self.count_aux(&children[(design[index] - b'a') as usize], design, cache, index + 1, false)
-                } else {
-                    0
-                };
-            let v2 =
-                if node.here {
-                    self.count_aux(self, design, cache, index, true)
-                } else {
-                    0
-                };
-            v1 + v2
         }
+        cache[design.len()]
     }
-
 }
+
+const fn mk_table() -> [usize; 128] {
+    let mut table = [0; 128];
+    table[b'w' as usize] = 1;
+    table[b'u' as usize] = 2;
+    table[b'b' as usize] = 3;
+    table[b'r' as usize] = 4;
+    table
+}
+
+const TABLE: [usize; 128] = mk_table();
