@@ -63,18 +63,18 @@ fn part2(bytes: &[[u8; 2]]) -> Option<String> {
     }
 
     let mut stack = Vec::with_capacity(1000);
-    dfs_aux(&mut grid, &mut stack, START);
+    dfs(&mut grid, &mut stack, START);
 
     bytes.iter().rev().find(|&&[x, y]| {
         let node = (y as usize + 1) * SIZE + x as usize + 1;
         grid[node] = b'.';
         (grid[node-1] == b'$' || grid[node+1] == b'$' || grid[node-SIZE] == b'$' || grid[node+SIZE] == b'$')
-                && dfs_aux(&mut grid, &mut stack, node)
+                && dfs(&mut grid, &mut stack, node)
     }).map(|[x, y]| format!("{x},{y}"))
 }
 
 #[inline]
-fn dfs_aux(grid: &mut [u8], stack: &mut Vec<usize>, start: usize) -> bool {
+fn dfs(grid: &mut [u8], stack: &mut Vec<usize>, start: usize) -> bool {
     stack.push(start);
     grid[start] = b'$';
     while let Some(node) = stack.pop() {

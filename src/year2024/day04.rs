@@ -38,17 +38,12 @@ fn part1(grid: &Grid<u8>) -> u32 {
 
 fn count_line(grid: &[u8], start: usize, times: usize, step: usize) -> u32 {
     let end = grid.len().min(start + step * times);
-    
     let mut word = 0;
     let mut count = 0;
-    let mut i = start;
     
-    while i < end {
-        word = (word << 8) | grid[i] as u32;
-        if word == XMAS || word == SAMX {
-            count += 1;
-        }
-        i += step;
+    for &c in grid[start..end].iter().step_by(step) {
+        word = (word << 8) | c as u32;
+        count += (word == XMAS || word == SAMX) as u32;
     }
 
     count
@@ -70,9 +65,7 @@ fn part2(grid: &Grid<u8>) -> u32 {
             let b = vec[index - width + 1];
             let c = vec[index + width - 1];
             let d = vec[index + width + 1];
-            if a.abs_diff(d) == 6 && b.abs_diff(c) == 6 {
-                count += 1;
-            }
+            count += (a.abs_diff(d) == 6 && b.abs_diff(c) == 6) as u32;
         }
     }
     count

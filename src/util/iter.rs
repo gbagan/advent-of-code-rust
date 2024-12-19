@@ -1,6 +1,5 @@
 use core::hash::Hash;
-use std::collections::HashSet;
-use std::collections::HashMap;
+use ahash::{HashSet, HashMap, HashMapExt, HashSetExt};
 use std::ops::AddAssign;
 
 use num_traits::ConstZero;
