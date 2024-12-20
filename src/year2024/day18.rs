@@ -38,7 +38,6 @@ fn part1(bytes: &[[u8; 2]]) -> Option<u32> {
         if node == END {
             return Some(dist);
         }
-        grid[node] = b'#';
         for next in [node + 1, node - 1, node + 73, node - 73] {
             if grid[next] == b'.' {
                 grid[next] = b'#';

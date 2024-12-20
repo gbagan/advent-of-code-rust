@@ -5,19 +5,23 @@ use crate::util::{grid::Grid, parallel::*, parser::*};
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
     let puzzles: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
+    let mut springs2 = Vec::new(); 
     let p1 = puzzles.iter().map(|(springs, groups)| {
-        let mut springs = springs.to_vec();
-        springs.push(b'.');
-        count_arrangements(&springs, groups)
+        springs2.clear();
+        springs2.extend_from_slice(springs);
+        springs2.push(b'.');
+        count_arrangements(&springs2, groups)
     }).sum();
     
     let p2 = puzzles
         .into_par_iter()
         .map(|puzzle| {
             let (springs, groups) = puzzle;
+            let mut springs2 = Vec::with_capacity(5 * springs.len() + 5);
+            let mut groups2 = Vec::with_capacity(5 * groups.len());
 
-            let mut springs2 = springs.to_vec();
-            let mut groups2 = groups.to_vec();
+            springs2.extend_from_slice(springs);
+            groups2.extend_from_slice(groups);
             for _ in 0..4 {
                 springs2.push(b'?');
                 springs2.extend_from_slice(springs);

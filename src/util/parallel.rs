@@ -116,6 +116,10 @@ impl<'a, T: Send + Sync> SliceIter<'a, T> {
     pub fn chunks(&self, k: usize) -> ChunkIter<'a, T> {
         ChunkIter { slice: self.slice, size: k  }
     }
+
+    pub fn chunks_with_index(&self, k: usize) -> ChunkWithIndexIter<'a, T> {
+        ChunkWithIndexIter { slice: self.slice, size: k  }
+    }
 }
 
 impl<'a, T: Send + Sync> ParallelIterator for SliceIter<'a, T> {
@@ -161,6 +165,30 @@ where
     }
 }
 
+pub struct ChunkWithIndexIter<'a, T: Sync> {
+    slice: &'a [T],
+    size: usize,
+}
+
+impl<'a, T: Send + Sync> ParallelIterator for ChunkWithIndexIter<'a, T>
+where
+{
+    type Item = (usize, &'a [T]);
+    
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        let start = self.size * index;
+        let end = (self.size * (index + 1)).min(self.slice.len());
+        Some((start, &self.slice[start..end]))
+    }
+
+    fn start(&self) -> usize {
+        0
+    }
+
+    fn end(&self) -> usize {
+        self.slice.len().div_ceil(self.size)
+    }
+}
 
 
 // vec

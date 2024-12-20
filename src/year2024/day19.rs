@@ -1,3 +1,5 @@
+// dynamic programming
+
 use anyhow::*;
 
 pub fn solve(input: &str) -> Result<(u32, u64)> {
