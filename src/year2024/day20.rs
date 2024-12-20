@@ -30,24 +30,22 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         }
     }
 
-    let mut p1 = 0;
-
-    for (d, &i) in path.iter().enumerate() {
-        let d = d as i16;
-        for j in [i - width - 1, i - width + 1, i + width - 1, i + width + 1, i - 2, i + 2, i - 2 * width, i + 2 * width] {
-            if distances[j] < d - 100 {
-                p1 += 1;
-            }
-        }
-    }
-
-    let p2 = path
+    let res = path
         .into_par_iter()
         .chunks_with_index(128)
         .map(|(index, chunk)| {
-            let mut acc = 0u32;
+            let mut acc1 = 0u32;
+            let mut acc2 = 0u32;
             for (index2, &pos) in chunk.iter().enumerate() {
+                
                 let dist = (index + index2) as i16;
+        
+                for j in [pos - width - 1, pos - width + 1, pos + width - 1, pos + width + 1, pos - 2, pos + 2, pos - 2 * width, pos + 2 * width] {
+                    if distances[j] < dist - 100 {
+                        acc1 += 1;
+                    }
+                }
+                
                 let px = pos % width;
                 let mut nexty = pos;
                 for i in 0..21 {
@@ -56,7 +54,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
                     for next in min..max+1 {
                         let j = next.abs_diff(nexty) as i16;
                         if distances[next] <= dist - 100 - i as i16 - j {
-                            acc += 1;
+                            acc2 += 1;
                         }
                     }
                     nexty += width;
@@ -71,7 +69,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
                     for next in min..max+1 {
                         let j = next.abs_diff(nexty) as i16;
                         if distances[next] <= dist - 100 - i as i16 - j {
-                            acc += 1;
+                            acc2 += 1;
                         }
                     }
                     nexty -= width;
@@ -80,8 +78,8 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
                     }
                 }
             }
-            acc
+            acc2 << 11 | acc1
         }).sum();
 
-    Ok((p1, p2))
+    Ok((res & 2047, res >> 11))
 }
