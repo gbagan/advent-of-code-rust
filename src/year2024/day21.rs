@@ -1,46 +1,35 @@
 use anyhow::*;
+use itertools::Itertools;
+use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
     let mut p1 = 0;
     let mut p2 = 0;
 
     for line in input.lines() {
-        let row = line.as_bytes();
-        let (x, y) = solve_row(row);
+        let (x, y) = solve_row(line);
         p1 += x;
         p2 += y;
     }
     Ok((p1, p2))
 }
 
-pub fn solve_row(row: &[u8]) -> (u64, u64) {
-    assert!(row.len() == 4);
-    let n = (row[0] - b'0') as u64 * 100
-        + (row[1] - b'0') as u64 * 10
-        + (row[2] - b'0') as u64;
+fn solve_row(row: &str) -> (u64, u64) {
+    let n = row.try_unsigned().unwrap_or(0);
+    let row = row.as_bytes();
     let a = numpad_index(row[0]);
-    let b = numpad_index(row[1]);
-    let c = numpad_index(row[2]);
-    let d = numpad_index(row[3]);
-    let p1 =
-        NUMPAD_TABLE_WEIGHT2[110 + a] 
-        + NUMPAD_TABLE_WEIGHT2[a * 11 + b]
-        + NUMPAD_TABLE_WEIGHT2[b * 11 + c]
-        + NUMPAD_TABLE_WEIGHT2[c * 11 + d];
-    let p2 =
-        NUMPAD_TABLE_WEIGHT25[110 + a] 
-        + NUMPAD_TABLE_WEIGHT25[a * 11 + b]
-        + NUMPAD_TABLE_WEIGHT25[b * 11 + c]
-        + NUMPAD_TABLE_WEIGHT25[c * 11 + d];
-
+    let mut p1 = NUMPAD_PAIR_WEIGHT2[10 * 11 + a];
+    let mut p2 = NUMPAD_PAIR_WEIGHT25[10 * 11 + a];
+    for (i, j) in row.iter().map(|&c| numpad_index(c)).tuple_windows() {
+        p1 += NUMPAD_PAIR_WEIGHT2[i * 11 + j];
+        p2 += NUMPAD_PAIR_WEIGHT25[i * 11 + j];
+    }
     (n * p1, n * p2)
 }
 
 const DIRPAD_TABLE: [[u64; 25]; 25] = compute_dirpad_table();
-const DIRPAD_TABLE_WEIGHT2: [u64; 25] = dirpad_pair_weights(2);
-const DIRPAD_TABLE_WEIGHT25: [u64; 25] = dirpad_pair_weights(25);
-const NUMPAD_TABLE_WEIGHT2: [u64; 121] = numpad_pair_weights(&DIRPAD_TABLE_WEIGHT2);
-const NUMPAD_TABLE_WEIGHT25: [u64; 121] = numpad_pair_weights(  &DIRPAD_TABLE_WEIGHT25);
+const NUMPAD_PAIR_WEIGHT2: [u64; 121] = numpad_pair_weights(2);
+const NUMPAD_PAIR_WEIGHT25: [u64; 121] = numpad_pair_weights(25);
 
 const fn numpad_index(c: u8) -> usize {
     if c == b'A' { 10 } else { (c - b'0') as usize }
@@ -228,14 +217,15 @@ const fn numpad_pair_weight(from: u8, to: u8, dirpad_weights: &[u64]) -> u64 {
     res
 }
 
-const fn numpad_pair_weights(dirpad_weights: &[u64]) -> [u64; 121] {
+const fn numpad_pair_weights(depth: u32) -> [u64; 121] {
+    let weights = dirpad_pair_weights(depth);
     const T: [u8; 11] = [b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'A'];
     let mut res = [0; 121];
     let mut i = 0;
     while i < 11 {
         let mut j = 0;
         while j < 11 {
-            res[i * 11 + j] += numpad_pair_weight(T[i], T[j], dirpad_weights);
+            res[i * 11 + j] += numpad_pair_weight(T[i], T[j], &weights);
             j += 1;
         }
         i += 1;
