@@ -37,7 +37,6 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
             let mut acc1 = 0u32;
             let mut acc2 = 0u32;
             for (index2, &pos) in chunk.iter().enumerate() {
-                
                 let dist = (index + index2) as i16;
         
                 for j in [pos - width - 1, pos - width + 1, pos + width - 1, pos + width + 1, pos - 2, pos + 2, pos - 2 * width, pos + 2 * width] {
