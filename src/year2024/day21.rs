@@ -83,6 +83,45 @@ const fn dirpad_step(from: u8, to: u8) -> (u8, i32, u8, i32) {
     }
 }
 
+const fn sequence_aux(d1: u8, f1: i32, d2: u8, f2: i32) -> [u64; 25] {
+    let mut table = [0; 25];
+    if f1 == 0 && f2 == 0 {
+        table[4 * 5 + 4] = 1;
+    } else if f1 == 0 {
+        table[4 * 5 + d2 as usize] += 1;
+        let mut i = 0;
+        while i < f2 - 1 {
+            table[d2 as usize * 5 + d2 as usize] += 1;
+            i += 1;
+        }
+        table[d2 as usize * 5 + 4] += 1;
+    }  else if f2 == 0 {
+        table[4 * 5 + d1 as usize] += 1;
+        let mut i = 0;
+        while i < f1 - 1 {
+            table[d1 as usize * 5 + d1 as usize] += 1;
+            i += 1;
+        }
+        table[d1 as usize * 5 + 4] += 1;
+    } else {
+        table[4 * 5 + d1 as usize] += 1;
+        let mut i = 0;
+        while i < f1 - 1 {
+            table[d1 as usize * 5 + d1 as usize] += 1;
+            i += 1;
+        }
+        table[d1 as usize * 5 + d2 as usize] += 1;
+        i = 0;
+        while i < f2 - 1 {
+            table[d2 as usize * 5 + d2 as usize] += 1;
+            i += 1;
+        }
+        table[d2 as usize * 5 + 4] += 1;
+    }
+    table
+}
+
+
 const fn compute_dirpad_table() -> [[u64; 25]; 25] {
     let mut table = [[0; 25]; 25];
     let mut from = 0;
@@ -91,39 +130,7 @@ const fn compute_dirpad_table() -> [[u64; 25]; 25] {
         while to < 5 {
             let index = ((from * 5) + to) as usize;
             let (d1, f1, d2, f2) = dirpad_step(from, to);
-            if f1 == 0 && f2 == 0 {
-                table[index][4 * 5 + 4] = 1;
-            } else if f1 == 0 {
-                table[index][4 * 5 + d2 as usize] += 1;
-                let mut i = 0;
-                while i < f2 - 1 {
-                    table[index][d2 as usize * 5 + d2 as usize] += 1;
-                    i += 1;
-                }
-                table[index][d2 as usize * 5 + 4] += 1;
-            }  else if f2 == 0 {
-                table[index][4 * 5 + d1 as usize] += 1;
-                let mut i = 0;
-                while i < f1 - 1 {
-                    table[index][d1 as usize * 5 + d1 as usize] += 1;
-                    i += 1;
-                }
-                table[index][d1 as usize * 5 + 4] += 1;
-            } else {
-                table[index][4 * 5 + d1 as usize] += 1;
-                let mut i = 0;
-                while i < f1 - 1 {
-                    table[index][d1 as usize * 5 + d1 as usize] += 1;
-                    i += 1;
-                }
-                table[index][d1 as usize * 5 + d2 as usize] += 1;
-                i = 0;
-                while i < f2 - 1 {
-                    table[index][d2 as usize * 5 + d2 as usize] += 1;
-                    i += 1;
-                }
-                table[index][d2 as usize * 5 + 4] += 1;
-            }
+            table[index] = sequence_aux(d1, f1, d2, f2);
             to += 1;
 
         }
@@ -173,41 +180,8 @@ const fn dirpad_pair_weights(depth: u32) -> [u64; 25] {
 }
 
 const fn numpad_pair_weight(from: u8, to: u8, dirpad_weights: &[u64]) -> u64 {
-    let mut table = [0; 25];
     let (d1, f1, d2, f2) = numpad_step(from, to);
-    if f1 == 0 && f2 == 0 {
-        table[4 * 5 + 4] = 1;
-    } else if f1 == 0 {
-        table[4 * 5 + d2 as usize] += 1;
-        let mut i = 0;
-        while i < f2 - 1 {
-            table[d2 as usize * 5 + d2 as usize] += 1;
-            i += 1;
-        }
-        table[d2 as usize * 5 + 4] += 1;
-    }  else if f2 == 0 {
-        table[4 * 5 + d1 as usize] += 1;
-        let mut i = 0;
-        while i < f1 - 1 {
-            table[d1 as usize * 5 + d1 as usize] += 1;
-            i += 1;
-        }
-        table[d1 as usize * 5 + 4] += 1;
-    } else {
-        table[4 * 5 + d1 as usize] += 1;
-        let mut i = 0;
-        while i < f1 - 1 {
-            table[d1 as usize * 5 + d1 as usize] += 1;
-            i += 1;
-        }
-        table[d1 as usize * 5 + d2 as usize] += 1;
-        i = 0;
-        while i < f2 - 1 {
-            table[d2 as usize * 5 + d2 as usize] += 1;
-            i += 1;
-        }
-        table[d2 as usize * 5 + 4] += 1;
-    }
+    let table = sequence_aux(d1, f1, d2, f2);
     let mut res = 0;
     let mut i = 0;
     while i < 25 {
