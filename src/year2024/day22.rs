@@ -29,7 +29,7 @@ pub fn solve(input: &str) -> Result<(u64, u16)> {
 
 fn sender(numbers: &[u64], chunks_size: usize, shared: &Shared, tx: &Sender<Vec<u16>>) {
     let mut seen = vec![0u16; 130321];
-    let mut diff = Vec::with_capacity(1000);
+    let mut diff = vec![(0, 0); 2000];
     let mut iter = 1;
 
     loop {
@@ -40,13 +40,12 @@ fn sender(numbers: &[u64], chunks_size: usize, shared: &Shared, tx: &Sender<Vec<
         }
         let mut prices = vec![0; 130321];
         for &n in &numbers[start..(start+chunks_size).min(numbers.len())] {
-            diff.clear();
             let mut m = n;
             let mut x = (m % 10) as u16;
-            for _ in 0..2000 {
+            for i in 0..2000 {
                 m = next_secret(m);
                 let y = (m % 10) as u16;
-                diff.push((9 + y - x, y));
+                diff[i] = (9 + y - x, y);
                 x = y;
             }
             for &[(d1, _), (d2, _), (d3, _), (d4, p)] in diff.array_windows() {
