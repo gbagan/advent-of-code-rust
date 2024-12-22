@@ -9,7 +9,7 @@ pub struct Shared {
     p1: AtomicU64,
 }
 
-pub fn solve(input: &str) -> Result<(u64, u32)> {
+pub fn solve(input: &str) -> Result<(u64, u16)> {
     let numbers: Vec<_> = input.iter_unsigned::<u64>().collect();
 
     let shared = Shared { p1: AtomicU64::new(0), start: AtomicUsize::new(0) };
@@ -27,7 +27,7 @@ pub fn solve(input: &str) -> Result<(u64, u32)> {
     Ok((p1, p2))
 }
 
-fn sender(numbers: &[u64], chunks_size: usize, shared: &Shared, tx: &Sender<Vec<u32>>) {
+fn sender(numbers: &[u64], chunks_size: usize, shared: &Shared, tx: &Sender<Vec<u16>>) {
     let mut seen = vec![0u16; 130321];
     let mut diff = Vec::with_capacity(1000);
     let mut iter = 1;
@@ -42,10 +42,10 @@ fn sender(numbers: &[u64], chunks_size: usize, shared: &Shared, tx: &Sender<Vec<
         for &n in &numbers[start..(start+chunks_size).min(numbers.len())] {
             diff.clear();
             let mut m = n;
-            let mut x = (m % 10) as u32;
+            let mut x = (m % 10) as u16;
             for _ in 0..2000 {
                 m = next_secret(m);
-                let y = (m % 10) as u32;
+                let y = (m % 10) as u16;
                 diff.push((9 + y - x, y));
                 x = y;
             }
@@ -65,7 +65,7 @@ fn sender(numbers: &[u64], chunks_size: usize, shared: &Shared, tx: &Sender<Vec<
 }
 
 
-fn receiver(size: usize, chunks_size: usize, shared: &Shared, rx: &Receiver<Vec<u32>>) -> (u64, u32) {
+fn receiver(size: usize, chunks_size: usize, shared: &Shared, rx: &Receiver<Vec<u16>>) -> (u64, u16) {
     let mut made = 0;
     let mut prices = vec![0; 130321];
     while made < size {
