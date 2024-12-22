@@ -66,14 +66,14 @@ fn sender(numbers: &[u64], chunks_size: usize, shared: &Shared, tx: &Sender<Vec<
 
 
 fn receiver(size: usize, chunks_size: usize, shared: &Shared, rx: &Receiver<Vec<u16>>) -> (u64, u16) {
-    let mut made = 0;
+    let mut done = 0;
     let mut prices = vec![0; 130321];
-    while made < size {
+    while done < size {
         let new_prices = rx.recv().unwrap();
         for (u, v) in prices.iter_mut().zip(new_prices) {
             *u += v;
         }
-        made += chunks_size;
+        done += chunks_size;
     }
     let p1 = shared.p1.load(Ordering::Relaxed);
     let p2 = *prices.iter().max().unwrap();
