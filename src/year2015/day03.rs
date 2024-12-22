@@ -1,5 +1,5 @@
 use anyhow::*;
-use std::collections::HashSet;
+use ahash::HashSet;
 use num_integer::Integer;
 
 pub fn solve(input: &str) -> Result<(usize, usize)> {

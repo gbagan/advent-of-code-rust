@@ -86,7 +86,6 @@ fn part2(grid: &Grid<u8>, start: usize, directions: &[u8]) -> u32 {
     gps(&grid, width as u32, b'[')
 }
 
-
 fn part2_grid(grid: &[u8]) -> Vec<u8> {
     let mut res = Vec::with_capacity(2*grid.len());
     for c in grid {

@@ -2,7 +2,7 @@
 // https://en.wikipedia.org/wiki/Dominator_(graph_theory)
 
 use anyhow::*;
-use std::collections::HashMap;
+use ahash::{HashMap, HashMapExt};
 
 use itertools::Itertools;
 use crate::util::{coord::Coord3, grid::Grid, iter::*, parser::*};
@@ -29,8 +29,10 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
     let mut cube_owners = HashMap::new();
     let mut dominator = vec![(0, 0); bricks.len()+1];
 
+
+    let mut cubes = Vec::new();
     for i in 0..bricks.len() {
-        let cubes = cubes_of(&bricks[i]);
+        cubes_of(&bricks[i], &mut cubes);
         let height = cubes
             .iter()
             .map(|p| heights[(p.x, p.y)])
@@ -61,16 +63,15 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
     Ok((p1, p2))
 }   
 
-fn cubes_of((pmin, pmax): &(Coord3, Coord3)) -> Vec<Coord3> {
-    let mut output = vec!();
+fn cubes_of((pmin, pmax): &(Coord3, Coord3), cubes: &mut Vec<Coord3>) {
+    cubes.clear();
     for x in pmin.x..pmax.x+1 {
         for y in pmin.y..pmax.y+1 {
             for z in pmin.z..pmax.z+1 {
-                output.push(Coord3::new(x, y, z));
+                cubes.push(Coord3::new(x, y, z));
             }
         }
     }
-    output
 }
 
 fn lowest_common_ancestor(ancestor: &[(usize, u32)], nodes: &[usize]) -> (usize, u32) {

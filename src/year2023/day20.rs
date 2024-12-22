@@ -1,6 +1,6 @@
 use anyhow::*;
 use itertools::Itertools;
-use std::collections::HashMap;
+use ahash::HashMap;
 use crate::util::parser::*;
 
 fn parse_line(line: &str) -> Result<(&str, (bool, Vec<&str>))> {

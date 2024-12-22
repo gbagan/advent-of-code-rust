@@ -2,7 +2,8 @@
 
 use anyhow::*;
 use crate::util::{iter::*, parser::*};
-use std::collections::{HashMap, HashSet, VecDeque};
+use ahash::{HashMap, HashSet, HashMapExt, HashSetExt};
+use std::collections::VecDeque;
 
 type Graph = Vec<Vec<usize>>;
 

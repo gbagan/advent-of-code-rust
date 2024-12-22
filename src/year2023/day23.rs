@@ -1,6 +1,6 @@
 use anyhow::*;
 use crate::util::grid::Grid;
-use std::collections::{HashSet, HashMap};
+use ahash::{HashSet, HashSetExt, HashMap, HashMapExt};
 use lazy_static::lazy_static;
 
 struct GridGraph {
@@ -30,8 +30,7 @@ fn neighbors2 (grid: &Grid<u8>, idx: usize) -> Vec<usize> {
     }
 }
 
-fn follow_path(grid: &Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) -> Option<(usize, u32)>
-{
+fn follow_path(grid: &Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) -> Option<(usize, u32)> {
     let mut len = 1;
     loop {
         let nbors = neighbors2(grid, pos);
@@ -61,8 +60,7 @@ fn follow_path(grid: &Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) ->
     }
 }
 
-fn compress_grid(grid: &Grid<u8>) -> Vec<Vec<(usize, u32)>>
-{
+fn compress_grid(grid: &Grid<u8>) -> Vec<Vec<(usize, u32)>> {
     let h = grid.height;
     let w = grid.width;
     let start = w+2;
