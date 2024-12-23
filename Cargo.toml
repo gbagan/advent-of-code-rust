@@ -13,6 +13,7 @@ overflow-checks = false
 ahash = "0.8.11"
 ansi_term = "0.12.1"
 anyhow = "1.0.86"
+arrayvec = "0.7.6"
 itertools = "0.13.0"    
 lazy_static = "1.5.0"
 # md-5 = "0.10.6"

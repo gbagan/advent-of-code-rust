@@ -1,70 +1,74 @@
 use anyhow::*;
+use arrayvec::ArrayVec;
 
-struct Input {
-    graph: Vec<Vec<usize>>,
-    reverse_table: Vec<(u8, u8)>,
-    matrix: Vec<bool>
+struct Graph {
+    adj: Vec<ArrayVec<usize, 13>>,
+    labels: Vec<(u8, u8)>,
+    matrix: Vec<bool>,
 }
 
 pub fn solve(input: &str) -> Result<(u32, String)> {
-    let mut graph: Vec<Vec<usize>> = Vec::new();
+    let n = input.len() / (3 * 13);
+
+    let mut adj = Vec::with_capacity(n);
     let mut table = [usize::MAX; 26*26];
-    let mut reverse_table = Vec::new();
-    
+    let mut labels = Vec::with_capacity(n);
+
     for &[l11, l12, _, l21, l22, _] in input.as_bytes().array_chunks() {
-        let n = graph.len();
+        let n = adj.len();
         let index = l11 as usize * 26 + l12 as usize - 2619;
         let mut i = table[index];
         if i == usize::MAX {
             i = n;
             table[index] = n;
-            graph.push(Vec::with_capacity(13));
-            reverse_table.push((l11, l12));
+            adj.push(ArrayVec::new());
+            labels.push((l11, l12));
         }
 
-        let n = graph.len();
+        let n = adj.len();
         let index = l21 as usize * 26 + l22 as usize - 2619;
         let mut j = table[index];
         if j == usize::MAX {
             j = n;
             table[index] = n;
-            graph.push(Vec::with_capacity(13));
-            reverse_table.push((l21, l22));
+            adj.push(ArrayVec::new());
+            labels.push((l21, l22));
         }
-        graph[i].push(j);
-        graph[j].push(i);
+        adj[i].push(j);
+        adj[j].push(i);
     }
 
-    let n = graph.len();
+    let n = adj.len();
     let mut matrix = vec![false; n*n];
-    for (i, nbor) in graph.iter().enumerate() {
+    for (i, nbor) in adj.iter().enumerate() {
         for j in nbor {
             matrix[n * i + j] = true;
         }
     }
 
-    let input = Input { graph, matrix, reverse_table };
-
-    let p1 = part1(&input);
-    let p2 = part2(&input).context("Part 2: No solution found")?;
+    let graph = Graph { adj, matrix, labels };
+    let p1 = part1(&graph);
+    let p2 = part2(&graph).context("Part 2: No solution found")?;
 
     Ok((p1, p2))
 }
 
-fn part1(input: &Input) -> u32 {
-    let Input {graph, matrix, reverse_table} = input;
-    let n = graph.len();
+fn part1(input: &Graph) -> u32 {
+    let Graph {adj, matrix, labels} = input;
+    let n = adj.len();
+    let mut seen = [false; 676];
     let mut count = 0;
-    for (u, nbor) in graph.iter().enumerate() {
-        if reverse_table[u].0 != b't' {
+    for (u, nbor) in adj.iter().enumerate() {
+        if labels[u].0 != b't' {
             continue;
         }
+        seen[u] = true;
         for (j, &v) in nbor.iter().enumerate() {
-            if v < u && reverse_table[v].0 == b't' {
+            if seen[v] {
                 continue;
             }
             for &w in &nbor[j+1..] {
-                if matrix[v * n + w] && !(w < u && reverse_table[w].0 == b't') {
+                if matrix[v * n + w] && !seen[w] {
                     count += 1;
                 }
             }
@@ -74,33 +78,20 @@ fn part1(input: &Input) -> u32 {
     count
 }
 
-fn part2(input: &Input) -> Option<String> {
-    let Input {graph, matrix: _, reverse_table} = input;
-    let n = graph.len();
-    let mut neighborhood = vec![false; n];
-
+fn part2(input: &Graph) -> Option<String> {
+    let Graph {adj, matrix, labels} = input;
+    let n = adj.len();
     let mut found = None;
-
 
     'outer: for u in 0..n {
         let mut excluded = None;
-        for x in &mut neighborhood {
-            *x = false;
-        }
-        neighborhood[u] = true;
-        for &v in &graph[u] {
-            neighborhood[v] = true;
-        }
-
-        let nbor = &graph[u];
-        for &v in nbor {
+        let neighborhood = &matrix[u*n..];
+        for &v in &adj[u] {
             let mut c = 0;
-            for &w in &graph[v] {
-                if !neighborhood[w] {
-                    c += 1;
-                }
+            for &w in &adj[v] {
+                c += neighborhood[w] as u32;
             }
-            if c > 1 {
+            if c < 11 {
                 match excluded {
                     None => excluded = Some(v),
                     Some(_) => continue 'outer,
@@ -114,16 +105,16 @@ fn part2(input: &Input) -> Option<String> {
         
     };
     if let Some((u, excluded)) = found {
-        let mut labels = Vec::new();
-        labels.push(reverse_table[u]);
-        for &v in &graph[u] {
+        let mut clique_labels = Vec::with_capacity(13);
+        clique_labels.push(labels[u]);
+        for &v in &adj[u] {
             if v != excluded {
-                labels.push(reverse_table[v]);
+                clique_labels.push(labels[v]);
             }
         }
-        labels.sort_unstable();
-        let mut string = String::with_capacity(2*labels.len() + 1);
-        for (i, &(u, v)) in labels.iter().enumerate() {
+        clique_labels.sort_unstable();
+        let mut string = String::with_capacity(27);
+        for (i, &(u, v)) in clique_labels.iter().enumerate() {
             if i > 0 {
                 string.push(',');
             }
