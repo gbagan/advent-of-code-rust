@@ -12,7 +12,7 @@ pub struct Shared {
 pub fn solve(input: &str) -> Result<(u64, u16)> {
     let numbers: Vec<_> = input.iter_unsigned::<u32>().collect();
     let start = AtomicUsize::new(0);
-    let mutex = Mutex::new(Shared {p1: 0, prices: vec![0; 130321]});
+    let mutex = Mutex::new(Shared {p1: 0, prices: vec![0; 130336]});
     let nb_threads = thread::available_parallelism().unwrap().get();
     let chunks_size = numbers.len().div_ceil(nb_threads);
 
