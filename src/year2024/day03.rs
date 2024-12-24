@@ -21,13 +21,13 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
             enabled = false;
         } else if input[i..].starts_with(b"mul(") {
             i += 4;
-            if i >= n || !input[i].is_ascii_digit() {
+            if i >= n || input[i].wrapping_sub(b'0') > 9 {
                 continue;
             }
-            let mut first = (input[i] - b'0') as u32;
+            let mut first = input[i].wrapping_sub(b'0') as u32;
             i += 1;
-            while i < n && input[i].is_ascii_digit() {
-                first = 10 * first + (input[i] - b'0') as u32;
+            while i < n && input[i].wrapping_sub(b'0') <= 9 {
+                first = 10 * first + (input[i].wrapping_sub(b'0') - b'0') as u32;
                 i += 1;
             }
 
@@ -36,13 +36,13 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
             }        
             i += 1;
             
-            if i >= n || !input[i].is_ascii_digit() {
+            if i >= n || input[i].wrapping_sub(b'0') > 9 {
                 continue;
             }
-            let mut second = (input[i] - b'0') as u32;
+            let mut second = input[i].wrapping_sub(b'0') as u32;
             i += 1;
-            while i < n && input[i].is_ascii_digit() {
-                second = 10 * second + (input[i] - b'0') as u32;
+            while i < n && input[i].wrapping_sub(b'0') <= 9 {
+                second = 10 * second + input[i].wrapping_sub(b'0') as u32;
                 i += 1;
             }
             if i >= n || input[i] != b')' {

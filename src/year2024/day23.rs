@@ -1,3 +1,5 @@
+// counting triangles and finding maximum clique
+
 use anyhow::*;
 use arrayvec::ArrayVec;
 
@@ -13,37 +15,30 @@ pub fn solve(input: &str) -> Result<(u32, String)> {
     let mut adj = Vec::with_capacity(n);
     let mut table = [usize::MAX; 26*26];
     let mut labels = Vec::with_capacity(n);
+    let mut matrix = vec![false; n*n];
 
     for &[l11, l12, _, l21, l22, _] in input.as_bytes().array_chunks() {
-        let n = adj.len();
         let index = l11 as usize * 26 + l12 as usize - 2619;
         let mut i = table[index];
         if i == usize::MAX {
-            i = n;
-            table[index] = n;
+            i = adj.len();
+            table[index] = i;
             adj.push(ArrayVec::new());
             labels.push((l11, l12));
         }
 
-        let n = adj.len();
         let index = l21 as usize * 26 + l22 as usize - 2619;
         let mut j = table[index];
         if j == usize::MAX {
-            j = n;
-            table[index] = n;
+            j = adj.len();
+            table[index] = j;
             adj.push(ArrayVec::new());
             labels.push((l21, l22));
         }
         adj[i].push(j);
         adj[j].push(i);
-    }
-
-    let n = adj.len();
-    let mut matrix = vec![false; n*n];
-    for (i, nbor) in adj.iter().enumerate() {
-        for j in nbor {
-            matrix[n * i + j] = true;
-        }
+        matrix[n * i + j] = true;
+        matrix[n * j + i] = true;
     }
 
     let graph = Graph { adj, matrix, labels };
