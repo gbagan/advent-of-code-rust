@@ -60,9 +60,7 @@ fn parse_8digits(mut val: u64) -> u32 {
     const MUL1: u64 = 100 + (1000000 << 32);
     const MUL2: u64 = 1 + (10000 << 32);
 
-    //val -= 0x3030303030303030;
     val = (val * 10) + (val >> 8);
     val = ((val & MASK).wrapping_mul(MUL1) + ((val >> 16) & MASK).wrapping_mul(MUL2)) >> 32;
-
     val as u32
 }

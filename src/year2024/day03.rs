@@ -27,7 +27,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
             let mut first = input[i].wrapping_sub(b'0') as u32;
             i += 1;
             while i < n && input[i].wrapping_sub(b'0') <= 9 {
-                first = 10 * first + (input[i].wrapping_sub(b'0') - b'0') as u32;
+                first = 10 * first + input[i].wrapping_sub(b'0') as u32;
                 i += 1;
             }
 

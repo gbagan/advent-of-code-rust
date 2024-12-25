@@ -49,8 +49,8 @@ fn part1(input: &[u8]) -> u64 {
 }
 
 struct Block {
-    start: u16,
-    size: u16,
+    start: u32,
+    size: u32,
 }
 
 fn part2(input: &[u8]) -> u64 {
@@ -60,7 +60,7 @@ fn part2(input: &[u8]) -> u64 {
     let mut start = 0;
 
     for n in input {
-        let size = (n - b'0') as u16;
+        let size = (n - b'0') as u32;
         blocks.push(Block { start, size });
         start += size;
     }
