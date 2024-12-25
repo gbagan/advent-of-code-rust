@@ -35,4 +35,4 @@ On a laptop with a Intel Core i7-11850H processor.
 | [23](https://adventofcode.com/2024/day/23) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2024/day23.rs) | 49 μs |
 | [24](https://adventofcode.com/2024/day/24) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2024/day24.rs) | 9 μs |
 | [25](https://adventofcode.com/2024/day/25) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2024/day25.rs) | 9 μs |
- | Total |     | 4558 μs |
+ | Total |     | 4.5 ms |
