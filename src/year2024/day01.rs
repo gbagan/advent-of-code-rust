@@ -21,16 +21,15 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         .map(|(x, y)| x.abs_diff(*y))
         .sum();
  
-    let n = list2.len();
     let mut p2 = 0;
     let mut i = 0;
 
     for x in list1 {
-        while i < n && list2[i] < x {
+        while i < list2.len() && list2[i] < x {
             i += 1;
         }
         let mut counter = 0;
-        while i < n && list2[i] == x {
+        while i < list2.len() && list2[i] == x {
             counter += 1;
             i += 1;
         }
@@ -42,12 +41,12 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
 
 #[inline]
 fn parse_5first(n: u64) -> u32 {
-    parse_8digits((n << 24) | 0x303030)
+    parse_8digits((n << 24) - 0x3030303030000000)
 }
 
 #[inline]
 fn parse_5last(n: u64) -> u32 {
-    parse_8digits((n & 0xFFFFFFFFFF000000) | 0x303030)
+    parse_8digits(n - 0x3030303030202020)
 }
 
 #[inline]
@@ -61,7 +60,7 @@ fn parse_8digits(mut val: u64) -> u32 {
     const MUL1: u64 = 100 + (1000000 << 32);
     const MUL2: u64 = 1 + (10000 << 32);
 
-    val -= 0x3030303030303030;
+    //val -= 0x3030303030303030;
     val = (val * 10) + (val >> 8);
     val = ((val & MASK).wrapping_mul(MUL1) + ((val >> 16) & MASK).wrapping_mul(MUL2)) >> 32;
 
