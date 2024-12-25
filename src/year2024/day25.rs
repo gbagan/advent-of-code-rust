@@ -10,18 +10,18 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     loop {
         if grid[0] == b'#' {
             let mut encoding = 0u32;
-            for i in 0..5 {
-                let j = (0..6).find(|&j|
-                    grid[6 + i + 6 * j] == b'.'
+            for i in 6..11 {
+                let j = grid[i..].iter().step_by(6).position(|&c|
+                    c == b'.'
                 ).unwrap();
                 encoding = encoding << 4 | j as u32;
             }
             top.push(encoding);
         } else {
             let mut encoding = 0u32;
-            for i in 0..5 {
-                let j = (0..6).find(|&j|
-                    grid[6 + i + 6 * j] == b'#'
+            for i in 6..11 {
+                let j = grid[i..].iter().step_by(6).position(|&c|
+                    c == b'#'
                 ).unwrap();
                 encoding = encoding << 4 | (7 - j as u32);
             }
