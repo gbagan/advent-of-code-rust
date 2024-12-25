@@ -3,8 +3,8 @@ use anyhow::*;
 const MASK: u32 = 0b1000_1000_1000_1000_1000;
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let mut bot = vec!();
-    let mut top = vec!();
+    let mut bot = Vec::with_capacity(256);
+    let mut top = Vec::with_capacity(256);
     let mut grid = input.as_bytes();
 
     loop {
@@ -14,7 +14,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
                 let j = (0..6).find(|&j|
                     grid[6 + i + 6 * j] == b'.'
                 ).unwrap();
-                encoding |= (j << (4 * i)) as u32;
+                encoding = encoding << 4 | j as u32;
             }
             top.push(encoding);
         } else {
@@ -23,7 +23,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
                 let j = (0..6).find(|&j|
                     grid[6 + i + 6 * j] == b'#'
                 ).unwrap();
-                encoding |= ((7 - j) << (4 * i)) as u32;
+                encoding = encoding << 4 | (7 - j as u32);
             }
             bot.push(encoding);
         }
