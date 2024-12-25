@@ -13,7 +13,7 @@ const CONWAY_INDEXES: [usize; 144] = [
     37, 28, 88, 37, 29, 37, 30, 33, 35, 34, 36
 ];
 
-const CONWAY_STRINGS: [&'static str; 92] = [
+const CONWAY_STRINGS: [&str; 92] = [
     "1112",
     "1112133",
     "111213322112",

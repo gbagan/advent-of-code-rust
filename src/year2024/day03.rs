@@ -33,7 +33,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
 
             if i >= n || input[i] != b',' {
                 continue;
-            }        
+            }
             i += 1;
             
             if i >= n || input[i].wrapping_sub(b'0') > 9 {

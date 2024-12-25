@@ -35,7 +35,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     }
 
     let mut p1 = 0;
-
+ 
     for x in top {
         for &y in &bot {
             p1 += ((x + y) & MASK == 0) as u32;

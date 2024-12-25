@@ -140,7 +140,7 @@ fn markdown(arg_year: String) {
                 std::result::Result::Ok((_, _, mut elapsed)) => {
                     let microseconds = elapsed.as_micros();
                     let mut elapsed_vec = Vec::new();
-                    let iterations = if microseconds < 5000 {100} else {20};
+                    let iterations = if microseconds < 5000 {1000} else {20};
                     for _ in 0..iterations {
                         let data = data.clone();
                         elapsed_vec.push(func(&data).unwrap().2);

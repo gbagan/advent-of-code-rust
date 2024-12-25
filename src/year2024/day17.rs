@@ -33,7 +33,7 @@ fn run(program: &[u64], mut a: u64, mut b: u64, mut c: u64) -> Vec<u8> {
             3 => if a != 0 {ip = literal as usize; continue},
             4 => b ^= c,
             5 => { 
-                if output.len() > 0 {
+                if !output.is_empty() {
                     output.push(b',');
                 }
                 output.push((combo as u8 & 7) + b'0');
