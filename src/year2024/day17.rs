@@ -7,16 +7,14 @@ pub fn solve(input: &str) -> Result<(String, u64)> {
     let program: Vec<_> = it.collect();
     
     let p1 = run(&program, a, b, c);
-    let p1: Vec<u8> = p1.iter().map(|&i| b'0' + i as u8).intersperse(b',').collect();
     let p1 = String::from_utf8(p1).unwrap();
-
     let p2 = quine(&program, 0, program.len()).context("Part 2: No solution found")?;
 
     Ok((p1, p2))
 }
 
-fn run(program: &[u64], mut a: u64, mut b: u64, mut c: u64) -> Vec<u64> {
-    let mut output = Vec::new();
+fn run(program: &[u64], mut a: u64, mut b: u64, mut c: u64) -> Vec<u8> {
+    let mut output = Vec::with_capacity(20);
 
     let mut ip = 0;
     
@@ -34,7 +32,12 @@ fn run(program: &[u64], mut a: u64, mut b: u64, mut c: u64) -> Vec<u64> {
             2 => b = combo & 7,
             3 => if a != 0 {ip = literal as usize; continue},
             4 => b ^= c,
-            5 => output.push(combo & 7), 
+            5 => { 
+                if output.len() > 0 {
+                    output.push(b',');
+                }
+                output.push((combo as u8 & 7) + b'0');
+            }
             6 => b = a >> combo,
             _ => c = a >> combo,
         }

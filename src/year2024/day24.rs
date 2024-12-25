@@ -7,7 +7,6 @@ enum Op {
     And, Or, Xor
 }
 
-#[derive(Clone, Copy)]
 enum Wire {
     Input(bool),
     Wire(usize, Op, usize),
@@ -30,12 +29,12 @@ fn parse_wires(input: &str) -> Result<Vec<LWire>> {
     let mut wires = Vec::with_capacity(350);
     let limit = memmem::find(input.as_bytes(),  b"\n\n").context("No delimiter found")?;
     let section1 = input[..limit+1].as_bytes();
-    let section2 = &input[limit+2..];
+    let section2 = input[limit+2..].as_bytes();
     for &[l1, l2, l3, _, _, b, _] in section1.array_chunks() {
         table.insert((l1, l2, l3), wires.len());
         wires.push(LWire {label: (l1, l2, l3), wire: Wire::Input(b == b'1')});
     }
-    let mut line = section2.as_bytes();
+    let mut line = section2;
     
     while !line.is_empty() {
         assert!(line.len() >= 18);
@@ -160,11 +159,11 @@ fn part2(wires: &[LWire]) -> String {
     p2
 }
 
-fn output_wire(mut left: usize, mut right: usize, op: Op, output: &HashMap<(usize, Op, usize), usize>) -> Option<usize> {
-    if left > right {
-        (left, right) = (right, left);
+fn output_wire(mut index1: usize, mut index2: usize, op: Op, output: &HashMap<(usize, Op, usize), usize>) -> Option<usize> {
+    if index1 > index2 {
+        (index1, index2) = (index2, index1);
     }
-    output.get(&(left, op, right)).copied()
+    output.get(&(index1, op, index2)).copied()
 }
 
 fn full_adder(

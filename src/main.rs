@@ -36,6 +36,7 @@ fn main() {
     match command.as_deref() {
         Some("solve") => solve(arg_year, arg_day, true),
         Some("time") => solve(arg_year, arg_day, false),
+        Some("markdown") => markdown(arg_year.unwrap()),
         Some("download") => download(&arg_year, &arg_day),
         _ => println!("Invalid command."),
     }
@@ -115,6 +116,60 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
     println!("Solved: {solved}");
     println!("Duration: {} μs", duration.as_micros());
 }
+
+fn markdown(arg_year: String) {
+    let solutions = solutions();
+
+    let mut duration = Duration::ZERO;
+
+    println!("| Day   | Source | Benchmark |");
+    println!("|:--------|:--------:|:------:|");
+
+    for Solution { year, day, func } in &solutions {
+        if arg_year.as_str() != year {
+            continue
+        }
+        
+        let path = Path::new("inputs").join(year).join(day);
+        if let Result::Ok(data) = read_to_string(&path) {
+            match func(&data) {
+                Err(err) => {
+                    eprintln!("{err:?}");
+                    eprintln!("{year} Day {day:02}");
+                },
+                std::result::Result::Ok((_, _, mut elapsed)) => {
+                    let microseconds = elapsed.as_micros();
+                    let mut elapsed_vec = Vec::new();
+                    let iterations = if microseconds < 5000 {100} else {20};
+                    for _ in 0..iterations {
+                        let data = data.clone();
+                        elapsed_vec.push(func(&data).unwrap().2);
+                    }
+                    elapsed = *elapsed_vec.select_nth_unstable(iterations/2-1).1;
+
+                    duration += elapsed;
+                    let microseconds = elapsed.as_micros();
+                    let nanoseconds = elapsed.as_nanos();
+
+                    let text = if microseconds <= 5 {
+                        format!("{nanoseconds} ns")
+                    } else {
+                        format!("{microseconds} μs")
+                    };
+                    let tmp = day.as_bytes();
+                    let day2 = if tmp[0] == b'0' { (tmp[1] as char).to_string() } else { day.clone() };
+
+                    println!("| [{day2}](https://adventofcode.com/{year}/day/{day2}) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year{year}/day{day}.rs) | {text} |");
+                }
+            }
+        } else {
+            eprintln!("{year} Day {day:02}");
+            eprintln!("    Missing input!");
+        }
+    }
+    println!(" | Total |     | {} μs |", duration.as_micros());
+}
+
 
 fn download(arg_year: &Option<String>, arg_day: &Option<String>) {
     let years_and_days = match (arg_year, arg_day) {
@@ -312,5 +367,6 @@ fn solutions() -> Vec<Solution> {
         solution!(year2024, day22),
         solution!(year2024, day23),
         solution!(year2024, day24),
+        solution!(year2024, day25),
     ]
 }
