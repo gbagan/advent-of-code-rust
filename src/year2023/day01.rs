@@ -22,17 +22,11 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     Ok((p1, p2))
 }
 
-fn matches_pattern1(c: u8) -> Option<u32> {
-    if c.is_ascii_digit() {
-        Some((c - b'0') as u32)
-    } else {
-        None
-    }
-}
-
 fn solve_one(line: &str) -> Option<u32> {
-    let n: u32 = line.bytes().find_map(matches_pattern1)?;
-    let m: u32 = line.bytes().rev().find_map(matches_pattern1)?;
+    let c1 = line.bytes().find(|c| c.is_ascii_digit())?;
+    let c2 = line.bytes().rfind(|c| c.is_ascii_digit())?;
+    let n = (c1 - b'0') as u32;
+    let m = (c2 - b'0') as u32;
     Some(n*10+m)
 }
 

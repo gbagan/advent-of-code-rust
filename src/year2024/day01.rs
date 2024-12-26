@@ -7,8 +7,8 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut list2 = Vec::with_capacity(1000);
     
     for line in input.as_bytes().array_chunks::<14>() {
-        let x = parse_5first(read_u64(&line[..8]));
-        let y = parse_5last(read_u64(&line[5..13]));
+        let x = parse_5first(to_u64(&line[..8]));
+        let y = parse_5last(to_u64(&line[5..13]));
 
         list1.push(x);
         list2.push(y);
@@ -40,17 +40,17 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
 }
 
 #[inline]
-fn parse_5first(n: u64) -> u32 {
-    parse_8digits((n << 24) - 0x3030303030000000)
+fn parse_5first(val: u64) -> u32 {
+    parse_8digits((val << 24) - 0x3030303030000000)
 }
 
 #[inline]
-fn parse_5last(n: u64) -> u32 {
-    parse_8digits(n - 0x3030303030202020)
+fn parse_5last(val: u64) -> u32 {
+    parse_8digits(val - 0x3030303030202020)
 }
 
 #[inline]
-fn read_u64(s: &[u8]) -> u64 {
+fn to_u64(s: &[u8]) -> u64 {
     u64::from_le_bytes(s.try_into().unwrap())
 }
 

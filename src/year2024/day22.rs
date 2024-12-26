@@ -52,7 +52,7 @@ fn worker(numbers: &[u32], chunks_size: usize, start: &AtomicUsize, mutex: &Mute
             secret = next_secret(secret);
             let price = (secret % 10) as u16;
             (diff1, diff2, diff3, diff4) = (diff2, diff3, diff4, 9 + price - prev_price);
-            let index = diff1 as usize * 19 * 19 * 19 + diff2 as usize * 19 * 19 + diff3 as usize * 19 + diff4 as usize;
+            let index = diff1 as usize * 6859 + diff2 as usize * 361 + diff3 as usize * 19 + diff4 as usize;
             if seen[index] != iter {
                 prices[index] += price;
                 seen[index] = iter;

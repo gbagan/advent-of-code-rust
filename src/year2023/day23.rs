@@ -1,15 +1,16 @@
 use anyhow::*;
+use arrayvec::ArrayVec;
 use crate::util::grid::Grid;
 use ahash::{HashSet, HashSetExt, HashMap, HashMapExt};
 use lazy_static::lazy_static;
 
 struct GridGraph {
-    extremities: u32,
-    horizontal: [[u32; 5]; 6],
-    vertical: [[u32; 6]; 6],
+    extremities: i32,
+    horizontal: [[i32; 5]; 6],
+    vertical: [[i32; 6]; 6],
 }
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> Result<(i32, i32)> {
     let grid = Grid::parse_with_padding(input, b'#')?;
     let graph = compress_grid(&grid);
     let grid = graph_to_grid(&graph);
@@ -18,9 +19,9 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     Ok((p1, p2))
 }
 
-fn neighbors2 (grid: &Grid<u8>, idx: usize) -> Vec<usize> {
+fn neighbors2 (grid: &Grid<u8>, idx: usize) -> ArrayVec<usize, 4> {
     if grid[idx] == b'#' {
-        vec!()
+        ArrayVec::new()
     } else {
         [idx-1, idx+1, idx-grid.width, idx+grid.width]
         .iter()
@@ -30,7 +31,7 @@ fn neighbors2 (grid: &Grid<u8>, idx: usize) -> Vec<usize> {
     }
 }
 
-fn follow_path(grid: &Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) -> Option<(usize, u32)> {
+fn follow_path(grid: &Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) -> Option<(usize, i32)> {
     let mut len = 1;
     loop {
         let nbors = neighbors2(grid, pos);
@@ -60,7 +61,7 @@ fn follow_path(grid: &Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) ->
     }
 }
 
-fn compress_grid(grid: &Grid<u8>) -> Vec<Vec<(usize, u32)>> {
+fn compress_grid(grid: &Grid<u8>) -> Vec<Vec<(usize, i32)>> {
     let h = grid.height;
     let w = grid.width;
     let start = w+2;
@@ -88,7 +89,7 @@ fn compress_grid(grid: &Grid<u8>) -> Vec<Vec<(usize, u32)>> {
     }).collect()
 }
 
-fn graph_to_grid(graph: &[Vec<(usize, u32)>]) -> GridGraph {
+fn graph_to_grid(graph: &[Vec<(usize, i32)>]) -> GridGraph {
     let start = 0;
     let next_to_start = graph[start][0].0;
     let goal = graph.len()-1;
@@ -155,7 +156,7 @@ fn graph_to_grid(graph: &[Vec<(usize, u32)>]) -> GridGraph {
 
 }
 
-fn part1(grid: &GridGraph) -> u32 {
+fn part1(grid: &GridGraph) -> i32 {
     let mut dist = [[0; 6]; 6];
     for x in 0..6 {
         for y in 0..6 {
@@ -258,7 +259,7 @@ const STATES: [[u8; 6]; N] = [
 lazy_static! {
     static ref STATE_INDEX: HashMap<[u8; 6], usize> = {
         let perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
-        let mut m = HashMap::new();
+        let mut m = HashMap::with_capacity(6*STATES.len());
         for (i, state) in STATES.iter().enumerate() {
             for perm in perms {
                 let state2 = state.map(|v| if v == 0 {0} else {perm[v as usize -1]+1});
@@ -269,47 +270,76 @@ lazy_static! {
     };
 }
 
-fn part2(grid: &GridGraph) -> Option<u32> {
-    let h_edges = vec!(
-        vec!((0, 1)),
-        vec!((0, 2)),
-        vec!((0, 3)),
-        vec!((0, 4)),
-        vec!((0, 5)),
-        vec!((1, 2)),
-        vec!((1, 3)),
-        vec!((1, 4)),
-        vec!((1, 5)),
-        vec!((2, 3)),
-        vec!((2, 4)),
-        vec!((2, 5)),
-        vec!((3, 4)),
-        vec!((3, 5)),
-        vec!((4, 5)),
+fn part2(grid: &GridGraph) -> Option<i32> {
+    let mut h_edges: [ArrayVec<(usize, usize), 2>; 30] = std::array::from_fn(|_| ArrayVec::new());
+        
+    h_edges[0].push((0, 1));
+    h_edges[1].push((0, 2));
+    h_edges[2].push((0, 3));
+    h_edges[3].push((0, 4));
+    h_edges[4].push((0, 5));
+    h_edges[5].push((1, 2));
+    h_edges[6].push((1, 3));
+    h_edges[7].push((1, 4));
+    h_edges[8].push((1, 5));
+    h_edges[9].push((2, 3));
+    h_edges[10].push((2, 4));
+    h_edges[11].push((2, 5));
+    h_edges[12].push((3, 4));
+    h_edges[13].push((3, 5));
+    h_edges[14].push((4, 5));
 
-        vec!((0, 1), (2, 3)),
-        vec!((0, 1), (2, 4)),
-        vec!((0, 1), (2, 5)),
-        vec!((0, 1), (3, 4)),
-        vec!((0, 1), (3, 5)),
-        vec!((0, 1), (4, 5)),
-        vec!((0, 2), (3, 4)),
-        vec!((0, 2), (3, 5)),
-        vec!((0, 2), (4, 5)),
-        vec!((1, 2), (3, 4)),
-        vec!((1, 2), (3, 5)),
-        vec!((1, 2), (4, 5)),
-        vec!((0, 3), (4, 5)),
-        vec!((1, 3), (4, 5)),
-        vec!((2, 3), (4, 5)),
-    );
+    h_edges[15].push((0, 1));
+    h_edges[15].push((2, 3));
+    
+    h_edges[16].push((0, 1));
+    h_edges[16].push((2, 4));
+    
+    h_edges[17].push((0, 1));
+    h_edges[17].push((2, 5));
+    
+    h_edges[18].push((0, 1));
+    h_edges[18].push((3, 4));
+    
+    h_edges[19].push((0, 1));
+    h_edges[19].push((3, 5));
+    
+    h_edges[20].push((0, 1));
+    h_edges[20].push((4, 5));
+    
+    h_edges[21].push((0, 2));
+    h_edges[21].push((3, 4));
+    
+    h_edges[22].push((0, 2));
+    h_edges[22].push((3, 5));
+    
+    h_edges[23].push((0, 2));
+    h_edges[23].push((4, 5));
+    
+    h_edges[24].push((1, 2));
+    h_edges[24].push((3, 4));
+    
+    h_edges[25].push((1, 2));
+    h_edges[25].push((3, 5));
+    
+    h_edges[26].push((1, 2));
+    h_edges[26].push((4, 5));
 
-    let mut current = [None; N];
-    current[5] = Some(0);
-    let mut next = [None; N];
+    h_edges[27].push((0, 3));
+    h_edges[27].push((4, 5));
+
+    h_edges[28].push((1, 3));
+    h_edges[28].push((4, 5));
+
+    h_edges[29].push((2, 3));
+    h_edges[29].push((4, 5));
+
+    let mut current = [i32::MIN; N];
+    current[5] = 0;
+    let mut next = [i32::MIN; N];
     for i in 0..6 {
         for (state, weight) in STATES.iter().zip(current) {
-            if let Some(weight) = weight {
+            if weight != i32::MIN {
                 for edges in &h_edges {
                     if let Some(new_state) = next_state(state, edges) {
                         let mut weight = weight;
@@ -324,17 +354,17 @@ fn part2(grid: &GridGraph) -> Option<u32> {
                             }
                         }
                         let idx = STATE_INDEX[&new_state];
-                        if next[idx] < Some(weight) {
-                            next[idx] = Some(weight);
+                        if next[idx] < weight {
+                            next[idx] = weight;
                         }
                     }
                 }
             }
         }
-        std::mem::swap(&mut current, &mut next);
-        next = [None; N];
+        current = next;
+        next = [i32::MIN; N];
     }
-    let v = current[0]?;
+    let v = current[0];
     Some(grid.extremities + v) 
 
 }
@@ -358,7 +388,7 @@ fn next_state(state: &[u8; 6], h_edges: &[(usize, usize)]) -> Option<[u8; 6]> {
         } else {
             let min = next[start].min(next[end]);
             let max = next[start].max(next[end]);
-            for c in next.iter_mut() {
+            for c in &mut next {
                 if *c == max {
                     *c = min
                 }
