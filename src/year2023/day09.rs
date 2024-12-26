@@ -1,3 +1,5 @@
+// Pascal Triangle
+
 use anyhow::*;
 use crate::util::parser::*;
 

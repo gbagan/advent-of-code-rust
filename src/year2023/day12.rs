@@ -5,7 +5,7 @@ use crate::util::{grid::Grid, parallel::*, parser::*};
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
     let puzzles: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
-    let mut springs2 = Vec::new(); 
+    let mut springs2 = Vec::new();
     let p1 = puzzles.iter().map(|(springs, groups)| {
         springs2.clear();
         springs2.extend_from_slice(springs);
@@ -15,21 +15,27 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
     
     let p2 = puzzles
         .into_par_iter()
-        .map(|puzzle| {
-            let (springs, groups) = puzzle;
-            let mut springs2 = Vec::with_capacity(5 * springs.len() + 5);
-            let mut groups2 = Vec::with_capacity(5 * groups.len());
-
-            springs2.extend_from_slice(springs);
-            groups2.extend_from_slice(groups);
-            for _ in 0..4 {
-                springs2.push(b'?');
+        .chunks(16)
+        .map(|puzzles| {
+            //let (springs, groups) = puzzle;
+            let mut springs2 = Vec::new();
+            let mut groups2 = Vec::new();
+            let mut sum = 0;
+            for (springs, groups) in puzzles {
+                springs2.clear();
+                groups2.clear();
                 springs2.extend_from_slice(springs);
                 groups2.extend_from_slice(groups);
-            }
-            springs2.push(b'.');
+                for _ in 0..4 {
+                    springs2.push(b'?');
+                    springs2.extend_from_slice(springs);
+                    groups2.extend_from_slice(groups);
+                }
+                springs2.push(b'.');
 
-            count_arrangements(&springs2, &groups2)
+                sum += count_arrangements(&springs2, &groups2)
+            }
+            sum
         })
         .sum();
     Ok((p1, p2))
