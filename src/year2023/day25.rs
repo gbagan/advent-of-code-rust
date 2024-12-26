@@ -1,61 +1,50 @@
 // Ford-Fulkerson algorithm
 
 use anyhow::*;
-use crate::util::{iter::*, parser::*};
-use ahash::{HashMap, HashSet, HashMapExt, HashSetExt};
+use arrayvec::ArrayVec;
 use std::collections::VecDeque;
 
-type Graph = Vec<Vec<usize>>;
-
-fn parse_line(line: &str) -> Result<(&str, Vec<&str>)> {
-    let (node, neighbors) = line.try_split_once(": ")?;
-    let neighbors = neighbors.split(' ').collect();
-    Ok((node, neighbors))
-}
+type Graph = Vec<ArrayVec<usize, 10>>;
 
 pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let nodes: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
-    let mut graph: Vec<Vec<_>> = Vec::with_capacity(nodes.len());
-    let mut i = 0;
-    let mut dict = HashMap::new();
-    for (node, nbors) in &nodes {
-        if !dict.contains_key(node) {
-            dict.insert(node, i);
-            i += 1;
+    let mut table = vec![usize::MAX; 26*26*26];
+    let mut graph: Graph = Vec::with_capacity(1500);
+    
+    for line in input.lines() {
+        let line = line.as_bytes();
+        let index1 = line[0] as usize * 676 + line[1] as usize * 26 + line[2] as usize - 68191;
+        let mut i = table[index1];
+        if i == usize::MAX {
+            i = graph.len();
+            table[index1] = i;
+            graph.push(ArrayVec::new());
         }
-        for nbor in nbors {
-            if !dict.contains_key(nbor) {
-                dict.insert(nbor, i);
-                i += 1;
+        for &[_, l1, l2, l3] in line[4..].array_chunks() {
+            let index2 = l1 as usize * 676 + l2 as usize * 26 + l3 as usize - 68191;
+            let mut j = table[index2];
+            if j == usize::MAX {
+                j = graph.len();
+                table[index2] = j;
+                graph.push(ArrayVec::new());
             }
-        }
-
-    }
-    for _ in 0..i {
-        graph.push(vec!());
-    }
-    for (node, nbors) in &nodes {
-        let i = dict[node];
-        for nbor in nbors {
-            let j = dict[nbor];
             graph[i].push(j);
             graph[j].push(i);
         }
+
     }
 
-    let p1 = part1(&graph);
+    let p1 = part1(&mut graph);
     Ok((p1, 0))
 }
 
-fn part1(graph: &Graph) -> usize {
+fn part1(graph: &mut Graph) -> usize {
     let n = graph.len();
-    let mut saturated = HashSet::new();
-    let mut visited: Vec<_> = graph.iter().map(|_| 0).collect();
-    let mut parent: Vec<_> = graph.iter().map(|_| 0).collect();
+    let mut visited: Vec<_> = vec![0; n];
+    let mut parent: Vec<_> = vec![0; n];
     let source = 0;
     let mut sink = 0;
     let mut i = 1;
-    // choose the sink as the farest vertex from the source
+    // choose the sink as the furthest vertex from the source
     let mut queue = VecDeque::new();
     queue.push_back(source);
     while let Some(node) = queue.pop_front() {
@@ -88,20 +77,20 @@ fn part1(graph: &Graph) -> usize {
             visited[node] = i;
             parent[node] = par;
             for &nbor in &graph[node] {
-                if !saturated.contains(&(node, nbor)) {
-                    queue.push_back((nbor, node));
-                }
+                queue.push_back((nbor, node));
             }
         }
 
         if sink_reached {
             let mut current = sink;
             while parent[current] != current {
-                saturated.insert ((parent[current], current));
+                let par = parent[current];
+                let i = graph[par].iter().position(|&r| r == current).unwrap();
+                graph[par].remove(i);
                 current = parent[current];
             }
         } else {
-            let m = visited.iter().count_if(|&&node| node == i);
+            let m = visited.iter().filter(|&&node| node == i).count();
             return m * (n - m);
         }
     }
