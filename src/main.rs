@@ -56,14 +56,12 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
         
         let path = Path::new("inputs").join(year).join(day);
         if let Result::Ok(data) = read_to_string(&path) {
-            //let instant = Instant::now();
             match func(&data) {
                 Err(err) => {
                     eprintln!("{err:?}");
                     eprintln!("{year} Day {day:02}");
                 },
                 std::result::Result::Ok((p1, p2, mut elapsed)) => {
-                    //let mut elapsed = instant.elapsed();
                     let microseconds = elapsed.as_micros();
                     let mut iterations = 0;
 
@@ -72,7 +70,6 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
                         iterations = if microseconds < 5000 {100} else {20};
                         for _ in 0..iterations {
                             let data = data.clone();
-                            //let instant = Instant::now();
                             elapsed_vec.push(func(&data).unwrap().2);
                         }
                         elapsed = *elapsed_vec.select_nth_unstable(iterations/2-1).1;
@@ -316,6 +313,7 @@ fn solutions() -> Vec<Solution> {
         solution!(year2022, day13),
         solution!(year2022, day14),
         solution!(year2022, day15),
+        solution!(year2022, day16),
 
         solution!(year2023, day01),
         solution!(year2023, day02),

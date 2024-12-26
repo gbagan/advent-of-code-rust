@@ -38,6 +38,6 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
 fn can_climb(c1: u8, c2: u8) -> bool {
     match (c1, c2) {
         (b'a', b'S') => true,
-        _ => c1 != b'E' &&  c1  <= c2 + 1
+        _ => c1 != b'E' && c1 <= c2 + 1
     }
 }

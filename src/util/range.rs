@@ -76,7 +76,7 @@ impl<A: Integer + Copy + Ord + ConstOne> Range<A> {
             output.push(previous);
         }
         output
-}
+    }
 }
 
 

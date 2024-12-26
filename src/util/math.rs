@@ -2,7 +2,7 @@ use std::ops::{AddAssign, DivAssign, MulAssign};
 use num_integer::Integer;
 use num_traits::{Num, Signed};
 
-pub fn solve_linear_system<A>(mat: &[Vec<A>]) -> Option<Vec<A>>
+pub fn solve_linear_system<A, const N: usize>(mat: &[[A; N]]) -> Option<Vec<A>>
 where A: Ord + Num + Signed + Copy + AddAssign + DivAssign
 {
     let mut mat = mat.to_vec();

@@ -1,5 +1,5 @@
 use anyhow::*;
-use std::collections::HashSet;
+use ahash::{HashSet, HashSetExt};
 use itertools::Itertools;
 use crate::util::{coord::Coord, parser::*, range::Range};
 

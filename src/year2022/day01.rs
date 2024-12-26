@@ -2,12 +2,23 @@ use anyhow::*;
 use crate::util::parser::*;
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let mut calories: Vec<u32> = input
+    let calories: Vec<u32> = input
         .split("\n\n")
         .map(|text|text.iter_unsigned::<u32>().sum())
         .collect();
-    calories.sort_unstable();
-    let p1 = calories[calories.len()-1];
-    let p2 = calories.iter().rev().take(3).sum();
-    Ok((p1, p2))   
+    let mut top1 = 0;
+    let mut top2 = 0;
+    let mut top3 = 0;
+
+    for val in calories {
+        if val > top1 {
+            (top1, top2, top3) = (val, top1, top2)
+        } else if val > top2 {
+            (top2, top3) = (val, top3)
+        } else if val > top3 {
+            top3 = val
+        }
+    }
+
+    Ok((top1, top1 + top2 + top3))   
 }

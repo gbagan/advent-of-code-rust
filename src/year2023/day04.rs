@@ -37,15 +37,12 @@ pub fn part1(scores: &[u32]) -> u32 {
 pub fn part2(scores: &[u32]) -> u32 {
     let mut vec: Vec<_> = scores.iter().map(|&s| (s, 1)).collect();
     let mut total = 0;
-    let mut i = 0;
-    while i < vec.len() {
+    for i in 0..vec.len() {
         let (score, freq) = vec[i];
         total += freq;
         for pair in vec.iter_mut().skip(i+1).take(score as usize) {
-            let (score2, freq2) = *pair;
-            *pair = (score2, freq2+freq);
+            pair.1 += freq;
         }
-        i+=1;
     }
     total
 }

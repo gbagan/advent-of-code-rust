@@ -14,7 +14,7 @@ struct Hailstone {
 
 pub fn solve(input: &str) -> Result<(u32, i64)> {
     let hailstones: Vec<_> = input
-        .iter_unsigned()
+        .iter_signed()
         .tuples()
         .map(|(px, py, pz, vx, vy, vz)| Hailstone {px, py, pz, vx, vy, vz})
         .collect();
@@ -23,34 +23,14 @@ pub fn solve(input: &str) -> Result<(u32, i64)> {
     Ok((p1, p2))
 }
 
-fn crosses_inside_test_area(start: i64, end: i64, h1: &Hailstone, h2: &Hailstone) -> bool {
-    let d = h1.vy * h2.vx - h1.vx * h2.vy;
-    if d == 0 {
-        return false;
-    }
-
-    let t1 = (h2.vx * (h2.py - h1.py) - h2.vy * (h2.px - h1.px)) as f64 / d as f64;
-    let t2 = (h1.vx * (h2.py - h1.py) - h1.vy * (h2.px - h1.px)) as f64 / d as f64;
-    
-    if t1 < 0.0 || t2 < 0.0 {
-        return false;
-    }
-    let x = h1.px as f64 + t1 * h1.vx as f64;
-    let y = h1.py as f64 + t1 * h1.vy as f64;
-
-    let start = start as f64;
-    let end = end as f64;
-
-    x >= start && y >= start && x <= end && y <= end
-}
+const START: i64 = 200_000_000_000_000;
+const END: i64 = 400_000_000_000_000;
 
 fn part1(hailstones: &[Hailstone]) -> u32 {
-    let start = 200_000_000_000_000;
-    let end = 400_000_000_000_000;
     let mut counter = 0;
     for (i, h1) in hailstones.iter().enumerate() {
         for h2 in &hailstones[i+1..] {
-            if crosses_inside_test_area(start, end, h1, h2) {
+            if crosses_inside_test_area(START, END, h1, h2) {
                 counter += 1;
             }
         }
@@ -58,25 +38,38 @@ fn part1(hailstones: &[Hailstone]) -> u32 {
     counter
 }
 
-fn build_equations(h: &Hailstone) -> Vec<Vec<i64>> {
-    let Hailstone {px, py, pz, vx, vy, vz} = h;
-    vec!(vec!(*vy, -vx, 0, -py, *px, 0, px * vy - py * vx),
-         vec!(*vz, 0, -vx, -pz, 0, *px, px * vz - pz * vx),
-         vec!(0, *vz, -vy, 0, -pz, *py, py * vz - pz * vy)
-        )
+#[inline]
+fn crosses_inside_test_area(start: i64, end: i64, h1: &Hailstone, h2: &Hailstone) -> bool {
+    let d = h1.vy * h2.vx - h1.vx * h2.vy;
+    if d == 0 {
+        return false;
+    }
+
+    let t1 = (h2.vx * (h2.py - h1.py) - h2.vy * (h2.px - h1.px)) / d;
+    let t2 = (h1.vx * (h2.py - h1.py) - h1.vy * (h2.px - h1.px)) / d;
+    
+    if t1 < 0 || t2 < 0 {
+        return false;
+    }
+    let x = h1.px + t1 * h1.vx;
+    let y = h1.py + t1 * h1.vy;
+
+    x >= start && y >= start && x <= end && y <= end
 }
 
-fn diff_equations(e1: &[Vec<i64>], e2: &[Vec<i64>]) -> Vec<Vec<OrderedFloat<f64>>> {
-    let n = e1.len();
-    let mut res = vec!();
-    for i in 0..n {
-        res.push(e1[i]
-            .iter()
-            .zip(&e2[i])
-            .map(|(x, y)| OrderedFloat((x - y) as f64))
-            .collect());
-    }
-    res
+fn build_equations(h: &Hailstone) -> [[i64; 7]; 3] {
+    let &Hailstone {px, py, pz, vx, vy, vz} = h;
+    [ [vy, -vx, 0, -py, px, 0, px * vy - py * vx],
+      [vz, 0, -vx, -pz, 0, px, px * vz - pz * vx],
+      [0, vz, -vy, 0, -pz, py, py * vz - pz * vy]
+    ]
+}
+
+fn diff_equations<const N: usize>(e1: &[[i64; N]], e2: &[[i64; N]]) -> Vec<[OrderedFloat<f64>; N]> {
+    e1.iter()
+        .zip(e2.iter())
+        .map(|(row1, row2)| std::array::from_fn(|i| OrderedFloat((row1[i] - row2[i]) as f64)))
+        .collect()
 }
 
 fn part2(hs: &[Hailstone]) -> Option<i64> {
@@ -88,9 +81,6 @@ fn part2(hs: &[Hailstone]) -> Option<i64> {
     let sol = solve_linear_system(&eqs)?;
     Some((sol[0].into_inner() + sol[1].into_inner() + sol[2].into_inner()).round() as i64)
 }
-
-
-
 
 #[test]
 fn cross_test() {

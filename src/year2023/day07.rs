@@ -1,12 +1,49 @@
 use anyhow::*;
 use crate::util::parser::*;
 
-type Hand<'a> = ([u8; 5], usize);
+type Hand<'a> = ([u8; 5], u32);
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let hands: Vec<_> = input.lines().map(parse_hand).collect();
-    let p1 = solve_with(&hands, hand_score1);
-    let p2 = solve_with(&hands, hand_score2);
+pub fn solve(input: &str) -> Result<(u32, u32)> {
+    let mut scores1 = Vec::with_capacity(1000);
+    let mut scores2 = Vec::with_capacity(1000);
+    
+    for hand in input.lines().map(parse_hand) {
+        let mut card_counts = [0; 14];
+        let mut score1a = 0;
+        let mut score2a = 0;
+        let mut distinct_cards = 0;
+        let mut max_count = 0;
+
+        for card in hand.0 {
+            let mut value = card_score(card);
+            let count= &mut card_counts[value as usize]; 
+            *count += 1;
+            if *count == 1 {
+                distinct_cards += 1;
+            }
+            score1a = score1a << 4 | value;
+
+            if card == b'J' {
+                value = 0;
+            } else if *count > max_count {
+                max_count = *count;
+            }
+
+            score2a = score2a << 4 | value;
+        }
+        let j_count = card_counts[10];
+        let score1b = 5 * max_count.max(j_count) - distinct_cards;
+        let score2b = 5 * (max_count + j_count) - distinct_cards + (j_count > 0 && j_count < 5) as u32;
+
+        scores1.push((score1b << 24 | score1a, hand.1));
+        scores2.push((score2b << 24 | score2a, hand.1));
+    }
+
+    scores1.sort_unstable();
+    scores2.sort_unstable();
+
+    let p1 = scores1.iter().enumerate().map(|(i, c)| (i as u32 + 1) * c.1).sum();
+    let p2 = scores2.iter().enumerate().map(|(i, c)| (i as u32 + 1) * c.1).sum();
     Ok((p1, p2))
 }
 
@@ -16,83 +53,14 @@ fn parse_hand(line: &str) -> Hand {
     (cards, bid)
 }
 
-fn solve_with(hands: &[Hand], hand_score: fn([u8; 5], &mut Vec<u64>) -> u64) -> usize {
-    let mut freqs = Vec::new();
-    let mut hands: Vec<_> = hands.iter().map(|(hand, bid)| (hand_score(*hand, &mut freqs), bid)).collect();
-    hands.sort_unstable();
-    hands.iter().enumerate().map(|(i, c)| (i+1) * c.1).sum()
-}
-
-fn card_score(c: u8) -> u64 {
+#[inline]
+fn card_score(c: u8) -> u32 {
     match c {
         b'T' => 9,
         b'J' => 10,
         b'Q' => 11,
         b'K' => 12,
         b'A' => 13,
-        _ => (c - b'1') as u64,
+        _ => (c - b'1') as u32,
     }
 }
-
-fn card_freq(mut cards: [u8; 5], freqs: &mut Vec<u64>) {
-    cards.sort_unstable();
-    freqs.clear();
-    let mut counter = 0;
-    let mut previous = cards[0];
-    for c in cards {
-        if c == previous {
-            counter += 1;
-        } else {
-            if previous != b'1' {
-                freqs.push(counter);
-            }
-            counter = 1;
-            previous = c;
-        }
-    }
-    if previous != b'1' {
-        freqs.push(counter);
-    }
-    freqs.sort_unstable();
-    freqs.reverse()
-}
-
-fn encode_score(cards: [u8; 5], freq: &[u64]) -> u64 {
-    let mut score = freq[0] << 4;
-    if freq.len() >= 2 {
-        score |= freq[1];
-    }
-    for c in cards {
-        score = (score << 4) | card_score(c);
-    }
-    score
-}
-
-fn hand_score1(cards: [u8; 5], freqs: &mut Vec<u64>) -> u64 {
-    card_freq(cards, freqs);
-    encode_score(cards, freqs)
-}
-
-fn hand_score2(cards: [u8; 5], freqs: &mut Vec<u64>) -> u64 {
-    let mut cards = cards;
-    let nb_jokers = cards.iter().filter(|&&c| c == b'J').count();
-    for card in &mut cards {
-        if *card == b'J' {
-            *card = b'1';
-        }
-    }
-    card_freq(cards, freqs);
-    if freqs.is_empty() {
-        freqs.push(nb_jokers as u64);
-    } else {
-        freqs[0] += nb_jokers as u64;
-    }
-    encode_score(cards, &freqs)
-}
-
-/* 
-#[test]
-fn power_test() {
-    assert_eq!(card_freq([b'K', b'A', b'A', b'K', b'A']), vec!(3, 2));
-}
-*/

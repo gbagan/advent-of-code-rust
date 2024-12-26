@@ -20,11 +20,10 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
                     valid = valid && n <= 13;
                     g = g.max(n);
                 }
-                "blue" => {
+                _ => {
                     valid = valid && n <= 14;
                     b = b.max(n);
                 }
-                _ => bail!("Invalid color: {color}")
             }
         }
 
