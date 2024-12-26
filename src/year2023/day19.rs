@@ -1,5 +1,5 @@
 use anyhow::*;
-use std::collections::HashMap;
+use ahash::HashMap;
 use itertools::Itertools;
 use crate::util::parser::*;
 
@@ -15,7 +15,7 @@ struct Step<'a> {
 pub fn solve(input: &str) -> Result<(u32, u64)> {
     let (input1, input2) = input.try_split_once("\n\n")?;
     let workflows = input1.try_parse_lines_and_collect(parse_workflow)?;
-    let ratings = input2.iter_unsigned().tuples().map(|(x, y, z, t)| [x, y, z, t]).collect_vec();
+    let ratings = input2.iter_unsigned::<u16>().array_chunks::<4>().collect_vec();
     let p1 = part1(&workflows, &ratings);
     let p2 = part2(&workflows);
     Ok((p1, p2))

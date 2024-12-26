@@ -70,7 +70,7 @@ fn is_symbol(c: u8) -> bool {
 
 fn bytes_to_int(bytes: &[u8]) -> u32 {
     let mut n = 0;
-    for c in bytes {
+    for &c in bytes {
         n = n * 10 + (c - b'0') as u32;
     }
     n
