@@ -1,25 +1,36 @@
 // dynamic programming
 
 use anyhow::*;
-use crate::util::{grid::Grid, parallel::*, parser::*};
+use crate::util::{parallel::*, parser::*};
 
 pub fn solve(input: &str) -> Result<(u64, u64)> {
     let puzzles: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
     let mut springs2 = Vec::new();
+    let mut table = Vec::new();
+    let mut next_operational = Vec::new();
+
     let p1 = puzzles.iter().map(|(springs, groups)| {
         springs2.clear();
         springs2.extend_from_slice(springs);
         springs2.push(b'.');
-        count_arrangements(&springs2, groups)
+        count_arrangements(&springs2, groups, &mut table, &mut next_operational)
     }).sum();
     
     let p2 = puzzles
         .into_par_iter()
         .chunks(16)
         .map(|puzzles| {
-            //let (springs, groups) = puzzle;
-            let mut springs2 = Vec::new();
-            let mut groups2 = Vec::new();
+            let max_spring_len = puzzles.iter().map(|p| p.0.len()*5+5).max().unwrap();
+            let max_group_len = puzzles.iter().map(|p| p.1.len()*5).max().unwrap();
+            let max_table_size = puzzles.iter().map(|p|
+                    ((p.0.len()*5+6)*(p.1.len()*5+1)))
+                .max().unwrap();
+
+            let mut springs2 = Vec::with_capacity(max_spring_len);
+            let mut groups2 = Vec::with_capacity(max_group_len);
+            let mut table = Vec::with_capacity(max_table_size);
+            let mut next_operational = Vec::with_capacity(max_spring_len);
+
             let mut sum = 0;
             for (springs, groups) in puzzles {
                 springs2.clear();
@@ -33,7 +44,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
                 }
                 springs2.push(b'.');
 
-                sum += count_arrangements(&springs2, &groups2)
+                sum += count_arrangements(&springs2, &groups2, &mut table, &mut next_operational)
             }
             sum
         })
@@ -48,10 +59,12 @@ fn parse_line(line: &str) -> Result<(&[u8], Vec<u8>)> {
     Ok((springs, groups))
 }
 
-fn count_arrangements(springs: &[u8], groups: &[u8]) -> u64 {
+fn count_arrangements(springs: &[u8], groups: &[u8], table: &mut Vec<u64>, next_operational: &mut Vec<usize>) -> u64 {
     let n = springs.len();
 
-    let mut next_operational = vec![0; n];
+    next_operational.clear();
+    next_operational.resize(n, 0);
+
     for i in (0..n).rev() {
         if springs[i] == b'.' {
             next_operational[i] = i;
@@ -60,21 +73,25 @@ fn count_arrangements(springs: &[u8], groups: &[u8]) -> u64 {
         }
     }
 
-    let mut table: Grid<u64> = Grid::new(springs.len()+1, groups.len()+1, 0);
-    table[(springs.len(), groups.len())] = 1;
+    let width = groups.len()+1;
+    let height = n+1;
+
+    table.clear();
+    table.resize(width * height, 0);    
+    table[springs.len() * width + groups.len()] = 1;
     for i in (0..springs.len()).rev() {
         for j in (0..groups.len()+1).rev() {
             let next_op = next_operational[i];
             if springs[i] != b'#' {
-                table[(i, j)] = table[(i+1, j)]
+                table[i *width + j] = table[(i+1) * width + j]
             };
             if j < groups.len() {
                 let i2 = i + groups[j] as usize;
                 if next_op >= i2 && springs[i2] != b'#' {
-                    table[(i, j)] += table[(i2+1, j+1)];
+                    table[i * width + j] += table[(i2+1) * width +  j+1];
                 }
             }
         }
     }
-    table[(0, 0)]
+    table[0]
 }
