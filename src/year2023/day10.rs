@@ -1,39 +1,83 @@
 // Shoelace formula and Pick theorem for Part 2
 
 use anyhow::*;
-use crate::util::{coord::Coord, grid::Grid};
+use memchr::memchr;
 
-type Point = Coord::<i32>;
+enum Dir {
+    North, South, West, East
+}
+
 
 pub fn solve(input: &str) -> Result<(i32,i32)> {
-    let grid = Grid::parse(input)?;
-    let mut start = None;
-    for y in 0..grid.height {
-        for x in 0..grid.width {
-            if grid[(x, y)] == b'S' {
-                start = Some(Point::new(x as i32, y as i32))
-            }
-        }
-    }
-    let start = start.context("Start tile not found")?;
-    let mut current = start.adjacent().iter().copied().find(|&p| grid[p] != b'.')
-                        .context("No empty tile adjacent to the start tile")?;
-    let mut length = 1;
-    let mut dir = current - start;
-    let mut prev = start;
-    let mut area = current.y * prev.x - current.x * prev.y;
-    while current != start {
-        dir = match grid[current] {
-            b'L' => if dir == Point::SOUTH {Point::EAST} else {Point::NORTH} 
-            b'J' => if dir == Point::SOUTH {Point::WEST} else {Point::NORTH}
-            b'7' => if dir == Point::NORTH {Point::WEST} else {Point::SOUTH}
-            b'F' => if dir == Point::NORTH {Point::EAST} else {Point::SOUTH}
-            _ => dir
+    let grid = input.as_bytes();
+    let width = memchr(b'\n', grid).unwrap() + 1;
+    let start = memchr(b'S', grid).unwrap();
+    let mut current = start;
+    let mut dir =
+        if matches!(grid[start - 1], b'-' | b'L' | b'F' ) {
+            Dir::West 
+        } else if matches!(grid[start + 1], b'-' | b'J' | b'7') {
+            Dir::East
+        } else {
+            Dir::North
         };
-        length += 1;
-        prev = current;
-        current += dir;
-        area += current.y * prev.x - current.x * prev.y;
+
+    let mut length = 0;
+    let mut area = 0i32;
+    let mut x = 0;
+    let mut y = 0;
+
+    loop {
+        let mut steps = 1;
+        match dir {
+            Dir::West => {
+                current -= 1;
+                while grid[current] == b'-' {
+                    steps += 1;
+                    current -= 1;
+                }
+                length += steps;
+                x -= steps;
+                area += steps * y;
+                dir = if grid[current] == b'L' { Dir::North } else { Dir::South }
+            },
+            Dir::East => {
+                current += 1;
+                while grid[current] == b'-' {
+                    steps += 1;
+                    current += 1;
+                }
+                length += steps;
+                x += steps;
+                area -= steps * y;
+                dir = if grid[current] == b'J' { Dir::North } else { Dir::South }
+            },
+            Dir::North => {
+                current -= width;
+                while grid[current] == b'|' {
+                    steps += 1;
+                    current -= width;
+                }
+                length += steps;
+                y -= steps;
+                area -= steps * x;
+                dir = if grid[current] == b'7' { Dir::West } else { Dir::East }
+            },
+            Dir::South => {
+                current += width;
+                while grid[current] == b'|' {
+                    steps += 1;
+                    current += width;
+                }
+                length += steps;
+                y += steps;
+                area += steps * x;
+                dir = if grid[current] == b'J' { Dir::West } else { Dir::East }
+            },
+        }
+        if current == start {
+            break;
+        }
     }
     let p1 = length / 2;
     let p2 = (area.abs() - length) / 2 + 1;
