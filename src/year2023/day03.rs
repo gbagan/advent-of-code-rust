@@ -5,7 +5,7 @@ use itertools::Itertools;
 use std::str;
 
 pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let grid = Grid::parse(input)?;
+    let grid = Grid::parse_with_padding(input, b'.')?;
     let mut number_grid: Grid<Option<u32>> = grid.map(|_| None);
     let mut i = 0;
     let mut first_digit = None;
@@ -42,17 +42,20 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         }
     }
 
+    let mut adj_numbers = Vec::new();
     // part 2
     for y in 0..(grid.width as i32) {
         for x in 0..(grid.height as i32) {
             if grid[(x, y)] == b'*' {
                 let p = Coord::new(x, y);
-                let adj_numbers: Vec<_> =
+                adj_numbers.clear();
+                adj_numbers.extend(
                     p.surrounding()
                      .iter()
-                     .filter_map(|&p| if grid.contains(p) {number_grid[p]} else {None})
-                     .unique()
-                     .collect();
+                     .filter_map(|&p| number_grid[p])
+                );
+                adj_numbers.sort_unstable();
+                adj_numbers.dedup();
                 if adj_numbers.len() == 2 {
                     p2 += adj_numbers[0] * adj_numbers[1];
                 }
