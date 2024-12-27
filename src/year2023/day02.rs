@@ -1,6 +1,6 @@
 use anyhow::*;
 
-pub fn solve(input: &str) -> Result<(usize, u32)> {
+pub fn solve(input: &str) -> Result<(u32, u32)> {
     let input = input.as_bytes();
 
     let mut p1 = 0;
@@ -8,15 +8,13 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
     let mut i = 0;
     let mut id = 1;
 
-    //for (id, line) in input.lines().enumerate() {
     while i < input.len() - 1 {
         let mut r = 0;
         let mut g = 0;
         let mut b = 0;
 
         i += 5 + (if id < 10 {1} else if id < 100 {2} else {3});
-        
-        //println!("newline");
+
         while input[i] != b'\n' {
             i += 2;
             let mut n = 0;
@@ -27,7 +25,6 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             }
 
             i += 1;
-            //println!("{n} {}", input[i] as char);
 
             match input[i] {
                 b'r' => {
