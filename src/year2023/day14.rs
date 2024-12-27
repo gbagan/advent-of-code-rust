@@ -1,6 +1,6 @@
 use anyhow::*;
 use crate::util::grid::Grid;
-use crate::util::many_times_on;
+use ahash::{HashMap, HashMapExt};
 
 // north_cubes[next_north_cubre[p]] is the position of the next cube rock at the north of the position p
 struct Input {
@@ -17,7 +17,7 @@ struct Input {
     next_cube_east: Vec::<i16>,
 }
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> Result<(usize, i32)> {
     let grid = Grid::parse_with_padding(input, b'#')?;
     let mut rounded = vec!();
     let mut north_cubes = vec!();
@@ -82,36 +82,53 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
 
 }
 
-fn tilt(rounded: &mut [i16], cubes: &[i16], next_cube: &[i16], direction: i16) -> Vec<i16> {
-    let mut state = cubes.to_vec();
+fn part1(input: &Input) -> usize {
+    let mut rounded = input.rounded.clone();
+    let mut state = Vec::with_capacity(input.north_cubes.len());
+    tilt(&mut rounded, &mut state, &input.north_cubes, &input.next_cube_north, input.width as i16);
+    rounded.iter().map(|&i| input.height - 1 - (i as usize / input.width)).sum()
+}
+
+fn part2(input: &Input) -> i32 {
+    let width = input.width as i32;
+    let height = input.height as i32;
+    let mut seen = HashMap::with_capacity(100);
+    let rounded = &mut input.rounded.clone();
+    let (i, j) = loop {
+        let state = step(rounded, &input);
+        if let Some(prev) = seen.insert(state, seen.len()) {
+            break (prev, seen.len());
+        }
+    };
+
+    let k = i + (1_000_000_000 - 1 - j) % (j - i);
+    let (state, _) = seen.iter().find(|pair| *pair.1 == k).unwrap();
+
+    input.east_cubes.iter().zip(state.iter()).map(|(&cube, &n)| {
+        let y = height - 1 - (cube as i32) / width;
+        (cube - n) as i32 * y
+    }).sum()
+}
+
+
+
+fn tilt(rounded: &mut [i16], state: &mut Vec<i16>, cubes: &[i16], next_cube: &[i16], direction: i16) {
+    state.clear();
+    state.extend_from_slice(&cubes);
 
     for rock in rounded {
         let index = next_cube[*rock as usize] as usize;
         state[index] += direction;
         *rock = state[index];
     }
+}
 
+#[inline]
+fn step(rounded: &mut [i16], input: &Input) -> Vec<i16> {
+    let mut state = Vec::with_capacity(input.north_cubes.len());
+    tilt(rounded, &mut state, &input.north_cubes, &input.next_cube_north, input.width as i16);
+    tilt(rounded, &mut state, &input.west_cubes, &input.next_cube_west, 1);
+    tilt(rounded, &mut state, &input.south_cubes, &input.next_cube_south, -(input.width as i16));
+    tilt(rounded, &mut state, &input.east_cubes, &input.next_cube_east, -1);
     state
-}
-
-
-fn part1(input: &Input) -> usize {
-    let mut rounded = input.rounded.clone();
-    tilt(&mut rounded, &input.north_cubes, &input.next_cube_north, input.width as i16);
-    rounded.iter().map(|&i| input.height - 1 - (i as usize / input.width)).sum()
-}
-
-fn step(rounded: &[i16], input: &Input) -> (Vec<i16>, Vec<i16>) {
-    let mut rounded = rounded.to_vec();
-    tilt(&mut rounded, &input.north_cubes, &input.next_cube_north, input.width as i16);
-    tilt(&mut rounded, &input.west_cubes, &input.next_cube_west, 1);
-    tilt(&mut rounded, &input.south_cubes, &input.next_cube_south, -(input.width as i16));
-    let state = tilt(&mut rounded, &input.east_cubes, &input.next_cube_east, -1);
-    (rounded, state)
-}
-
-fn part2(input: &Input) -> usize {
-    let (rounded, _) =  many_times_on(1_000_000_000, (input.rounded.clone(), vec!()), |p| p.1.clone(),
-                                |p| step(&p.0, input));
-    rounded.iter().map(|&i| input.height - 1 - (i as usize / input.width)).sum()
 }
