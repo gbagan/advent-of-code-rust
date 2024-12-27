@@ -1,14 +1,12 @@
 // Shoelace formula and Pick theorem for Part 2
 
-use anyhow::*;
 use memchr::memchr;
 
 enum Dir {
     North, South, West, East
 }
 
-
-pub fn solve(input: &str) -> Result<(i32,i32)> {
+pub fn solve(input: &str) -> (i32,i32) {
     let grid = input.as_bytes();
     let width = memchr(b'\n', grid).unwrap() + 1;
     let start = memchr(b'S', grid).unwrap();
@@ -81,5 +79,5 @@ pub fn solve(input: &str) -> Result<(i32,i32)> {
     }
     let p1 = length / 2;
     let p2 = (area.abs() - length) / 2 + 1;
-    Ok((p1, p2))
+    (p1, p2)
 }

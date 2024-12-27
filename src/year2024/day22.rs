@@ -1,4 +1,3 @@
-use anyhow::*;
 use crate::util::parser::*;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Mutex;
@@ -9,7 +8,7 @@ pub struct Shared {
     prices: Vec<u16>,
 }
 
-pub fn solve(input: &str) -> Result<(u64, u16)> {
+pub fn solve(input: &str) -> (u64, u16) {
     let numbers: Vec<_> = input.iter_unsigned::<u32>().collect();
     let start = AtomicUsize::new(0);
     let mutex = Mutex::new(Shared {p1: 0, prices: vec![0; 130336]});
@@ -23,7 +22,7 @@ pub fn solve(input: &str) -> Result<(u64, u16)> {
     });
     let shared = mutex.lock().unwrap();
     let p2 = *shared.prices.iter().max().unwrap();
-    Ok((shared.p1, p2))
+    (shared.p1, p2)
 }
 
 fn worker(numbers: &[u32], chunks_size: usize, start: &AtomicUsize, mutex: &Mutex<Shared>) {

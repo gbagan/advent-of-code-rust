@@ -1,5 +1,18 @@
-use anyhow::*;
 use crate::util::parser::*;
+
+pub fn solve(input: &str) -> (u32, u32) {
+    let mut p1 = 0;
+    let mut p2 = 0;
+    for line in input.lines() {
+        let row = line.iter_unsigned::<u8>();
+        match is_safe(row) {
+            Safety::Safe => { p1 += 1; p2 += 1 },
+            Safety::QuasiSafe => p2 += 1,
+            Safety::Unsafe => {},
+        }
+    }
+    (p1, p2)
+}
 
 #[derive(PartialEq, Eq)]
 enum Safety {
@@ -14,7 +27,7 @@ fn is_safe_pair(a: u8, b: u8) -> bool {
 fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
     let [first, second, third] =
         match it.next_chunk() {
-            std::result::Result::Ok(x) => x,
+            Ok(x) => x,
             _ => return Safety::Safe
         };
 
@@ -100,18 +113,4 @@ fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
     } else {
         Safety::Unsafe
     }
-}
-
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let mut p1 = 0;
-    let mut p2 = 0;
-    for line in input.lines() {
-        let row = line.iter_unsigned::<u8>();
-        match is_safe(row) {
-            Safety::Safe => { p1 += 1; p2 += 1 },
-            Safety::QuasiSafe => p2 += 1,
-            Safety::Unsafe => {},
-        }
-    }
-    Ok((p1, p2))
 }

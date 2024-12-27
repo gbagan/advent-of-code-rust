@@ -1,36 +1,33 @@
-use anyhow::*;
-use crate::util::grid::Grid;
+use memchr::memchr;
 
 const XMAS: u32 = 0x584d4153;
 const SAMX: u32 = 0x53414d58;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let grid = Grid::parse(input)?;
-    let p1 = part1(&grid);
-    let p2 = part2(&grid);
-    Ok((p1, p2))
+pub fn solve(input: &str) -> (u32, u32) {
+    let grid = input.as_bytes();
+    let size = memchr(b'\n', grid).unwrap();
+    let p1 = part1(&grid, size);
+    let p2 = part2(&grid, size);
+    (p1, p2)
 }
 
-fn part1(grid: &Grid<u8>) -> u32 {
-    let height = grid.height;
-    let width = grid.width;
+fn part1(grid: &[u8], size: usize) -> u32 {
+    let width = size + 1;
     let mut count = 0;
 
-    assert!(height == width);
-
-    for i in 0..width {
-        count += count_line(&grid.vec, i, width, width);
-        count += count_line(&grid.vec, i * width, width, 1);
+    for i in 0..size {
+        count += count_line(&grid, i, size, width);
+        count += count_line(&grid, i * width, size, 1);
     }
 
     for i in 0..width-3 {
-        count += count_line(&grid.vec, i,width - i, width + 1);
-        count += count_line(&grid.vec, width - i - 1, width - i, width - 1);
+        count += count_line(&grid, i,size - i, width + 1);
+        count += count_line(&grid, size - i - 1, size - i, width - 1);
     }
 
     for i in 1..width-3 {
-        count += count_line(&grid.vec, i * width, width - i, width + 1);
-        count += count_line(&grid.vec, i * width + width - 1, width - i, width - 1);
+        count += count_line(&grid, i * width, size - i, width + 1);
+        count += count_line(&grid, i * width + size - 1, size - i, width - 1);
     }
 
     count
@@ -50,21 +47,19 @@ fn count_line(grid: &[u8], start: usize, times: usize, step: usize) -> u32 {
 }
 
 
-fn part2(grid: &Grid<u8>) -> u32 {
-    let vec = &grid.vec;
-    let height = grid.height;
-    let width = grid.width;
+fn part2(grid: &[u8], size: usize) -> u32 {
+    let width = size + 1;
     let mut count = 0;
-    for i in 1..height - 1 {
-        for j in 1..width - 1 {
+    for i in 1..size - 1 {
+        for j in 1..size - 1 {
             let index = i * width + j;
-            if vec[index] != b'A' {
+            if grid[index] != b'A' {
                 continue
             }
-            let a = vec[index - width - 1];
-            let b = vec[index - width + 1];
-            let c = vec[index + width - 1];
-            let d = vec[index + width + 1];
+            let a = grid[index - width - 1];
+            let b = grid[index - width + 1];
+            let c = grid[index + width - 1];
+            let d = grid[index + width + 1];
             count += (a.abs_diff(d) == 6 && b.abs_diff(c) == 6) as u32;
         }
     }

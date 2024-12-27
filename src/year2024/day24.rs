@@ -1,4 +1,3 @@
-use anyhow::*;
 use memchr::memmem;
 use ahash::{HashMap, HashMapExt};
 
@@ -17,17 +16,17 @@ struct LWire {
     wire: Wire,
 }
 
-pub fn solve(input: &str) -> Result<(u64, String)> {
-    let wires = parse_wires(input)?;
+pub fn solve(input: &str) -> (u64, String) {
+    let wires = parse_wires(input);
     let p1 = part1(&wires);
     let p2 = part2(&wires);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
-fn parse_wires(input: &str) -> Result<Vec<LWire>> {
+fn parse_wires(input: &str) -> Vec<LWire> {
     let mut table = HashMap::with_capacity(350);
     let mut wires = Vec::with_capacity(350);
-    let limit = memmem::find(input.as_bytes(),  b"\n\n").context("No delimiter found")?;
+    let limit = memmem::find(input.as_bytes(),  b"\n\n").unwrap();
     let section1 = input[..limit+1].as_bytes();
     let section2 = input[limit+2..].as_bytes();
     for &[l1, l2, l3, _, _, b, _] in section1.array_chunks() {
@@ -84,10 +83,8 @@ fn parse_wires(input: &str) -> Result<Vec<LWire>> {
             line = &line[19..];
         }
     }
-    Ok(wires)
+    wires
 }
-
-
 
 fn part1(wires: &[LWire]) -> u64 {
     let mut cache = vec![None; wires.len()];

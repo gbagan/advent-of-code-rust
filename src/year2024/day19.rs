@@ -1,9 +1,7 @@
 // dynamic programming
 
-use anyhow::*;
-
-pub fn solve(input: &str) -> Result<(u32, u64)> {
-    let split = memchr::memmem::find(input.as_bytes(), b"\n\n").context("Parsing error: No separator found")?;
+pub fn solve(input: &str) -> (u32, u64) {
+    let split = memchr::memmem::find(input.as_bytes(), b"\n\n").unwrap();
     let patterns = &input[..split];
     let designs = &input[split+2..];
     
@@ -22,7 +20,7 @@ pub fn solve(input: &str) -> Result<(u32, u64)> {
         p1 += (score > 0) as u32;
         p2 += score;
     }
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 struct TrieNode {

@@ -1,16 +1,15 @@
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(String, u64)> {
+pub fn solve(input: &str) -> (String, u64) {
     let mut it = input.iter_unsigned::<u64>();
-    let [a, b, c] = it.next_chunk().ok().context("Invalid input")?;
+    let [a, b, c] = it.next_chunk().unwrap();
     let program: Vec<_> = it.collect();
     
     let p1 = run(&program, a, b, c);
     let p1 = String::from_utf8(p1).unwrap();
-    let p2 = quine(&program, 0, program.len()).context("Part 2: No solution found")?;
+    let p2 = quine(&program, 0, program.len()).unwrap();
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn run(program: &[u64], mut a: u64, mut b: u64, mut c: u64) -> Vec<u8> {

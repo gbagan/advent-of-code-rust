@@ -1,6 +1,4 @@
-use anyhow::*;
-
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let input = input.as_bytes();
 
     let mut p1 = 0;
@@ -50,5 +48,5 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         id += 1;
         i += 1;
     }
-    Ok((p1, p2))
+    (p1, p2)
 }

@@ -1,12 +1,12 @@
-use anyhow::*;
 use itertools::Itertools;
 use crate::util::parser::*;
 use std::cmp::Ordering;
+use memchr::memmem;
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> (usize, usize) {
     let mut table = [Ordering::Greater; 10000];
 
-    let split = memchr::memmem::find(input.as_bytes(), b"\n\n").context("No separator found")?;
+    let split = memmem::find(input.as_bytes(), b"\n\n").unwrap();
     let section1 = &input[..split];
     let section2 = &input[split+2..];
     for (x, y) in section1.iter_unsigned::<usize>().tuples() {
@@ -28,5 +28,5 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
         }
 
     }
-    Ok((p1, p2))
+    (p1, p2)
 }

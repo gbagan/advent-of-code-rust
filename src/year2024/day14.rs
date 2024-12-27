@@ -1,7 +1,6 @@
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(u32, i32)> {
+pub fn solve(input: &str) -> (u32, i32) {
     let robots: Vec<_> =
         input
         .iter_signed::<i32>()
@@ -10,9 +9,9 @@ pub fn solve(input: &str) -> Result<(u32, i32)> {
         .collect();
 
     let p1 = part1(&robots);
-    let p2 = part2(&robots).context("Part 2: No solution found")?;
+    let p2 = part2(&robots);
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part1(robots: &[[i32; 4]]) -> u32 {
@@ -42,7 +41,7 @@ fn part1(robots: &[[i32; 4]]) -> u32 {
     quadrant1 * quadrant2 * quadrant3 * quadrant4
 }
 
-fn part2(robots: &[[i32; 4]]) -> Option<i32> {
+fn part2(robots: &[[i32; 4]]) -> i32 {
     const PERIOD: i32 = 101 * 103;
     const PX: i32 = 51 * 103;
     const PY: i32 = 51 * 101;
@@ -60,7 +59,7 @@ fn part2(robots: &[[i32; 4]]) -> Option<i32> {
         }
         let max = left.min(right);
         (t, max)
-    }).min_by_key(|x| x.1)?.0;
+    }).min_by_key(|x| x.1).unwrap().0;
 
     let ty = (0..103).map(|t| {
         let mut top = 0;
@@ -75,9 +74,9 @@ fn part2(robots: &[[i32; 4]]) -> Option<i32> {
         }
         let max = top.min(bot);
         (t, max)
-    }).min_by_key(|x| x.1)?.0;
+    }).min_by_key(|x| x.1).unwrap().0;
 
     // we search for the moment t such that t = tx [mod 101] and t = ty [mod 103] 
     
-    Some((PX * tx + PY * ty) % PERIOD)
+    (PX * tx + PY * ty) % PERIOD
 }

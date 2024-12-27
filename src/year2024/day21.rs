@@ -1,8 +1,7 @@
-use anyhow::*;
 use itertools::Itertools;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(u64, u64)> {
+pub fn solve(input: &str) -> (u64, u64) {
     let mut p1 = 0;
     let mut p2 = 0;
 
@@ -11,7 +10,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
         p1 += x;
         p2 += y;
     }
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn solve_row(row: &str) -> (u64, u64) {

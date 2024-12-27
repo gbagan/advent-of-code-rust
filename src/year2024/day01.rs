@@ -1,8 +1,6 @@
 // https://lemire.me/blog/2022/01/21/swar-explained-parsing-eight-digits/
 
-use anyhow::*;
-
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) ->(u32, u32) {
     let mut list1 = Vec::with_capacity(1000);
     let mut list2 = Vec::with_capacity(1000);
     
@@ -36,7 +34,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         p2 += x * counter;
     }
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 #[inline]

@@ -1,9 +1,8 @@
-use anyhow::*;
 use crate::util::parser::*;
 
 type Hand<'a> = ([u8; 5], u32);
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut scores1 = Vec::with_capacity(1000);
     let mut scores2 = Vec::with_capacity(1000);
     
@@ -44,7 +43,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
 
     let p1 = scores1.iter().enumerate().map(|(i, c)| (i as u32 + 1) * c.1).sum();
     let p2 = scores2.iter().enumerate().map(|(i, c)| (i as u32 + 1) * c.1).sum();
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn parse_hand(line: &str) -> Hand {

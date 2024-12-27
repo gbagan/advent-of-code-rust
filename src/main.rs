@@ -30,6 +30,21 @@ macro_rules! solution {
     }};
 }
 
+macro_rules! solution2 {
+    ($year:tt, $day:tt) => {{
+        let year = stringify!($year).trim_matches(char::is_alphabetic).to_string(); 
+        let day = stringify!($day).trim_matches(char::is_alphabetic).to_string();
+        let func = |input: &String| {
+            let instant = Instant::now();
+            let (p1, p2) = $year::$day::solve(input);
+            let elapsed = instant.elapsed();
+            Ok((p1.to_string(), p2.to_string(), elapsed))
+        };
+
+        Solution { year, day, func }
+    }};
+}
+
 
 fn main() {
     let (command, arg_year, arg_day) = (args().nth(1), args().nth(2), args().nth(3));
@@ -315,17 +330,17 @@ fn solutions() -> Vec<Solution> {
         solution!(year2022, day15),
         solution!(year2022, day16),
 
-        solution!(year2023, day01),
-        solution!(year2023, day02),
+        solution2!(year2023, day01),
+        solution2!(year2023, day02),
         solution!(year2023, day03),
-        solution!(year2023, day04),
+        solution2!(year2023, day04),
         solution!(year2023, day05),
-        solution!(year2023, day06),
-        solution!(year2023, day07),
+        solution2!(year2023, day06),
+        solution2!(year2023, day07),
         solution!(year2023, day08),
-        solution!(year2023, day09),
-        solution!(year2023, day10),
-        solution!(year2023, day11),
+        solution2!(year2023, day09),
+        solution2!(year2023, day10),
+        solution2!(year2023, day11),
         solution!(year2023, day12),
         solution!(year2023, day13),
         solution!(year2023, day14),
@@ -341,30 +356,30 @@ fn solutions() -> Vec<Solution> {
         solution!(year2023, day24),
         solution!(year2023, day25),
 
-        solution!(year2024, day01),
-        solution!(year2024, day02),
-        solution!(year2024, day03),
-        solution!(year2024, day04),
-        solution!(year2024, day05),
+        solution2!(year2024, day01),
+        solution2!(year2024, day02),
+        solution2!(year2024, day03),
+        solution2!(year2024, day04),
+        solution2!(year2024, day05),
         solution!(year2024, day06),
-        solution!(year2024, day07),
+        solution2!(year2024, day07),
         solution!(year2024, day08),
-        solution!(year2024, day09),
+        solution2!(year2024, day09),
         solution!(year2024, day10),
         solution!(year2024, day11),
         solution!(year2024, day12),
-        solution!(year2024, day13),
-        solution!(year2024, day14),
+        solution2!(year2024, day13),
+        solution2!(year2024, day14),
         solution!(year2024, day15),
         solution!(year2024, day16),
-        solution!(year2024, day17),
-        solution!(year2024, day18),
-        solution!(year2024, day19),
+        solution2!(year2024, day17),
+        solution2!(year2024, day18),
+        solution2!(year2024, day19),
         solution!(year2024, day20),
-        solution!(year2024, day21),
-        solution!(year2024, day22),
-        solution!(year2024, day23),
-        solution!(year2024, day24),
-        solution!(year2024, day25),
+        solution2!(year2024, day21),
+        solution2!(year2024, day22),
+        solution2!(year2024, day23),
+        solution2!(year2024, day24),
+        solution2!(year2024, day25),
     ]
 }

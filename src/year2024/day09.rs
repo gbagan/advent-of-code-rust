@@ -1,11 +1,8 @@
-use anyhow::*;
-
-pub fn solve(input: &str) -> Result<(u64, u64)> {
+pub fn solve(input: &str) -> (u64, u64) {
     let input = input.trim_ascii_end().as_bytes();
-    ensure!(input.len() & 1 == 1, "input length must be odd");
     let p1 = part1(input);
     let p2 = part2(input);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part1(input: &[u8]) -> u64 {

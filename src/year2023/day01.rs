@@ -1,4 +1,12 @@
-use anyhow::*;
+pub fn solve(input: &str) -> (u32, u32) {
+    let mut p1 = 0;
+    let mut p2 = 0;
+    for line in input.lines() {
+        p1 += solve_one(line);
+        p2 += solve_two(line);
+    }
+    (p1, p2)
+}
 
 const PATTERNS: [(&[u8], u32); 9] = [
     (b"one", 1),
@@ -12,22 +20,12 @@ const PATTERNS: [(&[u8], u32); 9] = [
     (b"nine", 9),
 ];
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let mut p1 = 0;
-    let mut p2 = 0;
-    for line in input.lines() {
-        p1 += solve_one(line).with_context(|| format!("No pattern found: {line}"))?;
-        p2 += solve_two(line).with_context(|| format!("No pattern found: {line}"))?;
-    }
-    Ok((p1, p2))
-}
-
-fn solve_one(line: &str) -> Option<u32> {
-    let c1 = line.bytes().find(|c| c.is_ascii_digit())?;
-    let c2 = line.bytes().rfind(|c| c.is_ascii_digit())?;
+fn solve_one(line: &str) -> u32 {
+    let c1 = line.bytes().find(|c| c.is_ascii_digit()).unwrap();
+    let c2 = line.bytes().rfind(|c| c.is_ascii_digit()).unwrap();
     let n = (c1 - b'0') as u32;
     let m = (c2 - b'0') as u32;
-    Some(n*10+m)
+    n*10+m
 }
 
 fn matches_pattern2(s: &[u8]) -> Option<u32> {
@@ -38,11 +36,11 @@ fn matches_pattern2(s: &[u8]) -> Option<u32> {
     }
 }
 
-fn solve_two(line: &str) -> Option<u32> {
+fn solve_two(line: &str) -> u32 {
     let line = line.as_bytes();
-    let n: u32 = (0..line.len()).find_map(|i| matches_pattern2(&line[i..]))?;
-    let m: u32 = (0..line.len()).rev().find_map(|i| matches_pattern2(&line[i..]))?;
-    Some(n*10+m)
+    let n: u32 = (0..line.len()).find_map(|i| matches_pattern2(&line[i..])).unwrap();
+    let m: u32 = (0..line.len()).rev().find_map(|i| matches_pattern2(&line[i..])).unwrap();
+    n*10+m
 }
 
 #[cfg(test)]
@@ -51,13 +49,13 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        assert_eq!(solve_one("a1b2c3d4e5f"), Some(15));
-        assert_eq!(solve_one("treb7uchet"), Some(77));
+        assert_eq!(solve_one("a1b2c3d4e5f"), 15);
+        assert_eq!(solve_one("treb7uchet"), 77);
     }
 
     #[test]
     fn test_part_two() {
-        assert_eq!(solve_two("abcone2threexyz"), Some(13));
-        assert_eq!(solve_two("4nineeightseven2"), Some(42));
+        assert_eq!(solve_two("abcone2threexyz"), 13);
+        assert_eq!(solve_two("4nineeightseven2"), 42);
     }
 }

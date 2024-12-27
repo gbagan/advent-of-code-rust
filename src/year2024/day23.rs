@@ -1,6 +1,5 @@
 // counting triangles and finding maximum clique
 
-use anyhow::*;
 use arrayvec::ArrayVec;
 
 struct Graph {
@@ -9,7 +8,7 @@ struct Graph {
     matrix: Vec<bool>,
 }
 
-pub fn solve(input: &str) -> Result<(u32, String)> {
+pub fn solve(input: &str) -> (u32, String) {
     let n = input.len() / (3 * 13);
 
     let mut adj = Vec::with_capacity(n);
@@ -43,9 +42,9 @@ pub fn solve(input: &str) -> Result<(u32, String)> {
 
     let graph = Graph { adj, matrix, labels };
     let p1 = part1(&graph);
-    let p2 = part2(&graph).context("Part 2: No solution found")?;
+    let p2 = part2(&graph);
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part1(input: &Graph) -> u32 {
@@ -73,7 +72,7 @@ fn part1(input: &Graph) -> u32 {
     count
 }
 
-fn part2(input: &Graph) -> Option<String> {
+fn part2(input: &Graph) -> String {
     let Graph {adj, matrix, labels} = input;
     let n = adj.len();
     let mut found = None;
@@ -99,25 +98,22 @@ fn part2(input: &Graph) -> Option<String> {
         }
         
     };
-    if let Some((u, excluded)) = found {
-        let mut clique_labels = Vec::with_capacity(13);
-        clique_labels.push(labels[u]);
-        for &v in &adj[u] {
-            if v != excluded {
-                clique_labels.push(labels[v]);
-            }
+    let (u, excluded) = found.unwrap();
+    let mut clique_labels = Vec::with_capacity(13);
+    clique_labels.push(labels[u]);
+    for &v in &adj[u] {
+        if v != excluded {
+            clique_labels.push(labels[v]);
         }
-        clique_labels.sort_unstable();
-        let mut string = String::with_capacity(27);
-        for (i, &(u, v)) in clique_labels.iter().enumerate() {
-            if i > 0 {
-                string.push(',');
-            }
-            string.push(u as char);
-            string.push(v as char);
-        }
-        Some(string)
-    } else {
-        None
     }
+    clique_labels.sort_unstable();
+    let mut string = String::with_capacity(27);
+    for (i, &(u, v)) in clique_labels.iter().enumerate() {
+        if i > 0 {
+            string.push(',');
+        }
+        string.push(u as char);
+        string.push(v as char);
+    }
+    string
 }

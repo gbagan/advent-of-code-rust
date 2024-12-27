@@ -1,13 +1,12 @@
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(u64, u64)> {
-    let (line1, line2) = input.try_split_once('\n')?;
+pub fn solve(input: &str) -> (u64, u64) {
+    let (line1, line2) = input.split_once('\n').unwrap();
     let line1 = &line1[10..];
     let line2 = &line2[10..];
     let p1 = part1(line1, line2);
     let p2 = part2(line1, line2);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 pub fn part1(line1: &str, line2: &str) -> u64 {

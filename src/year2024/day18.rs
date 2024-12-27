@@ -1,6 +1,5 @@
 // part 1: BFS, part 2: DFS
 
-use anyhow::*;
 use crate::util::parser::*;
 use std::collections::VecDeque;
 
@@ -8,16 +7,16 @@ const SIZE: usize = 73;
 const START: usize = SIZE+1;
 const END: usize =  (SIZE-1) * SIZE - 2;
 
-pub fn solve(input: &str) -> Result<(u32, String)> {
+pub fn solve(input: &str) -> (u32, String) {
     let bytes: Vec<_> = input.iter_unsigned().array_chunks().collect();
 
-    let p1 = part1(&bytes).context("Part 1: No solution found")?;
-    let p2 = part2(&bytes).context("Part 2: No solution found")?;
+    let p1 = part1(&bytes);
+    let p2 = part2(&bytes);
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
-fn part1(bytes: &[[u8; 2]]) -> Option<u32> {
+fn part1(bytes: &[[u8; 2]]) -> u32 {
     let mut grid = vec![b'.'; SIZE*SIZE];
     for i in 0..SIZE {
         grid[i] = b'#';
@@ -36,7 +35,7 @@ fn part1(bytes: &[[u8; 2]]) -> Option<u32> {
 
     while let Some((dist, node)) = queue.pop_front() {
         if node == END {
-            return Some(dist);
+            return dist;
         }
         for next in [node + 1, node - 1, node + 73, node - 73] {
             if grid[next] == b'.' {
@@ -45,10 +44,10 @@ fn part1(bytes: &[[u8; 2]]) -> Option<u32> {
             }
         }
     }
-    None
+    unreachable!();
 }
 
-fn part2(bytes: &[[u8; 2]]) -> Option<String> {
+fn part2(bytes: &[[u8; 2]]) -> String {
     let mut grid = vec![b'.'; SIZE*SIZE];
     for i in 0..SIZE {
         grid[i] = b'#';
@@ -64,12 +63,13 @@ fn part2(bytes: &[[u8; 2]]) -> Option<String> {
     let mut stack = Vec::with_capacity(1000);
     dfs(&mut grid, &mut stack, START);
 
-    bytes.iter().rev().find(|&&[x, y]| {
+    let &[x, y] = bytes.iter().rfind(|&&[x, y]| {
         let node = (y as usize + 1) * SIZE + x as usize + 1;
         grid[node] = b'.';
         (grid[node-1] == b'$' || grid[node+1] == b'$' || grid[node-SIZE] == b'$' || grid[node+SIZE] == b'$')
                 && dfs(&mut grid, &mut stack, node)
-    }).map(|[x, y]| format!("{x},{y}"))
+    }).unwrap();
+    format!("{x},{y}")
 }
 
 #[inline]

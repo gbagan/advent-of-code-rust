@@ -1,8 +1,6 @@
-use anyhow::*;
-
 const MASK: u32 = 0b1000_1000_1000_1000_1000;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut bot = Vec::with_capacity(256);
     let mut top = Vec::with_capacity(256);
     let mut grid = input.as_bytes();
@@ -42,5 +40,5 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         }
     }
 
-    Ok((p1, 0))
+    (p1, 0)
 }

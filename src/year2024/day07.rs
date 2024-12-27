@@ -1,7 +1,6 @@
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(u64, u64)> {
+pub fn solve(input: &str) -> (u64, u64) {
     let mut p1 = 0;
     let mut p2 = 0;
 
@@ -18,7 +17,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
         row.clear();
     }
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 pub fn solve_p1(row: &[u64], goal: u64, idx: usize) -> bool {
