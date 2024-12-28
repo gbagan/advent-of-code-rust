@@ -1,4 +1,3 @@
-use anyhow::*;
 use arrayvec::ArrayVec;
 
 struct Input {
@@ -8,10 +7,10 @@ struct Input {
     flows: Vec<u32>
 }
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let input = parse_input(input);
+pub fn solve(input: &str) -> (u32, u32) {
+    let _input = parse_input(input);
 
-    Ok((0, 0))
+    (0, 0)
 } 
 
 fn parse_input(input: &str) -> Input {
@@ -64,7 +63,7 @@ fn parse_input(input: &str) -> Input {
         graph_to_mat[j] = i;
     }
     
-    let mut matrix = vec![0; size * size];
+    let matrix = vec![0; size * size];
 
     Input { matrix, size, start, flows }
 }

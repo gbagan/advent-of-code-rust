@@ -1,21 +1,17 @@
-use anyhow::*;
-use itertools::Itertools;
 use ahash::HashMap;
+use arrayvec::ArrayVec;
 use crate::util::parser::*;
 
-fn parse_line(line: &str) -> Result<(&str, (bool, Vec<&str>))> {
-    let (key, values) = line.try_split_once(" -> ")?;
-    let first_char = key.chars().next().context("Nothing before ' -> '")?;
+fn parse_line(line: &str) -> (&str, (bool, ArrayVec<&str, 6>)) {
+    let (key, values) = line.try_split_once(" -> ").unwrap();
+    let first_char = key.chars().next().unwrap();
     let key = key.trim_start_matches(['%', '&']);
     let values = values.split(", ").collect();
-    Ok((key, (first_char == '&', values)))
+    (key, (first_char == '&', values))
 }
 
-pub fn solve(input: &str) -> Result<(u64, u64)> {
-    let network: HashMap<_, _> = input
-        .lines()
-        .map(|line| parse_line(line).with_context(|| format!("Parse error on line: {line}")))
-        .try_collect()?;
+pub fn solve(input: &str) -> (u64, u64) {
+    let network: HashMap<_, _> = input.lines().map(parse_line).collect();
 
     let numbers: Vec<u32> = network["broadcaster"].1.iter().map(|&node| {
         let mut number = 0;
@@ -36,7 +32,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
     }).collect();
     let p1 = part1(&numbers);
     let p2 = part2(&numbers);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part1(numbers: &[u32]) -> u64 {

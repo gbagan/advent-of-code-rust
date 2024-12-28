@@ -1,10 +1,9 @@
 // dynamic programming
 
-use anyhow::*;
 use crate::util::{parallel::*, parser::*};
 
-pub fn solve(input: &str) -> Result<(u64, u64)> {
-    let puzzles: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
+pub fn solve(input: &str) -> (u64, u64) {
+    let puzzles: Vec<_> = input.lines().map(parse_line).collect();
     let mut springs2 = Vec::new();
     let mut table = Vec::new();
     let mut next_operational = Vec::new();
@@ -49,14 +48,13 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
             sum
         })
         .sum();
-    Ok((p1, p2))
+    (p1, p2)
 }
 
-fn parse_line(line: &str) -> Result<(&[u8], Vec<u8>)> {
-    let (springs, groups) = line.try_split_once(' ')?;
-    let springs = springs.as_bytes();
+fn parse_line(line: &str) -> (&[u8], Vec<u8>) {
+    let (springs, groups) = line.split_once(' ').unwrap();
     let groups = groups.iter_unsigned().collect();
-    Ok((springs, groups))
+    (springs.as_bytes(), groups)
 }
 
 fn count_arrangements(springs: &[u8], groups: &[u8], table: &mut Vec<u64>, next_operational: &mut Vec<usize>) -> u64 {

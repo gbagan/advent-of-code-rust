@@ -1,15 +1,13 @@
 // dominators
 // https://en.wikipedia.org/wiki/Dominator_(graph_theory)
 
-use anyhow::*;
 use ahash::{HashMap, HashMapExt};
-
 use itertools::Itertools;
-use crate::util::{coord::Coord3, grid::Grid, iter::*, parser::*};
+use crate::util::{coord::Coord3, grid::Grid, parser::*};
 
 type Dominators = Vec<(usize, u32)>;
 
-pub fn solve(input: &str) -> Result<(usize, u32)> {
+pub fn solve(input: &str) -> (usize, u32) {
     let mut bricks: Vec<_> = input
         .iter_unsigned()
         .tuples()
@@ -18,8 +16,6 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             let p2 = Coord3::new(x2, y2, z2);
             (p1.min(p2), p1.max(p2))
         }).collect();
-
-    ensure!(!bricks.is_empty(), "No brick has been parsed");
 
     bricks.sort_unstable_by_key(|b| b.0.z);
     
@@ -31,6 +27,9 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
 
 
     let mut cubes = Vec::new();
+
+    let mut supported_by = vec!();
+
     for i in 0..bricks.len() {
         cubes_of(&bricks[i], &mut cubes);
         let height = cubes
@@ -39,7 +38,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
             .max()
             .unwrap();
         let fall = bricks[i].0.z - height - 1;
-        let mut supported_by = vec!();
+        supported_by.clear();
         for cube in &cubes {
             heights[(cube.x, cube.y)] = cube.z - fall;
             cube_owners.insert(Coord3::new(cube.x, cube.y, cube.z - fall), i);
@@ -60,7 +59,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
 
     let p1 = part1(&dominator);
     let p2 = dominator.iter().map(|(_, h)| *h).sum();
-    Ok((p1, p2))
+    (p1, p2)
 }   
 
 fn cubes_of((pmin, pmax): &(Coord3, Coord3), cubes: &mut Vec<Coord3>) {
@@ -101,5 +100,5 @@ fn part1(dominator: &Dominators) -> usize {
     for (v, _) in dominator {
         safe[*v] = false;
     }
-    safe.iter().count_if(|&&n| n)
+    safe.iter().filter(|&&n| n).count()
 }

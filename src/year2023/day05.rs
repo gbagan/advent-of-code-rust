@@ -1,4 +1,3 @@
-use anyhow::*;
 use crate::util::{parser::*, range::Range};
 use itertools::Itertools;
 
@@ -7,9 +6,9 @@ struct ShiftRange {
     shift: i64,
 }
 
-pub fn solve(input: &str) -> Result<(i64, i64)> {
+pub fn solve(input: &str) -> (i64, i64) {
     let mut lines = input.lines();
-    let (line, _) = lines.next_tuple().context("Parse error")?;
+    let (line, _) = lines.next_tuple().unwrap();
     let seeds: Vec<i64> = line.iter_unsigned().collect();
     
     let mut maps = vec!();
@@ -17,17 +16,16 @@ pub fn solve(input: &str) -> Result<(i64, i64)> {
         let mut map = vec!();
         for line in lines.by_ref() {
             if line.is_empty() { break }
-            let (destination, source, length) = line.iter_unsigned().collect_tuple()
-                                                            .context("Parse error")?;
+            let (destination, source, length) = line.iter_unsigned().collect_tuple().unwrap();
             let range = Range{lower: source, upper: source+length-1};
             map.push(ShiftRange {range, shift: destination - source});
         }
         maps.push(map)
     }
     
-    let p1 = part1(&seeds, &maps).context("Part 1: No solution found")?;
-    let p2 = part2(&seeds, &maps).context("Part 2: No solution found")?;
-    Ok((p1, p2))
+    let p1 = part1(&seeds, &maps);
+    let p2 = part2(&seeds, &maps);
+    (p1, p2)
 }
 
 fn step(seeds: &mut [i64], ranges: &[ShiftRange]) {
@@ -39,12 +37,12 @@ fn step(seeds: &mut [i64], ranges: &[ShiftRange]) {
     )
 }
 
-fn part1(seeds: &[i64], maps: &[Vec<ShiftRange>]) -> Option<i64> {
+fn part1(seeds: &[i64], maps: &[Vec<ShiftRange>]) -> i64 {
     let mut seeds = seeds.to_vec();
     for ranges in maps.iter() {
         step(&mut seeds, ranges);
     }
-    seeds.iter().min().copied()
+    *seeds.iter().min().unwrap()
 }
 
 fn step2(seeds: &Vec<Range<i64>>, ranges: &Vec<ShiftRange>) -> Vec<Range<i64>> {
@@ -59,7 +57,7 @@ fn step2(seeds: &Vec<Range<i64>>, ranges: &Vec<ShiftRange>) -> Vec<Range<i64>> {
     result
 }
 
-fn part2(seeds: &[i64], maps: &[Vec<ShiftRange>]) -> Option<i64> {
+fn part2(seeds: &[i64], maps: &[Vec<ShiftRange>]) -> i64 {
     let mut seeds: Vec<_> = seeds.iter()
                                 .tuples()
                                 .map(|(&lower, &length)| Range {lower, upper: lower+length-1})
@@ -67,5 +65,5 @@ fn part2(seeds: &[i64], maps: &[Vec<ShiftRange>]) -> Option<i64> {
     for ranges in maps {
         seeds = step2(&seeds, ranges);
     }
-    seeds.iter().map(|seed| seed.lower).min()
+    seeds.iter().map(|seed| seed.lower).min().unwrap()
 }

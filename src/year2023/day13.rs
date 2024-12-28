@@ -1,28 +1,54 @@
-use anyhow::*;
-use crate::util::grid::Grid;
+use memchr::{memchr, memmem};
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> (usize, usize) {
+    let mut input = input.as_bytes();
     let mut p1 = 0;
     let mut p2 = 0;
-    for pair in input.split("\n\n").map(parse_grid) {
-        let (a, b) = pair?;
+    let mut rows = Vec::with_capacity(16);
+    let mut columns = Vec::with_capacity(16);
+    let nn_finder = memmem::Finder::new(b"\n\n");
+
+    while let Some(sep) = nn_finder.find(input) {
+        let grid = &input[..sep];
+        input = &input[sep+2..];
+        let (a, b) = parse_grid(grid, &mut rows, &mut columns);
         p1 += a;
         p2 += b;
     };
-    Ok((p1, p2))
+    let (a, b) = parse_grid(input, &mut rows, &mut columns);
+    p1 += a;
+    p2 += b;
+
+    (p1, p2)
 }
 
-fn parse_grid(input: &str) -> Result<(usize, usize)> {
-    let grid = Grid::parse(input)?;
-    let mut rows: Vec<u32> = vec![0; grid.height];
-    let mut columns: Vec<u32> = vec![0; grid.width];
-    for x in 0..grid.width {
-        for y in 0..grid.height {
-            let b = if grid[(x, y)] == b'#' {1} else {0};
-            columns[x] = columns[x] * 2 + b;
-            rows[y] = rows[y] * 2 + b;
+fn parse_grid(grid: &[u8], rows: &mut Vec<u32>, columns: &mut Vec<u32>) -> (usize, usize) {
+    let width = memchr(b'\n', grid).unwrap();
+    let height = (grid.len() + 1) / (width + 1);
+
+    columns.clear();
+    rows.clear();
+    columns.resize(width, 0);
+    rows.resize(height, 0);
+
+    let mut x= 0;
+    let mut y = 0;
+    for &c in grid {
+        match c {
+            b'.' => {
+                columns[x] <<= 1;
+                rows[y] <<= 1;
+                x += 1;
+            }
+            b'#' => {
+                columns[x] = columns[x] << 1 | 1;
+                rows[y] = rows[y] << 1 | 1;
+                x += 1;
+            }
+            _ => { y += 1; x = 0; }
         }
     }
+
     let p1 = if let Some (v) = reflect(&columns) {
         v
     } else if let Some(v) = reflect(&rows) {
@@ -39,7 +65,7 @@ fn parse_grid(input: &str) -> Result<(usize, usize)> {
     };
 
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn reflect(encoding: &[u32]) -> Option<usize> {

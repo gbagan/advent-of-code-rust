@@ -1,12 +1,12 @@
-use anyhow::*;
+use arrayvec::ArrayVec;
 use crate::util::{coord::*, grid::*};
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let mut grid = Grid::parse(input)?;
+pub fn solve(input: &str) -> (usize, usize) {
+    let mut grid = Grid::parse(input).unwrap();
     let width = grid.width as i32;
     let height = grid.height as i32;
 
-    let mut antennas: Vec<Vec<Coord<i32>>> = vec![Vec::new(); 128];
+    let mut antennas: Vec<ArrayVec<Coord<i32>, 8>> = vec![ArrayVec::new(); 128];
 
     for y in 0..height {
         for x in 0..width {
@@ -51,6 +51,5 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
 
     let p2 = grid.vec.iter().filter(|&&c| c == b'#').count();
 
-    Ok((p1, p2))
-
+    (p1, p2)
 }

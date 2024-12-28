@@ -1,4 +1,3 @@
-use anyhow::*;
 use arrayvec::ArrayVec;
 use crate::util::grid::Grid;
 use ahash::{HashSet, HashSetExt, HashMap, HashMapExt};
@@ -10,13 +9,13 @@ struct GridGraph {
     vertical: [[i32; 6]; 6],
 }
 
-pub fn solve(input: &str) -> Result<(i32, i32)> {
-    let grid = Grid::parse_with_padding(input, b'#')?;
+pub fn solve(input: &str) -> (i32, i32) {
+    let grid = Grid::parse_with_padding(input, b'#').unwrap();
     let graph = compress_grid(&grid);
     let grid = graph_to_grid(&graph);
     let p1 = part1(&grid);
-    let p2 = part2(&grid).context("Part 2: No solution found")?;
-    Ok((p1, p2))
+    let p2 = part2(&grid);
+    (p1, p2)
 }
 
 fn neighbors2 (grid: &Grid<u8>, idx: usize) -> ArrayVec<usize, 4> {
@@ -61,12 +60,12 @@ fn follow_path(grid: &Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) ->
     }
 }
 
-fn compress_grid(grid: &Grid<u8>) -> Vec<Vec<(usize, i32)>> {
+fn compress_grid(grid: &Grid<u8>) -> Vec<ArrayVec<(usize, i32), 4>> {
     let h = grid.height;
     let w = grid.width;
     let start = w+2;
     let goal = w * (h-1) - 3;
-    let mut junctions = vec!();
+    let mut junctions: ArrayVec<usize, 36> = ArrayVec::new();
     let mut n = 0;
     let grid2: Vec<_> = (0..h*w).map(|idx| {
         let nbors = neighbors2(grid, idx);
@@ -89,7 +88,7 @@ fn compress_grid(grid: &Grid<u8>) -> Vec<Vec<(usize, i32)>> {
     }).collect()
 }
 
-fn graph_to_grid(graph: &[Vec<(usize, i32)>]) -> GridGraph {
+fn graph_to_grid(graph: &[ArrayVec<(usize, i32), 4>]) -> GridGraph {
     let start = 0;
     let next_to_start = graph[start][0].0;
     let goal = graph.len()-1;
@@ -270,7 +269,7 @@ lazy_static! {
     };
 }
 
-fn part2(grid: &GridGraph) -> Option<i32> {
+fn part2(grid: &GridGraph) -> i32 {
     let mut h_edges: [ArrayVec<(usize, usize), 2>; 30] = std::array::from_fn(|_| ArrayVec::new());
         
     h_edges[0].push((0, 1));
@@ -365,7 +364,7 @@ fn part2(grid: &GridGraph) -> Option<i32> {
         next = [i32::MIN; N];
     }
     let v = current[0];
-    Some(grid.extremities + v) 
+    grid.extremities + v
 
 }
 

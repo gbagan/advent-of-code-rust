@@ -1,6 +1,6 @@
-use anyhow::*;
 use ahash::HashMap;
 use itertools::Itertools;
+use memchr::memmem;
 use crate::util::parser::*;
 
 type Workflows<'a> = HashMap<&'a str, Vec<Step<'a>>>;
@@ -12,13 +12,15 @@ struct Step<'a> {
     instr: Instr<'a>,
 }
 
-pub fn solve(input: &str) -> Result<(u32, u64)> {
-    let (input1, input2) = input.try_split_once("\n\n")?;
-    let workflows = input1.try_parse_lines_and_collect(parse_workflow)?;
-    let ratings = input2.iter_unsigned::<u16>().array_chunks::<4>().collect_vec();
+pub fn solve(input: &str) -> (u32, u64) {
+    let sep = memmem::find(input.as_bytes(), b"\n\n").unwrap();
+    let input1 = &input[..sep];
+    let input2 = &input[sep+2..];
+    let workflows = input1.lines().map(parse_workflow).collect();
+    let ratings: Vec<_> = input2.iter_unsigned::<u16>().array_chunks::<4>().collect();
     let p1 = part1(&workflows, &ratings);
     let p2 = part2(&workflows);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 
@@ -30,31 +32,29 @@ fn parse_instr(s: &str) -> Instr {
     }
 }
 
-fn parse_workflow(line: &str) -> Result<(&str, Vec<Step>)> {
-    let (name, line) = line.split_once('{').context("Character '{' not found")?;
+fn parse_workflow(line: &str) -> (&str, Vec<Step>) {
+    let (name, line) = line.split_once('{').unwrap();
     let workflow = line.split([',', ':', '}']).tuples().map(|(first, second)| {
         if second.is_empty() {
-            Ok(Step{test: Test::Otherwise, instr: parse_instr(first)})
+            Step{test: Test::Otherwise, instr: parse_instr(first)}
         } else {
-            let (c, rel) = first.chars().next_tuple()
-                                        .with_context(|| format!("'{first}' must contains at least 2 characters"))?;
+            let (c, rel) = first.chars().next_tuple().unwrap();
             let c = match c {
                 'x' => 0,
                 'm' => 1,
                 'a' => 2,
                 's' => 3,
-                _ => bail!("Unexpected '{c}, expecting 'x', 'm', 'a', s'")
+                _ => panic!()
             };
-            let val = first[2..].parse()?;
+            let val = (&first[2..]).try_unsigned().unwrap();
             let test = match rel {
                 '<' => Test::LT(c, val),
-                '>' => Test::GT(c, val),
-                _ => bail!("Unexpected '{c}, expecting '<', '>'")
+                _ => Test::GT(c, val),
             };
-            Ok(Step{test, instr: parse_instr(second)})
+            Step{test, instr: parse_instr(second)}
         }
-    }).try_collect()?;
-    Ok((name, workflow))
+    }).collect();
+    (name, workflow)
 }
 
 fn accepts(rating: &[u16; 4], workflows: &HashMap<&str, Vec<Step>>) -> bool {

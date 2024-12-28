@@ -1,11 +1,10 @@
-use anyhow::*;
 use crate::util::grid::Grid;
 use crate::util::coord::Coord;
 use itertools::Itertools;
 use std::str;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let grid = Grid::parse_with_padding(input, b'.')?;
+pub fn solve(input: &str) -> (u32, u32) {
+    let grid = Grid::parse_with_padding(input, b'.').unwrap();
     let mut number_grid: Grid<Option<u32>> = grid.map(|_| None);
     let mut i = 0;
     let mut first_digit = None;
@@ -62,7 +61,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
             }
         }
     }
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 

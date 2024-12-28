@@ -1,4 +1,3 @@
-use anyhow::*;
 use std::cmp::max;
 use crate::util::{coord::Coord, grid::Grid, iter::AOCIter, parallel::*};
 
@@ -28,13 +27,12 @@ fn next_directions (c: u8, dir: u8) -> Vec<u8> {
     }
 }
 
-pub fn solve(input: &str) -> Result<(u64, u64)>{
-    let grid = Grid::parse(input)?;
+pub fn solve(input: &str) -> (u64, u64){
+    let grid = Grid::parse(input).unwrap();
     let mut north = grid.map(|_| 0);
     let mut south = grid.map(|_| 0);
     let mut west = grid.map(|_| 0);
     let mut east = grid.map(|_| 0);
-
 
     for x in 0..grid.width {
         let mut last: i32 = -1;
@@ -81,7 +79,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)>{
     let input = Input { grid, north, south, west, east};
     let p1 = count_energized(&input, Point::new(0, 0), EAST);
     let p2 = part2(&input);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> u64 {

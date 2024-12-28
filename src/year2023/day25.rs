@@ -1,12 +1,11 @@
 // Ford-Fulkerson algorithm
 
-use anyhow::*;
 use arrayvec::ArrayVec;
 use std::collections::VecDeque;
 
 type Graph = Vec<ArrayVec<usize, 10>>;
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> (usize, usize) {
     let mut table = vec![usize::MAX; 26*26*26];
     let mut graph: Graph = Vec::with_capacity(1500);
     
@@ -34,7 +33,7 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
     }
 
     let p1 = part1(&mut graph);
-    Ok((p1, 0))
+    (p1, 0)
 }
 
 fn part1(graph: &mut Graph) -> usize {

@@ -1,16 +1,11 @@
-use anyhow::*;
 use crate::util::grid::Grid;
 use std::collections::VecDeque;
 
 const NB_STEPS: u64 = 26_501_365;
 
-pub fn solve(input: &str) -> Result<(u64, u64)> {
-    let grid = Grid::parse_with_padding(input, b'#')?;
-    ensure!(grid.height == grid.width, "The grid is not square");
-    
+pub fn solve(input: &str) -> (u64, u64) {
+    let grid = Grid::parse_with_padding(input, b'#').unwrap();
     let start = grid.width / 2 + grid.width *  (grid.height / 2);
-
-    ensure!(grid[start] == b'S', "S is not at the center of the grid");
     
     let (even_inside, odd_inside, even_outside, odd_outside) =
             bfs(&grid, &[start], 65, u64::MAX);
@@ -34,7 +29,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
     let odd_corner = odd_outside;
     let p2 = (n+1) * (n+1) * odd + n * n * even + n * even_corner - (n+1) * odd_corner;
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn bfs(grid: &Grid<u8>, starts: &[usize], inside_limit: u64, limit: u64) -> (u64, u64, u64, u64) {

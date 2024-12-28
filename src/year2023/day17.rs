@@ -1,19 +1,18 @@
 // A* algorithm
 
-use anyhow::*;
 use arrayvec::ArrayVec;
 use crate::util::{coord::Coord, grid::Grid};
 
 type Point = Coord<usize>;
 
-pub fn solve(input: &str) -> Result<(u16, u16)> {
-    let grid= Grid::parse_with_padding(input, b'#')?;
+pub fn solve(input: &str) -> (u16, u16) {
+    let grid= Grid::parse_with_padding(input, b'#').unwrap();
     
     let mut queue  = vec![ArrayVec::new(); 100];
     let p1 = astar(&grid, &mut queue, 1, 3);
     queue.iter_mut().for_each(|q| q.clear());
     let p2 = astar(&grid, &mut queue, 4, 10);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 const VERTICAL: usize = 0;

@@ -1,4 +1,3 @@
-use anyhow::*;
 use crate::util::grid::Grid;
 use ahash::{HashMap, HashMapExt};
 
@@ -17,8 +16,8 @@ struct Input {
     next_cube_east: Vec::<i16>,
 }
 
-pub fn solve(input: &str) -> Result<(usize, i32)> {
-    let grid = Grid::parse_with_padding(input, b'#')?;
+pub fn solve(input: &str) -> (usize, i32) {
+    let grid = Grid::parse_with_padding(input, b'#').unwrap();
     let mut rounded = vec!();
     let mut north_cubes = vec!();
     let mut west_cubes = vec!();
@@ -78,7 +77,7 @@ pub fn solve(input: &str) -> Result<(usize, i32)> {
 
     let p1 = part1(&input);
     let p2 = part2(&input);
-    Ok((p1, p2))
+    (p1, p2)
 
 }
 

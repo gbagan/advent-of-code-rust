@@ -1,4 +1,3 @@
-use anyhow::*;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use crate::util::{math::solve_linear_system, parser::*};
@@ -12,15 +11,15 @@ struct Hailstone {
     vz: i64,
 } 
 
-pub fn solve(input: &str) -> Result<(u32, i64)> {
+pub fn solve(input: &str) -> (u32, i64) {
     let hailstones: Vec<_> = input
         .iter_signed()
         .tuples()
         .map(|(px, py, pz, vx, vy, vz)| Hailstone {px, py, pz, vx, vy, vz})
         .collect();
     let p1 = part1(&hailstones);
-    let p2 = part2(&hailstones).context("Part 2: No solution found")?;
-    Ok((p1, p2))
+    let p2 = part2(&hailstones);
+    (p1, p2)
 }
 
 const START: i64 = 200_000_000_000_000;
@@ -72,14 +71,14 @@ fn diff_equations<const N: usize>(e1: &[[i64; N]], e2: &[[i64; N]]) -> Vec<[Orde
         .collect()
 }
 
-fn part2(hs: &[Hailstone]) -> Option<i64> {
+fn part2(hs: &[Hailstone]) -> i64 {
     let e1 = build_equations(&hs[0]);
     let e2 = build_equations(&hs[1]);
     let e3 = build_equations(&hs[2]);
     let mut eqs = diff_equations(&e1, &e2);
     eqs.append(&mut diff_equations(&e2, &e3));
-    let sol = solve_linear_system(&eqs)?;
-    Some((sol[0].into_inner() + sol[1].into_inner() + sol[2].into_inner()).round() as i64)
+    let sol = solve_linear_system(&eqs).unwrap();
+    (sol[0].into_inner() + sol[1].into_inner() + sol[2].into_inner()).round() as i64
 }
 
 #[test]
