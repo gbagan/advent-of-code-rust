@@ -270,7 +270,7 @@ const STATES: [[u8; 6]; N] = [
 lazy_static! {
     static ref STATE_INDEX: HashMap<[u8; 6], usize> = {
         let perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
-        let mut m = HashMap::with_capacity(6*STATES.len());
+        let mut m = HashMap::new(); // HashMap::with_capacity(438);
         for (i, state) in STATES.iter().enumerate() {
             for perm in perms {
                 let state2 = state.map(|v| if v == 0 {0} else {perm[v as usize -1]+1});

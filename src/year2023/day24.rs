@@ -64,19 +64,19 @@ fn build_equations(h: &Hailstone) -> [[i64; 7]; 3] {
     ]
 }
 
-fn diff_equations<const N: usize>(e1: &[[i64; N]], e2: &[[i64; N]]) -> Vec<[OrderedFloat<f64>; N]> {
+fn diff_equations<'a, const N: usize>(e1: &'a [[i64; N]], e2: &'a [[i64; N]]) -> impl Iterator<Item=[OrderedFloat<f64>; N]> + 'a {
     e1.iter()
         .zip(e2.iter())
         .map(|(row1, row2)| std::array::from_fn(|i| OrderedFloat((row1[i] - row2[i]) as f64)))
-        .collect()
 }
 
 fn part2(hs: &[Hailstone]) -> i64 {
     let e1 = build_equations(&hs[0]);
     let e2 = build_equations(&hs[1]);
     let e3 = build_equations(&hs[2]);
-    let mut eqs = diff_equations(&e1, &e2);
-    eqs.append(&mut diff_equations(&e2, &e3));
+    let mut eqs = Vec::with_capacity(6);
+    eqs.extend(diff_equations(&e1, &e2));
+    eqs.extend(diff_equations(&e2, &e3));
     let sol = solve_linear_system(&eqs).unwrap();
     (sol[0].into_inner() + sol[1].into_inner() + sol[2].into_inner()).round() as i64
 }

@@ -9,16 +9,16 @@ pub fn solve(input: &str) -> (u16, u16) {
     let grid= Grid::parse_with_padding(input, b'#').unwrap();
     
     let mut queue  = vec![ArrayVec::new(); 100];
-    let p1 = astar(&grid, &mut queue, 1, 3);
+    let p1 = astar::<1, 3>(&grid, &mut queue);
     queue.iter_mut().for_each(|q| q.clear());
-    let p2 = astar(&grid, &mut queue, 4, 10);
+    let p2 = astar::<4, 10>(&grid, &mut queue);
     (p1, p2)
 }
 
 const VERTICAL: usize = 0;
 const HORIZONTAL: usize = 1;
 
-fn astar(grid: &Grid<u8>, queue: &mut [ArrayVec<(usize, usize, u16), 500>], min_dist: usize, max_dist: usize) -> u16 {
+fn astar<const MIN: usize, const MAX: usize>(grid: &Grid<u8>, queue: &mut [ArrayVec<(usize, usize, u16), 500>]) -> u16 {
     let start = grid.width + 1;
     let goal = Point::new(grid.width - 2, grid.height - 2);
     let mut heuristic = vec![0; grid.width * grid.height];
@@ -54,13 +54,13 @@ fn astar(grid: &Grid<u8>, queue: &mut [ArrayVec<(usize, usize, u16), 500>], min_
                 let mut psum = 0;
                 let mut next = node;
                 let next_dir = 1 - direction;
-                for i in 1..max_dist+1 {
+                for i in 1..MAX+1 {
                     next += dir2;
                     if grid[next] == b'#' {
                         break;
                     }
                     psum += grid[next] - b'0';
-                    if i < min_dist {
+                    if i < MIN {
                         continue;
                     }
                     let h = heuristic[next];
