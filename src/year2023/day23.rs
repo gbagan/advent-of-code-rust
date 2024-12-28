@@ -1,7 +1,6 @@
 use arrayvec::ArrayVec;
 use crate::util::grid::Grid;
 use ahash::{HashMap, HashMapExt};
-use lazy_static::lazy_static;
 
 struct GridGraph {
     extremities: i32,
@@ -267,8 +266,47 @@ const STATES: [[u8; 6]; N] = [
     [0, 3, 1, 2, 2, 1],
 ];
 
-lazy_static! {
-    static ref STATE_INDEX: HashMap<[u8; 6], usize> = {
+/*
+const fn to_state_index(c: [u8; 6]) -> usize {
+    ((c[0] as usize) << 10)
+    + ((c[1] as usize) << 8)
+    + ((c[2] as usize) << 6)
+    + ((c[3] as usize) << 4)
+    + ((c[4] as usize) << 2)
+    + c[5] as usize
+}
+
+const STATE_INDEX: [usize; 4096] = {
+    let mut table = [0; 4096];
+    let perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+    let mut i = 0; 
+    
+    while i < STATES.len() {
+        let mut j = 0;
+        let st = STATES[i];
+        while j < 6 {
+            let mut st2 = [0; 6];
+            let mut k = 0;
+            let perm = perms[j];
+            while k < 6 {
+                if st[k] > 0 {
+                    st2[k] = perm[st[k] as usize - 1] + 1;
+                }
+                k += 1;
+            }
+            table[to_state_index(st2)] = i;
+
+            j += 1;
+        }
+        i += 1;
+    }
+
+    table
+};
+*/
+
+fn part2(grid: &GridGraph) -> i32 {
+    let state_index: HashMap<[u8; 6], usize> = {
         let perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
         let mut m = HashMap::new(); // HashMap::with_capacity(438);
         for (i, state) in STATES.iter().enumerate() {
@@ -279,9 +317,7 @@ lazy_static! {
         }
         m
     };
-}
 
-fn part2(grid: &GridGraph) -> i32 {
     let mut h_edges: [ArrayVec<(usize, usize), 2>; 30] = std::array::from_fn(|_| ArrayVec::new());
         
     h_edges[0].push((0, 1));
@@ -364,7 +400,7 @@ fn part2(grid: &GridGraph) -> i32 {
                                 weight += grid.horizontal[i][j]
                             }
                         }
-                        let idx = STATE_INDEX[&new_state];
+                        let idx = state_index[&new_state];
                         if next[idx] < weight {
                             next[idx] = weight;
                         }
