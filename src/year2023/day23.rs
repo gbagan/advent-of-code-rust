@@ -1,6 +1,6 @@
 use arrayvec::ArrayVec;
 use crate::util::grid::Grid;
-use ahash::{HashSet, HashSetExt, HashMap, HashMapExt};
+use ahash::{HashMap, HashMapExt};
 use lazy_static::lazy_static;
 
 struct GridGraph {
@@ -10,8 +10,8 @@ struct GridGraph {
 }
 
 pub fn solve(input: &str) -> (i32, i32) {
-    let grid = Grid::parse_with_padding(input, b'#').unwrap();
-    let graph = compress_grid(&grid);
+    let mut grid = Grid::parse_with_padding(input, b'#').unwrap();
+    let graph = compress_grid(&mut grid);
     let grid = graph_to_grid(&graph);
     let p1 = part1(&grid);
     let p2 = part2(&grid);
@@ -30,8 +30,11 @@ fn neighbors2 (grid: &Grid<u8>, idx: usize) -> ArrayVec<usize, 4> {
     }
 }
 
-fn follow_path(grid: &Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) -> Option<(usize, i32)> {
+fn follow_path(grid: &mut Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) -> Option<(usize, i32)> {  
     let mut len = 1;
+    if grid[pos] == b'?' {
+        return None
+    }
     loop {
         let nbors = neighbors2(grid, pos);
         match nbors.len() {
@@ -42,6 +45,7 @@ fn follow_path(grid: &Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) ->
                     pos = next;
                     len += 1;
                 } else if pos == goal {
+                    grid[pred] = b'?';
                     return Some((pos, len))
                 } else {
                     return None
@@ -55,37 +59,45 @@ fn follow_path(grid: &Grid<u8>, mut pos: usize, mut pred: usize, goal: usize) ->
                 pred = pos;
                 pos = pos2;
             },
-            _ => return Some((pos, len))
+            _ => {
+                grid[pred] = b'?';
+                return Some((pos, len))
+            }
         }
     }
 }
 
-fn compress_grid(grid: &Grid<u8>) -> Vec<ArrayVec<(usize, i32), 4>> {
+fn compress_grid(grid: &mut Grid<u8>) -> Vec<ArrayVec<(usize, i32), 4>> {
     let h = grid.height;
     let w = grid.width;
     let start = w+2;
     let goal = w * (h-1) - 3;
-    let mut junctions: ArrayVec<usize, 36> = ArrayVec::new();
-    let mut n = 0;
-    let grid2: Vec<_> = (0..h*w).map(|idx| {
+    let mut junctions: ArrayVec<(usize, ArrayVec<usize, 4>), 36> = ArrayVec::new();
+    
+    let junction_index: Vec<_> = (0..h*w).map(|idx| {
         let nbors = neighbors2(grid, idx);
         if idx == start || idx == goal || nbors.len() > 2 {
-            let m = n;
-            n += 1;
-            let nbors2 = nbors
-                .iter()
-                .filter_map(|&next| follow_path(grid, next, idx, goal))
-                .collect();
-            junctions.push(idx);
-            (m, nbors2)
+            junctions.push((idx, nbors));
+            junctions.len() - 1
         } else {
-            (n, vec!())
+            0
         }
     }).collect();
-    junctions.iter().map(|&idx| {
-        let nbors = &grid2[idx];
-        nbors.1.iter().map(|&(idx2, len)| (grid2[idx2].0, len)).collect()
-    }).collect()
+
+    let mut compressed = vec![ArrayVec::new(); 36];
+    
+    for (i, (idx, nbors)) in junctions.iter().enumerate() {
+        for &nbor in nbors {
+            if let Some((idx2, len)) = follow_path(grid, nbor, *idx, goal) {
+                let j = junction_index[idx2];
+                compressed[i].push((j, len));
+                compressed[j].push((i, len));
+            }
+        }
+    }
+
+    compressed
+
 }
 
 fn graph_to_grid(graph: &[ArrayVec<(usize, i32), 4>]) -> GridGraph {
@@ -97,17 +109,17 @@ fn graph_to_grid(graph: &[ArrayVec<(usize, i32), 4>]) -> GridGraph {
     let mut nodes = [[0; 6]; 6];
     let mut horizontal = [[0; 5]; 6];
     let mut vertical = [[0; 6]; 6];
-    let mut visited = HashSet::new();
+    let mut seen = [false; 36];
     nodes[0][0] = next_to_start;
     let mut current = next_to_start;
-    
+    seen[current] = true;
+
     let mut next_border = |node: usize| {
-        let (node, weight) = graph[node]
+        let (node, weight) = *graph[node]
             .iter()
-            .find(|(next, _)|graph[*next].len() == 3 && !visited.contains(next))
-            .copied()
+            .find(|(next, _)|graph[*next].len() == 3 && !seen[*next])
             .unwrap();
-        visited.insert(node);
+        seen[node] = true;
         (node, weight)
     };
 
@@ -137,17 +149,17 @@ fn graph_to_grid(graph: &[ArrayVec<(usize, i32), 4>]) -> GridGraph {
             let left = nodes[y][x - 1];
             let (node, hweight, vweight) = graph[left]
                 .iter()
-                .find_map(|(node, hweight)|
-                    if visited.contains(node) {
+                .find_map(|&(node, hweight)|
+                    if seen[node] {
                         None 
                     } else {
-                        weight_between(*node, above).map(|w| (node, *hweight, w))
+                        weight_between(node, above).map(|w| (node, hweight, w))
                     }
                 ).unwrap();
             horizontal[y][x-1] = hweight;
             vertical[y-1][x] = vweight;
-            nodes[y][x] = *node;
-            visited.insert(*node);
+            nodes[y][x] = node;
+            seen[node] = true;
         }
     }
 
