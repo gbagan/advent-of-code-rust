@@ -12,23 +12,17 @@ pub fn part1(ingredients: &[[i32; 5]]) -> i32 {
     let mut prev_score = i32::MIN;
 
     loop {
-        let i = (0..4).map(|i| {
+        let (sol2, score2) = (0..16).map(|i| {
             let mut sol2 = sol;
-            sol2[i] += 1;
-            (i, score(sol2, ingredients))
-        }).max_by_key(|x| x.1).unwrap().0;
-
-        sol[i] += 1;
-        let (i, s2) = (0..4).map(|i| {
-            let mut sol2 = sol;
-            sol2[i] -= 1;
-            (i, score(sol2, ingredients))
+            sol2[i>>2] -= 1;
+            sol2[i&3] += 1;
+            (sol2, score(sol2, ingredients))
         }).max_by_key(|x| x.1).unwrap();
-        if s2 == prev_score {
-            return s2
+        if score2 == prev_score {
+            return score2
         }
-        prev_score = s2;
-        sol[i] -= 1;
+        prev_score = score2;
+        sol = sol2;
     }
 }
 
@@ -53,19 +47,37 @@ fn calories(quantities: [i32; 4], ingredients: &[[i32; 5]]) -> i32 {
 
 pub fn part2(ingredients: &[[i32; 5]]) -> i32 {
     let mut best_score = i32::MIN;
-    let c2 = ingredients[1][4];
-    let c4 = ingredients[3][4];
-    for i in 0..101 {
-        let c1 = i * ingredients[0][4];
-        for k in 0..101-i {
-            let c3 = k * ingredients[2][4];
-            if let Some((j, l)) = solve_equations(c2, c4, 100 - i - k, 500 - c1 - c3) {
+    if ingredients[2][4] != ingredients[3][4] {
+        let c3 = ingredients[2][4];
+        let c4 = ingredients[3][4];
+        for i in 0..101 {
+            let c1 = i * ingredients[0][4];
+            for j in 0..101-i {
+                let c2 = j * ingredients[2][4];
+                if let Some((k, l)) = solve_equations(c3, c4, 100 - i - j, 500 - c1 - c2) {
                 
-                let quantities = [i, j, k, l];
-                best_score = best_score.max(score(quantities, ingredients));
+                    let quantities = [i, j, k, l];
+                    best_score = best_score.max(score(quantities, ingredients));
+                }
             }
         }
-    }
+    } else if ingredients[1][4] != ingredients[3][4] {   
+        let c2 = ingredients[1][4];
+        let c4 = ingredients[3][4];
+        for i in 0..101 {
+            let c1 = i * ingredients[0][4];
+            for k in 0..101-i {
+                let c3 = k * ingredients[2][4];
+                if let Some((j, l)) = solve_equations(c2, c4, 100 - i - k, 500 - c1 - c3) {
+                
+                    let quantities = [i, j, k, l];
+                    best_score = best_score.max(score(quantities, ingredients));
+                }
+            }
+        }
+    } else {
+        panic!();
+    };
     best_score
 }
 
