@@ -1,28 +1,31 @@
-use anyhow::*;
-
-pub fn solve(input: &str) -> Result<(i32, usize)> {
+pub fn solve(input: &str) -> (i32, usize) {
+    let input = input.trim().as_bytes();
     let p1 = part1(input);
-    let p2 = part2(input).context("Part 2: no solution found")?;
-    Ok((p1, p2))
+    let p2 = part2(input);
+    (p1, p2)
 }
 
-pub fn part1(input: &str) -> i32 {
-    input.bytes().fold(0, |acc, chr|
-        match chr {
-            b'(' => acc + 1,
-            b')' => acc - 1,
-            _ => acc
+pub fn part1(input: &[u8]) -> i32 {
+    let mut n = 0;
+    
+    for &c in input {
+        n += (c == b'(') as i32
+    }
+    2 * n - input.len() as i32
+}
+
+pub fn part2(input: &[u8]) -> usize {
+    let mut n = 0;
+    
+    for (i, &c) in input.iter().enumerate() {
+        if c == b'(' {
+            n += 1;
+        } else {
+            n -= 1;
+            if n < 0 {
+                return i+1;
+            }
         }
-    )
-}
-
-pub fn part2(input: &str) -> Option<usize> {
-    input.bytes().scan(0, |acc, chr| {
-        match chr {
-            b'(' => *acc += 1,
-            b')' => *acc -= 1,
-            _ => ()
-        };
-        Some(*acc)
-    }).position(|r| r < 0).map(|x| x + 1)
+    }
+    unreachable!();
 }

@@ -1,55 +1,53 @@
-use anyhow::*;
-use ahash::HashSet;
-use num_integer::Integer;
+use ahash::{HashSet, HashSetExt};
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> (usize, usize) {
     let bytes = input.trim().as_bytes();
-    Ok((part1(bytes), part2(bytes)))
+    (part1(bytes), part2(bytes))
 }
 
 pub fn part1(bytes: &[u8]) -> usize {
-    let origin: (i32, i32) = (0, 0);
+    let mut position: (i32, i32) = (0, 0);
+    let mut seen = HashSet::new();
+    seen.insert(position);
 
-    let positions = bytes.iter().scan(origin, |acc, dir| {
-        match dir {
-            b'<' => acc.0 -= 1,
-            b'>' => acc.0 += 1,
-            b'^' => acc.1 -= 1,
-            b'v' => acc.1 += 1,
-            _ => panic!("Unexpected character: {}", *dir as char),
+    for &c in bytes.iter() {
+        match c {
+            b'<' => position.0 -= 1,
+            b'>' => position.0 += 1,
+            b'^' => position.1 -= 1,
+            _ => position.1 += 1,
         }
-        Some(*acc)
-    });
-    let mut visited: HashSet<(i32, i32)> = HashSet::from_iter(positions);
-    visited.insert(origin);
-    visited.len()
+        seen.insert(position);
+    }
+
+    seen.len()
 }
 
 pub fn part2(bytes: &[u8]) -> usize {
-    let origin: (isize, isize) = (0, 0);
+    let mut position1 = (0i32, 0i32);
+    let mut position2 = (0i32, 0i32);
+    let mut seen = HashSet::new();
+    seen.insert(position1);
 
-    let positions = bytes.iter().enumerate().scan((origin, origin), |(acc1, acc2), (i, dir)| {
-        if i.is_even() {
-            match dir {
-                b'<' => acc1.0 -= 1,
-                b'>' => acc1.0 += 1,
-                b'^' => acc1.1 -= 1,
-                b'v' => acc1.1 += 1,
-                _ => panic!("invalid direction: {dir}"),
+    for (i, &c) in bytes.iter().enumerate() {
+        if i & 1 == 0 {
+            match c {
+                b'<' => position1.0 -= 1,
+                b'>' => position1.0 += 1,
+                b'^' => position1.1 -= 1,
+                _ => position1.1 += 1,
             }
-            Some (*acc1)
+            seen.insert(position1);
         } else {
-            match dir {
-                b'<' => acc2.0 -= 1,
-                b'>' => acc2.0 += 1,
-                b'^' => acc2.1 -= 1,
-                b'v' => acc2.1 += 1,
-                _ => panic!("invalid direction: {dir}"),
+            match c {
+                b'<' => position2.0 -= 1,
+                b'>' => position2.0 += 1,
+                b'^' => position2.1 -= 1,
+                _ => position2.1 += 1,
             }
-            Some (*acc2)
-        }    
-    });
-    let mut visited: HashSet<(isize, isize)> = HashSet::from_iter(positions);
-    visited.insert(origin);
-    visited.len()
+            seen.insert(position2);
+        }
+    }
+
+    seen.len()
 }

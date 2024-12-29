@@ -1,4 +1,3 @@
-use anyhow::*;
 use std::thread;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::simd::{LaneCount, SupportedLaneCount};
@@ -11,7 +10,7 @@ pub struct Shared {
     p2: AtomicU32,
 }
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let input = input.trim();
     let shared = Shared {
         done: AtomicBool::new(false),
@@ -28,7 +27,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
 
     let p1 = shared.p1.load(Ordering::Relaxed);
     let p2 = shared.p2.load(Ordering::Relaxed);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn worker(input: &str, shared: &Shared) {

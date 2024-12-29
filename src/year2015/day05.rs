@@ -1,21 +1,14 @@
-use anyhow::*;
-
-pub fn solve(input: &str) -> Result<(u32, usize)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut p1 = 0;
     let mut p2 = 0;
     let mut pairs = [0; 729];
     
     for (i, line) in input.lines().enumerate() {
         let line = line.as_bytes();
-        if is_nice_string(line) {
-            p1 += 1;
-        }
-        if is_nice_string2(line, i, &mut pairs) {
-            p2 += 1;
-        }
+        p1 += is_nice_string(line) as u32;
+        p2 += is_nice_string2(line, i, &mut pairs) as u32;
     }
-    Ok((p1, p2))
-
+    (p1, p2)
 }
 
 fn is_nice_string (line: &[u8]) -> bool {
@@ -25,9 +18,7 @@ fn is_nice_string (line: &[u8]) -> bool {
     let mut pairs = 0;
     for c in line.iter() {
         let bits = 1 << (c - b'a');
-        if bits & 0x0104111 != 0 {
-            vowels += 1;
-        }
+        vowels += (bits & 0x0104111 != 0) as u32;
 
         if current & (previous << 1) & 0x101000a != 0 {
             return false;

@@ -1,13 +1,12 @@
 // dynamic programming
 
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let numbers: Vec<_> = input.iter_unsigned().collect();
     let p1 = solve1(&numbers, 150);
-    let p2 = solve2(&numbers, 150).context("Part 2: No solution Found")?;
-    Ok((p1, p2))
+    let p2 = solve2(&numbers, 150);
+    (p1, p2)
 }
 
 fn solve1(numbers: &[usize], target: usize) -> u32 {
@@ -30,7 +29,7 @@ fn solve1(numbers: &[usize], target: usize) -> u32 {
     table[size-1]
 }
 
-fn solve2(numbers: &[usize], target: usize) -> Option<u32> {
+fn solve2(numbers: &[usize], target: usize) -> u32 {
     let n = numbers.len();
     let m = target+1;
     let size = (n+1)*m;
@@ -57,11 +56,11 @@ fn solve2(numbers: &[usize], target: usize) -> Option<u32> {
             }
         }
         if table[size-1] != 0 {
-            return Some(table[size-1]);
+            return table[size-1];
         }
         std::mem::swap(&mut table, &mut prev_table);
     }
-    None
+    unreachable!()
 }
 
 #[cfg(test)]

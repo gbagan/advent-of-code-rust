@@ -1,6 +1,5 @@
-use anyhow::*;
 use itertools::Itertools;
-use std::collections::HashSet;
+use ahash::{HashSet, HashSetExt};
 use crate::util::{heap::MinHeap, parser::*};
 
 struct Config {
@@ -18,15 +17,26 @@ struct State {
     shield: u8,
 }
 
-pub fn solve(input: &str) -> Result<(i16, i16)> {
-    let (boss_hp, boss_damage) = input.iter_unsigned().collect_tuple()
-                                            .context("Parse error")?;
+pub fn solve(input: &str) -> (i16, i16) {
+    let (boss_hp, boss_damage) = input.iter_unsigned().collect_tuple().unwrap();
 
-    let p1 = simulate(boss_hp, boss_damage, false)
-                    .context("Part 1: Player cannot win")?;
-    let p2 = simulate(boss_hp, boss_damage, false)
-                    .context("Part 2: Player cannot win")?;
-    Ok((p1, p2))
+    let p1 = simulate(boss_hp, boss_damage, false);
+    let p2 = simulate(boss_hp, boss_damage, true);
+    (p1, p2)
+}
+
+pub fn simulate(boss_hp: i16, boss_damage: i16, hard_mode: bool) -> i16 {
+    let config = Config { boss_damage, hard_mode };
+    
+    let state = State {
+        player_hp: 50,
+        boss_hp,
+        current_mana: 500,
+        poison: 0,
+        recharge: 0,
+        shield: 0,
+    };
+    dijkstra(&config, &state)
 }
 
 fn apply_effects(state: &mut State) -> bool {
@@ -44,13 +54,13 @@ fn apply_effects(state: &mut State) -> bool {
     state.boss_hp <= 0
 }
 
-fn dijkstra(config: &Config, state: &State) -> Option<i16>{
+fn dijkstra(config: &Config, state: &State) -> i16 {
     let mut queue = MinHeap::new();
-    let mut visited = HashSet::new();
+    let mut seen = HashSet::new();
     queue.push(0, *state);
     
     while let Some((consumed_mana, state)) = queue.pop() {
-        if !visited.insert(state) {
+        if !seen.insert(state) {
             continue;
         }
         let hp = state.player_hp - (if config.hard_mode {1} else {0});
@@ -60,7 +70,7 @@ fn dijkstra(config: &Config, state: &State) -> Option<i16>{
         let mut state = state;
         state.player_hp = hp;
         if apply_effects(&mut state) {
-            return Some(consumed_mana);
+            return consumed_mana;
         }
     
         if state.current_mana >= 53 {
@@ -68,7 +78,7 @@ fn dijkstra(config: &Config, state: &State) -> Option<i16>{
             next.current_mana -= 53;
             next.boss_hp -= 4;
             if next.boss_hp <= 0 || apply_effects(&mut next) {
-                return Some(consumed_mana + 53);
+                return consumed_mana + 53;
             }
             if boss_turn(config, &mut next) {
                 queue.push(consumed_mana + 53, next);
@@ -116,7 +126,7 @@ fn dijkstra(config: &Config, state: &State) -> Option<i16>{
             }
         }
     }
-    None
+    unreachable!();
 }
 
 fn boss_turn(config: &Config, state: &mut State) -> bool {
@@ -126,18 +136,4 @@ fn boss_turn(config: &Config, state: &mut State) -> bool {
     }
     state.player_hp -= damage;
     state.player_hp >= 0 || state.current_mana >= 53
-}
-
-pub fn simulate(boss_hp: i16, boss_damage: i16, hard_mode: bool) -> Option<i16> {
-    let config = Config { boss_damage, hard_mode };
-    
-    let state = State {
-        player_hp: 50,
-        boss_hp,
-        current_mana: 500,
-        poison: 0,
-        recharge: 0,
-        shield: 0,
-    };
-    dijkstra(&config, &state)
 }

@@ -1,102 +1,91 @@
-use anyhow::*;
-use std::cmp::max;
-use itertools::Itertools;
-use crate::util::{parallel::*, parser::*};
+use crate::util::parser::*;
 
-pub struct Ingredient {
-    capacity: i32,
-    durability: i32,
-    flavor: i32,
-    texture: i32,
-    calories: i32,
-}
-
-pub fn solve(input: &str) -> Result<(i32, i32)> {
-    let mut ingredients = vec!();
-    for (capacity, durability, flavor, texture, calories) in input.iter_unsigned().tuples() {
-        ingredients.push(Ingredient { capacity, durability, flavor, texture, calories });
-    }
+pub fn solve(input: &str) -> (i32, i32) {
+    let ingredients: Vec<[i32; 5]> = input.iter_signed().array_chunks().collect();
     let p1 = part1(&ingredients);
     let p2 = part2(&ingredients);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
-fn score(quantities: & Vec<u32>, ingredients: &[Ingredient]) -> Option<i32> {
-    let capacity: i32 = ingredients
-        .iter()
-        .zip(quantities)
-        .map(|(ing, q)| ing.capacity * *q as i32)
-        .sum();
+pub fn part1(ingredients: &[[i32; 5]]) -> i32 {
+    let mut sol = [25, 25, 25, 25];
+    let mut prev_score = i32::MIN;
 
-    let durability: i32 = ingredients
-        .iter()
-        .zip(quantities)
-        .map(|(ing, q)| ing.durability * *q as i32)
-        .sum();
+    loop {
+        let i = (0..4).map(|i| {
+            let mut sol2 = sol;
+            sol2[i] += 1;
+            (i, score(sol2, ingredients))
+        }).max_by_key(|x| x.1).unwrap().0;
 
-    let flavor: i32 = ingredients
-        .iter()
-        .zip(quantities)
-        .map(|(ing, q)| ing.flavor * *q as i32)
-        .sum();
-
-    let texture: i32 = ingredients
-        .iter()
-        .zip(quantities)
-        .map(|(ing, q)| ing.texture * *q as i32)
-        .sum();
-
-    if capacity < 0 || durability < 0 || flavor < 0 || texture < 0 {
-        None
-    } else {
-        Some(capacity * durability * flavor * texture)
+        sol[i] += 1;
+        let (i, s2) = (0..4).map(|i| {
+            let mut sol2 = sol;
+            sol2[i] -= 1;
+            (i, score(sol2, ingredients))
+        }).max_by_key(|x| x.1).unwrap();
+        if s2 == prev_score {
+            return s2
+        }
+        prev_score = s2;
+        sol[i] -= 1;
     }
 }
 
-fn calories(quantities: & Vec<u32>, ingredients: &[Ingredient]) -> i32 {
-    ingredients
-        .iter()
-        .zip(quantities)
-        .map(|(ing, q)| ing.calories * *q as i32)
-        .sum()
+#[inline]
+fn score(quantities: [i32; 4], ingredients: &[[i32; 5]]) -> i32 {
+    let vals: [i32; 4] = std::array::from_fn(|i|
+        quantities.iter().zip(ingredients).map(|(&q, ing)| q * ing[i]).sum()
+    );
+
+    let v= vals[0].min(0) + vals[1].min(0) + vals[2].min(0) + vals[3].min(0);
+    if v == 0 {
+        vals[0] * vals[1] * vals[2] * vals[3]
+    } else {
+        1000 * v
+    }
 }
 
-pub fn part1(ingredients: &[Ingredient]) -> i32 {
-    (0usize..101).into_par_iter().map(|i| {
-        let i = i as u32;
-        let mut best_score = 0;
-        for j in 0..100-i+1 {
-            for k in 0..100-i-j+1 {
-                let quantities = vec!(i, j, k, 100 - i - j - k);
-                match score(&quantities, ingredients) {
-                    Some(s) if s > best_score => {
-                        best_score = s;
-                    }
-                    _ => ()
-                } 
-            }
-        }
-        best_score
-    }).reduce(0, max)
+#[inline]
+fn calories(quantities: [i32; 4], ingredients: &[[i32; 5]]) -> i32 {
+    quantities.iter().zip(ingredients).map(|(&q, ing)| q * ing[4]).sum()
 }
 
-pub fn part2(ingredients: &[Ingredient]) -> i32 {
-    let mut best_score = 0;
+pub fn part2(ingredients: &[[i32; 5]]) -> i32 {
+    let mut best_score = i32::MIN;
+    let c2 = ingredients[1][4];
+    let c4 = ingredients[3][4];
     for i in 0..101 {
-        for j in 0..101-i {
-            for k in 0..101-i-j {
-                let quantities = vec!(i, j, k, 100 - i - j - k);
-                if calories(&quantities, ingredients) != 500 {
-                    break;
-                }
-                match score(&quantities, ingredients) {
-                    Some(s) if s > best_score => {
-                        best_score = s;
-                    }
-                    _ => ()
-                } 
+        let c1 = i * ingredients[0][4];
+        for k in 0..101-i {
+            let c3 = k * ingredients[2][4];
+            if let Some((j, l)) = solve_equations(c2, c4, 100 - i - k, 500 - c1 - c3) {
+                
+                let quantities = [i, j, k, l];
+                best_score = best_score.max(score(quantities, ingredients));
             }
         }
     }
     best_score
+}
+
+#[inline]
+fn solve_equations(c3: i32, c4: i32, t1: i32, t2: i32) -> Option<(i32, i32)> {
+    let det1 = t2 - c4 * t1;
+    let det2 = c3 - c4;
+    if det2 == 0 || det1 % det2 != 0 {
+        return None;
+    }
+    let x = det1 / det2;
+    let y = t1 - x;
+
+    if x < 0 || y < 0 {
+        return None;
+    }
+    Some((x, y))
+}
+
+#[test]
+fn solve_equations_test() {
+    assert_eq!(solve_equations(3, 5, 10, 44), Some((3, 7)));
 }

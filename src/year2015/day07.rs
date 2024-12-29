@@ -1,5 +1,5 @@
 use anyhow::*;
-use std::collections::HashMap;
+use ahash::{HashMap, HashMapExt};
 use itertools::Itertools;
 use crate::util::parser::*;
 
