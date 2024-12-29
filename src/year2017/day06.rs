@@ -1,4 +1,3 @@
-use anyhow::*;
 use itertools::iterate;
 use crate::util::{iter::*, parser::*};
 
@@ -21,12 +20,17 @@ const SPREAD: [u64; 16] = [
     0x1111111111111110,
 ];
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> (usize, usize) {
     let banks: u64 = input.iter_unsigned().fold(0, |acc, n: u64| (acc << 4) + n);
 
-    let (i, j, _) = iterate(banks, step).find_duplicate()
-                            .context("No solution found")?;
-    Ok((j, j - i))
+    let (i, j, _) = iterate(banks, step).find_duplicate().unwrap();
+    (j, j - i)
+}
+
+fn step(banks: &u64) -> u64 {
+    let banks = *banks;
+    let (offset, max) = find_max(banks);
+    (banks & 0xffff_ffff_ffff_fff0u64.rotate_left(offset)) + SPREAD[max as usize].rotate_left(offset)
 }
 
 #[inline(always)]
@@ -40,12 +44,6 @@ fn find_max(banks: u64) -> (u32, u64) {
     }
     let offset = 60 - mask.leading_zeros();
     (offset, banks >> offset & 0xf)
-}
-
-fn step(banks: &u64) -> u64 {
-    let banks = *banks;
-    let (offset, max) = find_max(banks);
-    (banks & 0xffff_ffff_ffff_fff0u64.rotate_left(offset)) + SPREAD[max as usize].rotate_left(offset)
 }
 
 #[test]

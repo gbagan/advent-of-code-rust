@@ -11,7 +11,7 @@ struct Instr<'a> {
     val2: i32,
 }
 
-pub fn solve(input: &str) -> Result<(i32, i32)> {
+pub fn solve(input: &str) -> (i32, i32) {
     let mut vars: HashMap<&str, i32> = HashMap::new();
     let mut max_value = 0;
     // todo
@@ -22,14 +22,14 @@ pub fn solve(input: &str) -> Result<(i32, i32)> {
             let var1 = match instr.cmd {
                 "inc" => var1 + instr.val1,
                 "dec" => var1 - instr.val1,
-                _ => bail!("Unexpeced characters {}", instr.cmd),
+                _ => panic!("Unexpected characters {}", instr.cmd),
             };
             max_value = max_value.max(var1);
             vars.insert(instr.var1, var1);
         }
     }
     let max_final_value = *vars.values().max().unwrap();
-    Ok((max_final_value, max_value))
+    (max_final_value, max_value)
 }
 
 
@@ -48,6 +48,6 @@ fn compare(a: i32, cmp: &str, b: i32) -> bool {
         ">=" => a >= b,
         "<" => a < b,
         ">" => a > b,
-        _ => panic!("unexpected character {cmp}") 
+        _ => panic!("Unexpected character {cmp}") 
     }
 }

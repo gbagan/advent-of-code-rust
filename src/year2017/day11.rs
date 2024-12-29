@@ -1,9 +1,8 @@
-use anyhow::*;
 use crate::util::coord::Coord;
 
 type Point = Coord<i32>;
 
-pub fn solve(input: &str) -> Result<(i32, i32)> {
+pub fn solve(input: &str) -> (i32, i32) {
     let directions = input.trim().split(',').map(to_coord);
     let coords = directions.scan(Point::ORIGIN, |acc, dir| {
         *acc += dir;
@@ -17,7 +16,7 @@ pub fn solve(input: &str) -> Result<(i32, i32)> {
         p2 = p2.max(d);
     }
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn to_coord(s: &str) -> Point {

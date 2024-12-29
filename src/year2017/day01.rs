@@ -1,13 +1,11 @@
-use anyhow::*;
-
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> (usize, usize) {
     let bytes = input.trim().as_bytes();
     let p1 = captcha_sum(bytes, 1);
     let p2 = captcha_sum(bytes, bytes.len() / 2);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
-fn captcha_sum (bytes: &[u8], shift: usize) -> usize {
+fn captcha_sum(bytes: &[u8], shift: usize) -> usize {
     let mut acc = 0;
     let n = bytes.len();
     for (i, &c) in bytes.iter().enumerate() {

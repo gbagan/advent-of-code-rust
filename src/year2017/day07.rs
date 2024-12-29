@@ -1,29 +1,16 @@
-use anyhow::*;
 use std::collections::HashMap;
 use itertools::{Itertools, MinMaxResult};
 use crate::util::parser::*;
 
 struct Node<'a> {
     id: &'a str,
-    weight:u32,
+    weight: u32,
     total_weight: u32,
     children: Vec<usize>,
 }
 
-fn parse_line(line: &str) -> Result<(&str, u32, Vec<&str>)> {
-    let (node, children) =
-        if let Some((left, right)) = line.split_once(" -> ") {
-            (left, right.split(", ").collect())
-        } else {
-            (line, vec!())
-        };
-    let (id, weight) = node.split_once(" (").context("No delimiter ' (' found")?;
-    let weight = weight.trim_end_matches(')').try_unsigned()?;
-    Ok((id, weight, children))
-}
-
-pub fn solve(input: &str) -> Result<(String, u32)> {
-    let raw_nodes: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
+pub fn solve(input: &str) -> (String, u32) {
+    let raw_nodes: Vec<_> = input.lines().map(parse_line).collect();
     let mut tree = Vec::with_capacity(raw_nodes.len());
     let mut has_parent = vec![false; raw_nodes.len()];
     let mut  id_to_index = HashMap::new();
@@ -39,7 +26,7 @@ pub fn solve(input: &str) -> Result<(String, u32)> {
         }
     }
     
-    let root = has_parent.iter().position(|b| !b).context("No root found")?;
+    let root = has_parent.iter().position(|b| !b).unwrap();
     let p1 = tree[root].id.to_string();
     let mut p2 = 0;
 
@@ -62,7 +49,19 @@ pub fn solve(input: &str) -> Result<(String, u32)> {
             }
         }
     }
-    Ok((p1, p2))
+    (p1, p2)
+}
+
+fn parse_line(line: &str) -> (&str, u32, Vec<&str>) {
+    let (node, children) =
+        if let Some((left, right)) = line.split_once(" -> ") {
+            (left, right.split(", ").collect())
+        } else {
+            (line, vec!())
+        };
+    let (id, weight) = node.split_once(" (").unwrap();
+    let weight = weight.trim_end_matches(')').try_unsigned().unwrap();
+    (id, weight, children)
 }
 
 fn dfs(tree: &[Node], root: usize) -> Vec<usize> {

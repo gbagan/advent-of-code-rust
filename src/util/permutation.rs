@@ -1,66 +1,45 @@
-use std::ops::{Shr,ShrAssign};
-
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Permutation { pub indices: Vec<usize> }
+pub struct Permutation<const N: usize>{ pub indices: [usize; N] }
 
-impl Permutation {
-    pub fn one(n: usize) -> Self {
-        Permutation { indices: (0..n).collect() }
+impl<const N: usize> Permutation<N> {
+    pub fn one() -> Self {
+        Permutation { indices: std::array::from_fn(|i| i) }
     }
 
-    pub fn apply<A: Clone>(&self, arr: &[A]) -> Vec<A> {
-        self.indices.iter().map(|&idx| arr[idx].clone()).collect()
+    pub fn apply<A: Clone>(&self, arr: &[A]) -> [A; N] {
+        self.indices.map(|idx| arr[idx].clone())
     }
 
-    pub fn swap(n: usize, i: usize, j: usize) -> Self {
-        let mut perm = Self::one(n);
+    pub fn swap(i: usize, j: usize) -> Self {
+        let mut perm = Self::one();
         perm.indices[i] = j;
         perm.indices[j] = i;
         perm
     }
 
     pub fn inv(&self) -> Self {
-        let mut indices = vec![0; self.indices.len()];
+        let mut indices = [0; N];
         for (i, j) in self.indices.iter().enumerate() {
             indices[*j] = i;
         }
         Permutation { indices }
     }
-}
 
-impl Shr<&Permutation> for Permutation {
-    type Output = Self;
-
-    fn shr(self, other: &Permutation) -> Self::Output {
-        Permutation { indices: other.apply(&self.indices) }
-    }
-}
-
-impl Shr<&Permutation> for &Permutation {
-    type Output = Permutation;
-
-    fn shr(self, other: &Permutation) -> Self::Output {
-        Permutation { indices: other.apply(&self.indices) }
-    }
-}
-
-// todo: implements apply_in_place
-impl ShrAssign<&Permutation> for Permutation {
-    fn shr_assign(&mut self, other: &Permutation) {
-        self.indices = other.apply(&self.indices)
+    pub fn right_compose(&self, other: &Self) -> Self {
+        Self { indices: other.apply(&self.indices) }
     }
 }
 
 #[test]
 fn apply_test() {
     let arr = ['a', 'b', 'c'];
-    let perm = Permutation { indices:  vec!(0, 2, 1) };
-    assert_eq!(perm.apply(&arr), vec!('a', 'c', 'b'));
+    let perm = Permutation { indices:  [0, 2, 1] };
+    assert_eq!(perm.apply(&arr), ['a', 'c', 'b']);
 }
 
 #[test]
 fn shr_test() {
-    let perm1 = Permutation { indices:  vec!(0, 2, 1) };
-    let perm2 = Permutation { indices:  vec!(1, 2, 0) };
-    assert_eq!(perm1 >> &perm2, Permutation { indices:  vec!(2, 1, 0) });
+    let perm1 = Permutation { indices:  [0, 2, 1] };
+    let perm2 = Permutation { indices:  [1, 2, 0] };
+    assert_eq!(perm1.right_compose(&perm2), Permutation { indices:  [2, 1, 0] });
 }

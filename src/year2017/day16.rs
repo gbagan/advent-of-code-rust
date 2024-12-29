@@ -1,4 +1,3 @@
-use anyhow::*;
 use itertools::Itertools;
 use crate::util::parser::*;
 use crate::util::permutation::Permutation;
@@ -7,11 +6,11 @@ use crate::util::power;
 // a dance is a tuple of (p, q)
 // p represents the permutation implied by Spin and Exchange
 // q represents the permutation implied by Partner
-type Dance = (Permutation, Permutation);
+type Dance = (Permutation::<16>, Permutation::<16>);
 
-pub fn solve(input: &str) -> Result<(String, String)> {
-    let mut perm1 = Permutation::one(16);
-    let mut perm2 = Permutation::one(16);
+pub fn solve(input: &str) -> (String, String) {
+    let mut perm1 = Permutation::<16>::one();
+    let mut perm2 = Permutation::<16>::one();
     let mut offset = 0;
 
     let mut numbers = input.iter_unsigned::<usize>();
@@ -28,24 +27,22 @@ pub fn solve(input: &str) -> Result<(String, String)> {
                 let (a, b) = symbols.next_tuple().unwrap();
                 perm2.indices.swap((a - b'a') as usize, (b - b'a') as usize);
             }
-            _ => bail!("Unexpected character {}", c as char)
+            _ => panic!("Unexpected character {}", c as char)
         }
     }
     perm1.indices.rotate_left(offset % 16);
     let dance = (perm1, perm2.inv());
 
     let programs = b"abcdefghijklmnop";
-    //let dance = perform_dance(&moves);
-    let p1 = (&dance.1 >> &dance.0).apply(programs);
-    let p1: String = String::from_utf8(p1).unwrap();
+    let p1 = dance.1.right_compose(&dance.0).apply(programs);
+    let p1: String = String::from_utf8(p1.to_vec()).unwrap();
     
     let pdance = power(compose_dance, dance.clone(), 1_000_000_000);
-    let p2 = (&pdance.1 >> &pdance.0).apply(programs);
-    let p2 = String::from_utf8(p2).unwrap();
-    Ok((p1, p2))
+    let p2 = pdance.1.right_compose(&pdance.0).apply(programs);
+    let p2 = String::from_utf8(p2.to_vec()).unwrap();
+    (p1, p2)
 }
 
 fn compose_dance(d1: &Dance, d2: &Dance) -> Dance {
-    (&d1.0 >> &d2.0, &d1.1 >> &d2.1)
+    (d1.0.right_compose(&d2.0), d1.1.right_compose(&d2.1))
 }
-

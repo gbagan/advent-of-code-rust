@@ -40,11 +40,6 @@ fn score(quantities: [i32; 4], ingredients: &[[i32; 5]]) -> i32 {
     }
 }
 
-#[inline]
-fn calories(quantities: [i32; 4], ingredients: &[[i32; 5]]) -> i32 {
-    quantities.iter().zip(ingredients).map(|(&q, ing)| q * ing[4]).sum()
-}
-
 pub fn part2(ingredients: &[[i32; 5]]) -> i32 {
     let mut best_score = i32::MIN;
     if ingredients[2][4] != ingredients[3][4] {

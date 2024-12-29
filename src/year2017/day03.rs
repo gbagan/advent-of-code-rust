@@ -1,14 +1,13 @@
-use anyhow::*;
-use std::collections::HashMap;
+use ahash::{HashMap, HashMapExt};
 use crate::util::{coord::Coord, parser::*};
 
 type Point = Coord<i32>;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let n = input.try_unsigned()?;
+pub fn solve(input: &str) -> (u32, u32) {
+    let n = input.try_unsigned().unwrap();
     let p1 = part1(n);
     let p2 = part2(n);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part1(n: u32) -> u32 {

@@ -1,15 +1,14 @@
 // part 1 can be parallelized using modular exponentiation
 // no idea how to improve the execution time of part 2
 
-use anyhow::*;
 use itertools::{iterate, Itertools};
 use crate::util::{iter::*, parallel::*, parser::*, power};
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let (a, b) = input.iter_unsigned().collect_tuple().context("Need to parse two integers")?;
+pub fn solve(input: &str) -> (usize, usize) {
+    let (a, b) = input.iter_unsigned().collect_tuple().unwrap();
     let p1 = part1(a, b);
     let p2 = part2(a, b);
-    Ok((p1, p2))
+    (p1, p2)
 }
 #[inline]
 fn next_a(a: &u64) -> u64 {

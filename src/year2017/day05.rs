@@ -1,9 +1,10 @@
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let jumps: Vec<_> = input.iter_signed().collect();
-    Ok((part1(&jumps), part2(&jumps)))
+    let p1 = part1(&jumps);
+    let p2 = part2(&jumps);
+    (p1, p2)
 }
 
 fn part1(jumps: &[i32]) -> u32 {
@@ -23,11 +24,9 @@ fn part1(jumps: &[i32]) -> u32 {
 
 fn part2(jumps: &[i32]) -> u32 {
     let mut jumps = jumps.to_vec();
-    let n = jumps.len();
-
     let mut steps = 0;
     let mut offset = 0;
-    while offset < n {
+    while offset < jumps.len() {
         let offset2 = jumps[offset];
         if offset2 >= 3 {
             jumps[offset] -= 1;

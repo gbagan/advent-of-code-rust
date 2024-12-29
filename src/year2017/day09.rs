@@ -1,6 +1,4 @@
-use anyhow::*;
-
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut p1 = 0;
     let mut p2 = 0;
     let mut it = input.bytes();
@@ -24,14 +22,14 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
             _ => (),
         }
     }
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 
 #[test]
 fn part1_test() {
     let input = "{{{},{},{{}}}}";
-    assert_eq!(solve(input).ok(), Some((16, 0))); 
+    assert_eq!(solve(input), (16, 0)); 
     let input = "{{<a!>},{<a!>},{<a!>},{<ab>}}";
-    assert_eq!(solve(input).ok(), Some((3, 17))); 
+    assert_eq!(solve(input), (3, 17)); 
 }

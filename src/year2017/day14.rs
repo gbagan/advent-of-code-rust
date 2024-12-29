@@ -1,10 +1,9 @@
-use anyhow::*;
 use std::sync::Mutex;
 use std::thread;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use crate::util::{coord::Coord, grid::Grid, knothash::knothash};
 
-pub fn solve(input: &str) -> Result<(u32, usize)> {
+pub fn solve(input: &str) -> (u32, usize) {
     let mutex = Mutex::new([[0u8; 16]; 128]);
     let counter = AtomicUsize::new(0);
     thread::scope(|scope| {
@@ -15,7 +14,7 @@ pub fn solve(input: &str) -> Result<(u32, usize)> {
     let hashes = mutex.into_inner().unwrap();
     let p1 = part1(&hashes);
     let p2 = part2(&hashes);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn worker(input: &str, counter: &AtomicUsize, mutex: &Mutex<[[u8; 16]; 128]>) {
