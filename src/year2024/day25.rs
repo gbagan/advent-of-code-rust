@@ -1,8 +1,8 @@
 use std::simd::prelude::*;
 
-pub fn run(input: &str) -> (u32, u32) {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut top = [0; 250];
-    let mut bot = [0; 256];
+    let mut bot = [u32::MAX; 256];
     let mut grid = input.as_bytes();
 
     let mut i = 0;
