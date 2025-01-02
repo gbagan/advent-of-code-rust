@@ -2,6 +2,8 @@ use anyhow::*;
 use crate::util::grid::Grid;
 use ahash::{HashSet, HashSetExt};
 
+const WIDTH: usize = 47;
+
 pub fn solve(input: &str) -> Result<(u32, u32)> {
     let grid = Grid::parse_with_padding(input, b'#')?;
 
@@ -22,7 +24,6 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
 }
 
 fn hike_score(grid: &Grid<u8>, start: usize, stack: &mut Vec<(usize, u8)>, level9: &mut HashSet<usize>) -> (u32, u32) {
-    let width = grid.width;
     let mut rating = 0;
     stack.push((start , b'0'));
     while let Some((current, level)) = stack.pop() {
@@ -41,12 +42,12 @@ fn hike_score(grid: &Grid<u8>, start: usize, stack: &mut Vec<(usize, u8)>, level
             stack.push((next, level+1));
         }
 
-        let next = current - width;
+        let next = current - WIDTH;
         if grid[next] == level + 1 {
             stack.push((next, level+1));
         }
         
-        let next = current + width;
+        let next = current + WIDTH;
         if grid[next] == level + 1 {
             stack.push((next, level+1));
         }
