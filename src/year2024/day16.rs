@@ -1,20 +1,19 @@
-use anyhow::*;
 use crate::util::grid::*;
 use std::collections::VecDeque;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let grid = Grid::parse(input)?;
+pub fn solve(input: &str) -> (u32, u32) {
+    let grid = Grid::parse(input).unwrap();
     let start = grid.width * (grid.height-2) + 1;
     let end = grid.width * 2 - 2;
 
     let mut distances = vec![[u32::MAX; 2]; grid.vec.len()];
 
-    let p1 = part1(&grid, &mut distances, start, end).context("Part 1: No solution found")?;
+    let p1 = part1(&grid, &mut distances, start, end);
     let p2 = part2(grid.width, &distances, end);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
-fn part1(grid: &Grid<u8>, distances: &mut [[u32; 2]], start: usize, end: usize) -> Option<u32> {
+fn part1(grid: &Grid<u8>, distances: &mut [[u32; 2]], start: usize, end: usize) -> u32 {
     let width = grid.width;
     let grid = &grid.vec;
     let up = 0usize.wrapping_sub(width);
@@ -62,7 +61,7 @@ fn part1(grid: &Grid<u8>, distances: &mut [[u32; 2]], start: usize, end: usize) 
                 distances[node][1] = dist;
             }
             if node == end {
-                return Some(dist-1);
+                return dist-1;
             }
 
             for next_direction in directions {

@@ -1,9 +1,8 @@
-use anyhow::*;
 use crate::util::{parallel::*, grid::*};
 use ahash::{HashSet, HashSetExt};
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let grid = Grid::parse(input)?;
+pub fn solve(input: &str) -> (usize, usize) {
+    let grid = Grid::parse(input).unwrap();
     
     let mut start = (0, 0);
     'outer: for i in 0..grid.height {
@@ -97,7 +96,7 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
         })
         .sum();
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn has_cycle(grid: &Grid<u8>, seen: &mut HashSet<(i32, i32)>, slide: &Slide, start: (i32, i32), obsx: i32, obsy: i32) -> bool {
@@ -105,8 +104,7 @@ fn has_cycle(grid: &Grid<u8>, seen: &mut HashSet<(i32, i32)>, slide: &Slide, sta
     let height = grid.height as i32;
     let (mut currentx, mut currenty) = start;
     seen.clear();
-
-
+    
     loop {
         let nexty = slide.up[(currentx, currenty)];
         currenty =
@@ -159,7 +157,6 @@ fn has_cycle(grid: &Grid<u8>, seen: &mut HashSet<(i32, i32)>, slide: &Slide, sta
         }
     }
 }
-
 
 struct Slide {
     up: Grid<i32>,

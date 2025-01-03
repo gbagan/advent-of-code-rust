@@ -35,5 +35,5 @@ pub fn solve(input: &str) -> (u32, u32) {
         }
     }
 
-    (-p1.reduce_sum() as u32, 0)
+    (p1.reduce_sum() as u32, 0)
 }

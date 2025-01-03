@@ -8,7 +8,6 @@ pub fn solve(input: &str) -> (u32, u32) {
     (p1, p2)
 }
 
-
 const RANGE1: Range<usize> = 0..64;
 const RANGE2: Range<usize> = 61..125;
 const RANGE3: Range<usize> = 76..140;
@@ -17,14 +16,13 @@ const MASK3: u64 = u64::MAX - (1u64 << 46) + 1;
 
 macro_rules! encode {
     ($x:pat, $m:pat, $a:pat, $s:pat, $slice:expr) => {
-        let line = u8x64::from_slice($slice);
-        let $x = line.simd_eq(u8x64::splat(b'X')).to_bitmask();
-        let $m = line.simd_eq(u8x64::splat(b'M')).to_bitmask();
-        let $a = line.simd_eq(u8x64::splat(b'A')).to_bitmask();
-        let $s = line.simd_eq(u8x64::splat(b'S')).to_bitmask();
+        let v = u8x64::from_slice($slice);
+        let $x = v.simd_eq(u8x64::splat(b'X')).to_bitmask();
+        let $m = v.simd_eq(u8x64::splat(b'M')).to_bitmask();
+        let $a = v.simd_eq(u8x64::splat(b'A')).to_bitmask();
+        let $s = v.simd_eq(u8x64::splat(b'S')).to_bitmask();
     };
 }
-
 
 fn part1(grid: &[u8]) -> u32 {
     let mut p1 = 0;

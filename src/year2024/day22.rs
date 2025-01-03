@@ -63,7 +63,9 @@ fn worker(numbers: &[u32], chunks_size: usize, start: &AtomicUsize, mutex: &Mute
     }
     let mut shared = mutex.lock().unwrap();
     shared.p1 += p1;
-    add_vector(&mut shared.prices, &prices);
+    unsafe {
+        add_vector(&mut shared.prices, &prices)
+    }
 }
 
 #[inline]
@@ -76,11 +78,11 @@ fn next_secret(mut n: u32) -> u32 {
     n & 16777215
 }
 
-fn add_vector(v1: &mut [u16], v2: &[u16]) {
+unsafe fn add_vector(v1: &mut [u16], v2: &[u16]) {
     let n = v1.len() / 32;
     for i in 0..n {
-        let s1 = u16x32::from_slice(&v1[32*i..]);
-        let s2 = u16x32::from_slice(&v2[32*i..]);
+        let s1 = u16x32::from_slice(v1.get_unchecked(32*i..));
+        let s2 = u16x32::from_slice(v2.get_unchecked(32*i..));
         (s1 + s2).copy_to_slice(&mut v1[32*i..])
     }
 }

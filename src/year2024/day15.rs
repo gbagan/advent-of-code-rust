@@ -1,14 +1,13 @@
-use anyhow::*;
-use crate::util::{grid::*, parser::*};
+use crate::util::grid::*;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let (grid, directions) = input.trim().try_split_once("\n\n")?;
-    let grid = Grid::parse(grid)?;
-    let start = grid.vec.iter().position(|&c| c == b'@').context("No start symbol found")?;
+pub fn solve(input: &str) -> (u32, u32) {
+    let (grid, directions) = input.trim().split_once("\n\n").unwrap();
+    let grid = Grid::parse(grid).unwrap();
+    let start = grid.vec.iter().position(|&c| c == b'@').unwrap();
 
     let p1 = part1(&grid, start, directions.as_bytes());
     let p2 = part2(&grid, start, directions.as_bytes());
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part1(grid: &Grid<u8>, start: usize, directions: &[u8]) -> u32 {

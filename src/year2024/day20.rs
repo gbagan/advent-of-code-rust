@@ -1,11 +1,10 @@
-use anyhow::*;
 use crate::util::{grid::*, parallel::*};
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let grid = Grid::parse_with_padding(input, b'#')?;
+pub fn solve(input: &str) -> (u32, u32) {
+    let grid = Grid::parse_with_padding(input, b'#').unwrap();
     let width = grid.width;
     let grid = grid.vec;
-    let start = grid.iter().position(|&c| c == b'S').context("No start symbol found")?;
+    let start = grid.iter().position(|&c| c == b'S').unwrap();
     let mut distances = vec![i16::MAX; grid.len()];
     
     let mut path = Vec::with_capacity(10000);
@@ -80,5 +79,5 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
             acc2 << 11 | acc1
         }).sum();
 
-    Ok((res & 2047, res >> 11))
+    (res & 2047, res >> 11)
 }

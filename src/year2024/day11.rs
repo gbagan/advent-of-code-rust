@@ -1,8 +1,7 @@
 use ahash::{HashMap, HashMapExt};
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(u64, u64)> {
+pub fn solve(input: &str) -> (u64, u64) {
     let mut indices = HashMap::with_capacity(5000);
     let mut new_values = Vec::new();
     let mut occurences = Vec::new();
@@ -31,7 +30,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
 
     let p2 = occurences.iter().sum();
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 pub fn blink(values: &[u64], occurences: &[u64], stones: &mut Vec<(usize, usize)>, indices: &mut HashMap<u64, usize>)

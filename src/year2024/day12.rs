@@ -1,8 +1,7 @@
-use anyhow::*;
 use crate::util::grid::*;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let grid = Grid::parse_with_padding(input, b'.')?;
+pub fn solve(input: &str) -> (u32, u32) {
+    let grid = Grid::parse_with_padding(input, b'.').unwrap();
     let width = grid.width;
     let mut grid = grid.vec;
     let mut stack = Vec::with_capacity(500);
@@ -39,5 +38,5 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
             stack.clear();
         }
     }
-    Ok((p1, p2))
+    (p1, p2)
 }
