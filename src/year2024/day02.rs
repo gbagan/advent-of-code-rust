@@ -4,7 +4,7 @@ pub fn solve(input: &str) -> (u32, u32) {
     let mut p1 = 0;
     let mut p2 = 0;
     for line in input.lines() {
-        let row = line.iter_unsigned::<u8>();
+        let row = line.iter_unsigned::<u32>();
         match is_safe(row) {
             Safety::Safe => { p1 += 1; p2 += 1 },
             Safety::QuasiSafe => p2 += 1,
@@ -20,11 +20,11 @@ enum Safety {
 }
 
 #[inline]
-fn is_safe_pair(a: u8, b: u8) -> bool {
+fn is_safe_pair(a: u32, b: u32) -> bool {
     (1..=3).contains(&(b.wrapping_sub(a)))
 }
 
-fn is_safe(mut it: impl Iterator<Item=u8>) -> Safety {
+fn is_safe(mut it: impl Iterator<Item=u32>) -> Safety {
     let [first, second, third] =
         match it.next_chunk() {
             Ok(x) => x,

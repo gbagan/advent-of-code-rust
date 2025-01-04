@@ -75,7 +75,7 @@ pub fn solve(input: &str) -> (usize, usize) {
         for i in 0..grid.width {
             if seen[(i, j)] {
                 vseen.push((i, j));
-            }       
+            }
         }
     }
     
