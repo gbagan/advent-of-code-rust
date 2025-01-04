@@ -245,6 +245,26 @@ impl Grid<u8> {
 
         Ok(Grid { width, height, vec })
     }
+
+    pub fn parse_with_padding2<const W: usize, const H: usize>(input: &str, pad: u8) -> Self {
+        let input = input.as_bytes();
+        let mut vec = Vec::with_capacity((W * 2) * (H * 2));
+        for _ in 0..W+2 {
+            vec.push(pad)
+        }
+        
+        for i in 0..H {
+            vec.push(pad);
+            vec.extend_from_slice(&input[(W+1) * i.. (W+1) * i + W]);
+            vec.push(pad);
+        }
+
+        for _ in 0..W+2 {
+            vec.push(pad);
+        }
+
+        Grid { width: W, height: H, vec }
+    }
 }
 
 impl Grid<char> {

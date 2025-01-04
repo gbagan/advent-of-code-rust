@@ -1,30 +1,28 @@
-use crate::util::grid::*;
 use std::collections::VecDeque;
 
+const SIZE: usize = 141;
+const WIDTH: usize = SIZE + 1;
+const START: usize = WIDTH * (SIZE - 2) + 1;
+const END: usize = WIDTH * 2 - 3;
+const UP: usize = 0usize.wrapping_sub(WIDTH);
+
 pub fn solve(input: &str) -> (u32, u32) {
-    let grid = Grid::parse(input).unwrap();
-    let start = grid.width * (grid.height-2) + 1;
-    let end = grid.width * 2 - 2;
+    let grid= input.as_bytes();
+    let mut distances = vec![[u32::MAX; 2]; input.len()];
 
-    let mut distances = vec![[u32::MAX; 2]; grid.vec.len()];
-
-    let p1 = part1(&grid, &mut distances, start, end);
-    let p2 = part2(grid.width, &distances, end);
+    let p1 = part1(&grid, &mut distances);
+    let p2 = part2(&distances);
     (p1, p2)
 }
 
-fn part1(grid: &Grid<u8>, distances: &mut [[u32; 2]], start: usize, end: usize) -> u32 {
-    let width = grid.width;
-    let grid = &grid.vec;
-    let up = 0usize.wrapping_sub(width);
-    
+fn part1(grid: &[u8], distances: &mut [[u32; 2]]) -> u32 {
     let mut queue: VecDeque<(u32, usize, usize)> = VecDeque::with_capacity(1024);
     let mut todo = Vec::new();
     let mut next_todo = Vec::new();
 
-    todo.push((1, start, 1));
+    todo.push((1, START, 1));
     
-    let directions = [1, usize::MAX, width, up];
+    let directions = [1, usize::MAX, WIDTH, UP];
 
     loop {
         let mut index = 0;
@@ -60,7 +58,7 @@ fn part1(grid: &Grid<u8>, distances: &mut [[u32; 2]], start: usize, end: usize) 
                 }
                 distances[node][1] = dist;
             }
-            if node == end {
+            if node == END {
                 return dist-1;
             }
 
@@ -80,18 +78,18 @@ fn part1(grid: &Grid<u8>, distances: &mut [[u32; 2]], start: usize, end: usize) 
     }
 }
 
-fn part2(width: usize, distances: & [[u32; 2]], end: usize) -> u32 {
+fn part2(distances: &[[u32; 2]]) -> u32 {
     let mut stack = Vec::new();
     let mut seen = vec![(false, false); distances.len()];
 
-    let [d1, d2] = distances[end];
+    let [d1, d2] = distances[END];
     if d1 <= d2 {
-        stack.push((end, true));
-        seen[end].0 = true;
+        stack.push((END, true));
+        seen[END].0 = true;
     }
     if d2 <= d1 {
-        stack.push((end, false));
-        seen[end].1 = true;
+        stack.push((END, false));
+        seen[END].1 = true;
     }
 
     while let Some((node, is_horizontal)) = stack.pop() {
@@ -120,7 +118,7 @@ fn part2(width: usize, distances: & [[u32; 2]], end: usize) -> u32 {
         } else { // vertical
             let dist = distances[node];
             
-            let next = node + width;
+            let next = node + WIDTH;
             if distances[next][1].wrapping_add(1) == dist[1] && !seen[next].1 {
                 seen[next].1 = true;
                 stack.push((next, false))
@@ -130,7 +128,7 @@ fn part2(width: usize, distances: & [[u32; 2]], end: usize) -> u32 {
                 stack.push((next, true))
             }
             
-            let next = node - width;
+            let next = node - WIDTH;
             if distances[next][1].wrapping_add(1) == dist[1] && !seen[next].1 {
                 seen[next].1 = true;
                 stack.push((next, false))

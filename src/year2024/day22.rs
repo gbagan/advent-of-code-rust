@@ -36,10 +36,10 @@ fn worker(numbers: &[u32], chunks_size: usize, start: &AtomicUsize, mutex: &Mute
         let secret1 = next_secret(secret0);
         let secret2 = next_secret(secret1);
         let secret3 = next_secret(secret2);
-        let price0 = (secret0 % 10) as u16;
-        let price1 = (secret1 % 10) as u16;
-        let price2 = (secret2 % 10) as u16;
-        let price3 = (secret3 % 10) as u16;
+        let price0 = secret0 % 10;
+        let price1 = secret1 % 10;
+        let price2 = secret2 % 10;
+        let price3 = secret3 % 10;
         let mut diff1;
         let mut diff2 = 9 + price1 - price0;
         let mut diff3 = 9 + price2 - price1;
@@ -49,11 +49,11 @@ fn worker(numbers: &[u32], chunks_size: usize, start: &AtomicUsize, mutex: &Mute
 
         for _ in 0..1997 {
             secret = next_secret(secret);
-            let price = (secret % 10) as u16;
+            let price = secret % 10;
             (diff1, diff2, diff3, diff4) = (diff2, diff3, diff4, 9 + price - prev_price);
-            let index = diff1 as usize * 6859 + diff2 as usize * 361 + diff3 as usize * 19 + diff4 as usize;
+            let index = (diff1 * 6859 + diff2 * 361 + diff3 * 19 + diff4) as usize;
             if seen[index] != iter {
-                prices[index] += price;
+                prices[index] += price as u16;
                 seen[index] = iter;
             }
             prev_price = price;
@@ -83,6 +83,6 @@ unsafe fn add_vector(v1: &mut [u16], v2: &[u16]) {
     for i in 0..n {
         let s1 = u16x32::from_slice(v1.get_unchecked(32*i..));
         let s2 = u16x32::from_slice(v2.get_unchecked(32*i..));
-        (s1 + s2).copy_to_slice(&mut v1[32*i..])
+        (s1 + s2).copy_to_slice(v1.get_unchecked_mut(32*i..))
     }
 }
