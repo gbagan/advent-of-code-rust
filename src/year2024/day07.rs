@@ -19,14 +19,14 @@ pub fn solve(input: &str) -> (u64, u64) {
     (p1, p1+p2)
 }
 
-pub fn has_solution<const P2: bool>(row: &[u64], goal: u64, idx: usize) -> bool {
+fn has_solution<const P2: bool>(row: &[u64], goal: u64, idx: usize) -> bool {
     let current = row[idx];
     if idx == 1 {
         return goal == current
     }
     if P2 {
         if let Some(goal2) = truncate_number(goal, current) {
-            if solve_p2(row, goal2, idx - 1) {
+            if has_solution::<P2>(row, goal2, idx - 1) {
                 return true;
             }
         }
@@ -36,22 +36,6 @@ pub fn has_solution<const P2: bool>(row: &[u64], goal: u64, idx: usize) -> bool 
         return true;
     }
     goal >= current && has_solution::<P2>(row, goal - current, idx - 1)
-}
-
-pub fn solve_p2(row: &[u64], goal: u64, idx: usize) -> bool {
-    let current = row[idx];
-    if idx == 1 {
-        return goal == current
-    }
-    if let Some(goal2) = truncate_number(goal, current) {
-        if solve_p2(row, goal2, idx - 1) {
-            return true;
-        }
-    }
-    if goal % current == 0 && solve_p2(row, goal / current, idx - 1) {
-        return true;
-    }
-    goal >= current && solve_p2(row, goal - current, idx - 1)
 }
 
 #[inline]
