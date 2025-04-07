@@ -32,7 +32,7 @@ pub fn solve(input: &str) -> Result<(String, String)> {
 
 fn move_crates<const REVERSE: bool>(stacks: &mut [Vec<char>], amount: usize, from: usize, to: usize) {
     let n = stacks[from].len() - amount;
-    let [rfrom, rto] = stacks.get_many_mut([from, to]).unwrap();
+    let [rfrom, rto] = stacks.get_disjoint_mut([from, to]).unwrap();
     let moved = rfrom.drain(n..);
     if REVERSE {
         rto.extend(moved.rev());  

@@ -1,6 +1,5 @@
 #![feature(array_chunks)]
 #![feature(array_windows)]
-#![feature(get_many_mut)]
 #![feature(int_roundings)]
 #![feature(iter_array_chunks)]
 #![feature(iter_intersperse)]
