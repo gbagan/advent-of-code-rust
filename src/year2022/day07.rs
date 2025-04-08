@@ -1,7 +1,6 @@
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {    
+pub fn solve(input: &str) -> (u32, u32) {    
     let mut stack = vec!();
     let mut sizes = vec!();
 
@@ -29,9 +28,9 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     let p1 = sizes.iter().filter(|&&size| size <= 100_000).sum();
 
     let total_size = *sizes.last().unwrap();
-    ensure!(total_size >= 40_000_000, "Part 2: No solution found");
+    assert!(total_size >= 40_000_000, "Part 2: No solution found");
     let min_size = total_size - 40_000_000;
     let p2 = sizes.iter().filter(|&&size| size >= min_size).min().copied().unwrap();
 
-    Ok((p1, p2))
+    (p1, p2)
 }

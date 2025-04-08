@@ -1,7 +1,6 @@
-use anyhow::*;
-use std::collections::HashMap;
+use ahash::{HashMap, HashMapExt};
 use itertools::Itertools;
-use crate::util::{coord::Coord3, iter::*, parser::*};
+use crate::util::{coord::Coord3, parser::*};
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
 struct Particle {
@@ -18,18 +17,20 @@ impl Particle {
     }
 }
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let mut particles = Vec::new();
-    for (px, py, pz, vx, vy, vz, ax, ay, az) in input.iter_signed().tuples() {
-        particles.push(Particle { p: Coord3::new(px, py, pz),
+pub fn solve(input: &str) -> (usize, usize) {
+    let particles: Vec<_> = input
+        .iter_signed()
+        .tuples()
+        .map(|(px, py, pz, vx, vy, vz, ax, ay, az)| 
+            Particle { p: Coord3::new(px, py, pz),
                                   v: Coord3::new(vx, vy, vz),
                                   a: Coord3::new(ax, ay, az)
-                                });
-    }
+            })
+        .collect();
 
     let p1 = part1(&particles);
     let p2 = part2(&particles);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part1(particles: &[Particle]) -> usize {
@@ -57,5 +58,5 @@ fn part2(particles: &[Particle]) -> usize {
         }
         positions.clear();
     }
-    exploded.iter().count_if(|&&t| t == u32::MAX)
+    exploded.iter().filter(|&&t| t == u32::MAX).count()
 }

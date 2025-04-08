@@ -1,14 +1,13 @@
-use anyhow::*;
 use crate::util::grid::Grid;
 
 const CLEAN: usize = 1;
 const INFECTED: usize = 3;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let grid = Grid::parse(input)?;
+pub fn solve(input: &str) -> (u32, u32) {
+    let grid = Grid::parse(input).unwrap();
     let p1 = simulate(&grid, 10_000, 2);
     let p2 = simulate(&grid, 10_000_000, 1);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn simulate(inner: &Grid<u8>, bursts: usize, rule: usize) -> u32 {
@@ -31,9 +30,9 @@ fn simulate(inner: &Grid<u8>, bursts: usize, rule: usize) -> u32 {
 
     for _ in 0..bursts {
         let tile = grid[position] as usize;
-        let next_tile = (tile + rule) & 0x3;
+        let next_tile = (tile + rule) & 3;
         grid[position] = next_tile as u8;
-        direction = (direction + tile + 2) & 0x3;
+        direction = (direction + tile + 2) & 3;
         position = position.wrapping_add(directions[direction]);
         if next_tile == INFECTED {
             counter += 1;

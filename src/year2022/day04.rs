@@ -1,8 +1,7 @@
-use anyhow::*;
 use itertools::Itertools;
 use crate::util::{parser::*, range::Range};
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut p1 = 0;
     let mut p2 = 0;
     for (x1, y1, x2, y2) in input.iter_unsigned::<u32>().tuples() {
@@ -16,5 +15,5 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         }
     }
 
-    Ok((p1, p2))
+    (p1, p2)
 }

@@ -1,13 +1,12 @@
-use anyhow::*;
 use num_integer::Integer;
 use crate::util::iter::*;
 
-pub fn solve(input: &str) -> Result<(String, String)> {
+pub fn solve(input: &str) -> (String, String) {
     let ones = input.trim().bytes().map(|b| if b == b'1' { 1 } else { 0 }).partial_sums();
     let p1 = checksum(&ones, 272);
     let p2 = checksum(&ones, 35_651_584);
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn checksum(input_ones: &[u32], n: u32) -> String {

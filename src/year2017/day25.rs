@@ -1,6 +1,4 @@
-use anyhow::*;
 use std::array::from_fn;
-
 use itertools::Itertools;
 use crate::util::parser::*;
 
@@ -24,10 +22,10 @@ const LEFT_MASK: usize = (1 << (2 * N)) - (1 << N); // 992
 const RIGHT_MASK: usize = (1 << N) - 1;
 const TABLE_SIZE: usize = 1 << (2 * N);
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut lines = input.lines();
-    let (_, line2) = lines.next_tuple().context("The input must contains at least 2 lines")?;
-    let steps = line2.try_unsigned()?;
+    let (_, line2) = lines.next_tuple().unwrap();
+    let steps = line2.try_unsigned().unwrap();
 
     let transitions: Vec<_> = lines.tuples().map(|(_, _, _, write0, move0, next0, _, write1, move1, next1)| {
         let write0 = write0.ends_with("1.");
@@ -76,7 +74,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     let p1 = left.iter().map(|x| x.count_ones()).sum::<u32>() 
             + right.iter().map(|x| x.count_ones()).sum::<u32>()
             + center.count_ones();
-    Ok((p1, 0))
+    (p1, 0)
 }
 
 fn skip(trs: &[(Transition, Transition)], mut tape: usize, mut state: usize, limit: u32) -> Skip {

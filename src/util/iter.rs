@@ -5,15 +5,6 @@ use std::ops::AddAssign;
 use num_traits::ConstZero;
 
 pub trait AOCIter: Iterator {
-    #[inline]
-    fn count_if<P>(self, predicate: P) -> usize
-    where
-        Self: Sized,
-        P: FnMut(&Self::Item) -> bool,
-    {
-        self.filter(predicate).count()
-    }
-
     fn all_distinct(self) -> bool 
     where
         Self: Sized,

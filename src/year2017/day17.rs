@@ -1,12 +1,10 @@
-use anyhow::*;
-
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let n = input.try_unsigned()?;
+pub fn solve(input: &str) -> (usize, usize) {
+    let n = input.try_unsigned().unwrap();
     let p1 = part1(n);
     let p2 = part2(n);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part1(n: usize) -> usize {

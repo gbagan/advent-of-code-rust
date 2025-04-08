@@ -1,17 +1,16 @@
-use anyhow::*;
 use std::str::from_utf8;
 
-pub fn solve(input: &str) -> Result<(String, String)> {
+pub fn solve(input: &str) -> (String, String) {
     let pwd = input
         .trim()
         .as_bytes()
         .try_into()
-        .map_err(|_| anyhow!("Input must contain 8 characters"))?;
+        .unwrap();
     let pwd = next_password(pwd);
     let p1 =  from_utf8(&pwd).map(|p| p.to_string()).unwrap();
     let pwd = next_password(pwd);
     let p2 =  from_utf8(&pwd).map(|p| p.to_string()).unwrap();
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 

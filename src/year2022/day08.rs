@@ -1,12 +1,11 @@
-use anyhow::*;
-use crate::util::{grid::Grid, iter::AOCIter};
+use crate::util::grid::Grid;
 
-pub fn solve(input: &str) -> Result<(usize, u32)> {
-    let grid = Grid::parse(input)?;
+pub fn solve(input: &str) -> (usize, u32) {
+    let grid = Grid::parse(input).unwrap();
     let grid = grid.map(|v| (8 * (v - b'0')) as i8);
     let p1 = part1(&grid);
     let p2 = part2(&grid);
-    Ok((p1, p2))
+    (p1, p2)
 
 }
 
@@ -51,7 +50,7 @@ fn part1(grid: &Grid<i8>) -> usize {
             }
         }
     }
-    visible.vec.iter().count_if(|&&v| v)
+    visible.vec.iter().filter(|&&v| v).count()
 }
 
 const ONES: u128 = 0x0101_0101_0101_0101_0101;

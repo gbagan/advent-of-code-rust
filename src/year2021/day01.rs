@@ -1,10 +1,9 @@
-use anyhow::*;
-use crate::util::{iter::AOCIter, parser::*};
+use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> (usize, usize) {
     let numbers: Vec<u32> = input.iter_unsigned().collect();
-    let p1 = numbers.array_windows().count_if(|[x, y]| x < y);
-    let p2 = numbers.array_windows().count_if(|[x, _, _, y]| x < y);
+    let p1 = numbers.array_windows().filter(|[x, y]| x < y).count();
+    let p2 = numbers.array_windows().filter(|[x, _, _, y]| x < y).count();
 
-    Ok((p1, p2))
+    (p1, p2)
 }

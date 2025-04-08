@@ -1,10 +1,7 @@
-use anyhow::*;
-
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let p1 = part1(input);
     let p2 = part2(input);
-
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part1(input: &str) -> u32 {

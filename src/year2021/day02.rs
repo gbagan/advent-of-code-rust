@@ -1,4 +1,3 @@
-use anyhow::*;
 use itertools::Itertools;
 use crate::util::parser::*;
 
@@ -7,27 +6,27 @@ enum Command {
     Down(i32),
 }
 
-fn parse_command(cmd: &str, amount: &str) -> Result<Command> {
-    let amount: i32 = amount.try_unsigned()?;
+fn parse_command(cmd: &str, amount: &str) -> Command {
+    let amount: i32 = amount.try_unsigned().unwrap();
     match cmd {
-        "forward" => Ok(Command::Forward(amount)),
-        "down" => Ok(Command::Down(amount)),
-        "up" => Ok(Command::Down(-amount)),
-        _ => bail!("Invalid command {cmd}")
+        "forward" => Command::Forward(amount),
+        "down" => Command::Down(amount),
+        "up" => Command::Down(-amount),
+        _ => panic!("Invalid command {cmd}")
     }
 }
 
-pub fn solve(input: &str) -> Result<(i32, i32)> {
-    let commands: Vec<Command> = input
+pub fn solve(input: &str) -> (i32, i32) {
+    let commands: Vec<_> = input
         .split_ascii_whitespace()
         .tuples()
         .map(|(cmd, amount)| parse_command(cmd, amount))
-        .try_collect()?;
+        .collect();
 
     let p1 = part1(&commands);
     let p2 = part2(&commands);
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 

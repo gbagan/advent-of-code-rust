@@ -1,10 +1,9 @@
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(i32, i32)> {
+pub fn solve(input: &str) -> (i32, i32) {
     let p1 = input.iter_signed::<i32>().sum();
     let p2 = parse_json(input.as_bytes(), 0).value;
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 struct Parsed {

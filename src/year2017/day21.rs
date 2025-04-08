@@ -1,6 +1,3 @@
-use anyhow::*;
-use crate::util::{iter::*, parser::*};
-
 struct Pattern {
     three: u32,
     four: u32,
@@ -8,7 +5,7 @@ struct Pattern {
     nine: [usize; 9],
 }
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut block_three_index = [0usize; 16]; 
     let mut two_to_three = [[false; 9]; 16]; 
     let mut three_to_four = [[false; 16]; 512]; 
@@ -17,7 +14,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     let mut blocks_three = vec!(start);
     let mut i = 1;
     for line in input.lines() {
-        let (left, right) = line.try_split_once(" => ")?;
+        let (left, right) = line.split_once(" => ").unwrap();
         let left: Vec<_> = left.bytes().filter(|&c| c != b'/').map(|c| c == b'#').collect();
         let right = right.as_bytes();
         match left.len() {
@@ -39,7 +36,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
                     three_to_four[j] = right;
                 }
             }
-            _ => bail!("invalid input")
+            _ => panic!("invalid input")
         }
     }
 
@@ -61,8 +58,8 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         });
         Pattern {
             three: three.count_ones(),
-            four: four.iter().count_if(|&&b| b) as u32,
-            six: six.iter().count_if(|&&b| b) as u32,
+            four: four.iter().filter(|&&b| b).count() as u32,
+            six: six.iter().filter(|&&b| b).count() as u32,
             nine,
         }
     }).collect();
@@ -97,7 +94,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     }
     let p1 = count[5];
     let p2 = count[18];
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn orientations_two(block: &[bool]) -> [usize; 8] {

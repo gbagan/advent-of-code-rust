@@ -1,4 +1,3 @@
-use anyhow::*;
 use std::collections::HashMap;
 use itertools::Itertools;
 use crate::util::parser::*;
@@ -10,7 +9,7 @@ struct Bot<'a> {
     amount: usize,
 }
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut p1 = 0;
     let mut p2 = 1;
     
@@ -20,14 +19,14 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     while let Some(token) = tokens.next() {
         if token == "value" {
             let (value, _, _, bot, bot_no) = tokens.next_tuple().unwrap();
-            let value: u32 = value.try_unsigned()?;
-            let bot_no: u32 = bot_no.try_unsigned()?;
+            let value: u32 = value.try_unsigned().unwrap();
+            let bot_no: u32 = bot_no.try_unsigned().unwrap();
             gifts.push(((bot, bot_no), value));
         } else { // token == "bot"
             let (giver, _, _, _, receiver1, nbr1, _, _, _, receiver2, nbr2) = tokens.next_tuple().unwrap();
-            let giver: u32 = giver.try_unsigned()?;
-            let low = (receiver1, nbr1.try_unsigned()?);
-            let high = (receiver2, nbr2.try_unsigned()?); 
+            let giver: u32 = giver.try_unsigned().unwrap();
+            let low = (receiver1, nbr1.try_unsigned().unwrap());
+            let high = (receiver2, nbr2.try_unsigned().unwrap()); 
             bots.insert(giver, Bot {low, high, chips: [0, 0], amount: 0 });
         }
     }
@@ -54,5 +53,5 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         }
     }
 
-    Ok((p1, p2))
+    (p1, p2)
 }

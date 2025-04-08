@@ -1,4 +1,3 @@
-use anyhow::*;
 use itertools::Itertools;
 use num_integer::Integer;
 use crate::util::parser::*;
@@ -20,7 +19,7 @@ struct Monkey {
     if_false: usize
 }
 
-pub fn solve(input: &str) -> Result<(u64, u64)> {
+pub fn solve(input: &str) -> (u64, u64) {
     let mut items = vec!();
     let mut monkeys = vec!();
     let mut lines = input.lines();
@@ -34,7 +33,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
                 match line3.as_bytes()[23] {
                     b'+' => Operation::Add(val),
                     b'*' => Operation::Multiply(val),
-                    c => bail!("unexpected character {}", c as char),
+                    c => panic!("unexpected character {}", c as char),
                 }
             } else {
                 Operation::Square
@@ -50,7 +49,7 @@ pub fn solve(input: &str) -> Result<(u64, u64)> {
     let p1 = part1(&monkeys, &items);
     let p2 = part2(&monkeys, &items);
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part1(monkeys: &[Monkey], items: &[(usize, u64)]) -> u64 {

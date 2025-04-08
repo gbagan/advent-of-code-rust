@@ -1,4 +1,3 @@
-use anyhow::*;
 use std::cmp::min;
 use itertools::Itertools;
 use crate::util::parser::*;
@@ -9,7 +8,7 @@ pub struct Reindeer {
     cycle: u32,
 }
 
-pub fn solve(input: &str) -> Result<(u32, u16)> {
+pub fn solve(input: &str) -> (u32, u16) {
     let reindeers: Vec<_> = input
                             .iter_unsigned()
                             .tuples()
@@ -17,7 +16,7 @@ pub fn solve(input: &str) -> Result<(u32, u16)> {
                             .collect();
     let p1 = reindeers.iter().map(|r| distance(r, 2503)).max().unwrap_or(0);
     let p2 = part2(&reindeers);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 

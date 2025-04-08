@@ -1,7 +1,6 @@
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let calories: Vec<u32> = input
         .split("\n\n")
         .map(|text|text.iter_unsigned::<u32>().sum())
@@ -20,5 +19,5 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         }
     }
 
-    Ok((top1, top1 + top2 + top3))   
+    (top1, top1 + top2 + top3)
 }

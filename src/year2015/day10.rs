@@ -1,7 +1,6 @@
 // look-and-say  (Conway)
 // http://njohnston.ca/2010/10/a-derivation-of-conways-degree-71-look-and-say-polynomial/
 
-use anyhow::*;
 use crate::util::times;
 
 const CONWAY_INDEXES: [usize; 144] = [
@@ -213,12 +212,12 @@ fn freqs_size(freqs: &[u32]) -> u32 {
     .sum()
 }
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let sequence = input.trim();
     let init = CONWAY_STRINGS
         .iter()
         .position(|seq| *seq == sequence)
-        .with_context(|| format!("Pattern {sequence} is not found in Conway table"))?;
+        .unwrap();
 
     let mut freqs = [0; 92];
     freqs[init] = 1;
@@ -227,7 +226,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     let p1 = freqs_size(&freqs);
     let freqs = times(10, freqs, |x| next(x));
     let p2 = freqs_size(&freqs);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn next(freqs: &[u32]) -> [u32; 92] {

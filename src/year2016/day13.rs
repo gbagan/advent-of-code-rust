@@ -1,6 +1,5 @@
 // breadth first search
 
-use anyhow::*;
 use std::collections::VecDeque;
 use crate::util::{coord::Coord, grid::Grid, parser::*};
 
@@ -11,9 +10,9 @@ fn is_wall(p: Point, n: u32) -> bool {
     (x*x + 3*x + 2*x*y + y + y*y + n).count_ones() % 2 == 1
 }
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut p2 = 0;
-    let n = input.try_unsigned()?;
+    let n = input.try_unsigned().unwrap();
     let end = Point::new(31, 39);
     let mut seen = Grid::new(52, 52, false);
     let mut queue = VecDeque::new();
@@ -24,7 +23,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         }
         seen[node] = true;
         if node == end {
-            return Ok((dist, p2));
+            return (dist, p2);
         } else if dist <= 50 {
             p2 += 1;
         }
@@ -37,5 +36,5 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
             queue.push_back((node.above(), dist+1));
         }
     }
-    bail!("No solution found")
+    unreachable!();
 }

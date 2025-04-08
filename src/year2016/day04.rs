@@ -1,4 +1,3 @@
-use anyhow::*;
 use crate::util::parser::*;
 
 struct Room<'a> {
@@ -7,8 +6,8 @@ struct Room<'a> {
     checksum: &'a str,
 }
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let rooms: Vec<_> = input.try_parse_lines_and_collect(parse_room)?;
+pub fn solve(input: &str) -> (u32, u32) {
+    let rooms: Vec<_> = input.lines().map(parse_room).collect();
     
     let p1 = rooms
         .iter()
@@ -18,19 +17,19 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
     let p2 = rooms
         .iter()
         .find_map(|room| is_northpole_room(room).then_some(room.sector_id))
-        .context("Part 2: No solution found")?;
+        .unwrap();
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 
 
-fn parse_room(line: &str) -> Result<Room> {
+fn parse_room(line: &str) -> Room {
     let len = line.len();
     let encrypted = &line[..len-11]; 
-    let sector_id = (&line[len-10..len-7]).try_unsigned()?;
+    let sector_id = (&line[len-10..len-7]).try_unsigned().unwrap();
     let checksum = &line[len-6..len-1];
-    Ok(Room { encrypted, sector_id, checksum })
+    Room { encrypted, sector_id, checksum }
 }
 
 fn is_real_room(room: &Room) -> bool {

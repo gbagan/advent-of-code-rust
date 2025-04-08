@@ -75,3 +75,27 @@ fn power_test() {
     let n = power(|&x, &y| x * y, 2, 6);
     assert_eq!(n, 64);
 }
+
+pub fn foreach_permutation<T>(arr: &mut[T], mut callback: impl FnMut(&[T])) {
+    let n = arr.len();
+    let mut c = vec![0; n];
+    let mut i = 1;
+
+    callback(arr);
+
+    while i < n {
+        if c[i] < i {
+            if i & 1 == 0 {
+                arr.swap(0, i);
+            } else {
+                arr.swap(c[i], i);
+            }
+            callback(arr);
+            c[i] += 1;
+            i = 1;
+        } else {
+            c[i] = 0;
+            i += 1
+        }
+    }
+}

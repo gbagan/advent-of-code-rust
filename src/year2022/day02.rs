@@ -1,7 +1,6 @@
-use anyhow::*;
 use itertools::Itertools;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut p1 = 0;
     let mut p2 = 0;
     let score1 = [4, 8, 3, 1, 5, 9, 7, 2, 6];
@@ -13,5 +12,5 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         p2 += score2[index];
     }
 
-    Ok((p1, p2))
+    (p1, p2)
 }

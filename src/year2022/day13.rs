@@ -1,7 +1,6 @@
-use anyhow::*;
 use itertools::{Itertools, put_back_n};
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> (usize, usize) {
     let lines: Vec<_> = input.lines().filter(|line| !line.is_empty()).collect();  
     
     let p1 = lines
@@ -23,7 +22,7 @@ pub fn solve(input: &str) -> Result<(usize, usize)> {
     }
     let p2 = position1 * position2;
 
-    Ok((p1, p2))
+    (p1, p2)
 
 }
 

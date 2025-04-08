@@ -1,5 +1,5 @@
 use anyhow::*;
-use crate::util::{grid::Grid, iter::*};
+use crate::util::grid::Grid;
 
 pub fn solve(input: &str) -> Result<(usize, usize)> {
     let grid = Grid::parse_with_padding(input, b'B')?;
@@ -18,7 +18,7 @@ fn step1(grid: &Grid<u8>) -> Grid<u8> {
         } else {
             b'L'
         }
-        b'#' => if directions.iter().count_if(|&&d| grid[i+d] == b'#') >= 4 {
+        b'#' => if directions.iter().filter(|&&d| grid[i+d] == b'#').count() >= 4 {
             b'L'
         } else {
             b'#'

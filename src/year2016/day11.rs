@@ -1,5 +1,5 @@
-use anyhow::*;
-use std::collections::{HashSet, VecDeque};
+use std::collections::VecDeque;
+use ahash::{HashSet, HashSetExt};
 
 #[derive(Clone, Copy, Default, PartialEq, Eq, Hash, Debug)]
 struct State {
@@ -62,7 +62,7 @@ impl Floor {
 
 }
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut state = State::default();
 
     for (i, line) in input.lines().enumerate() {
@@ -71,22 +71,22 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         state.floor[i] = Floor::new(generators, microchips);
     }
     state.elevator = 0;
-    let p1 = bfs(state).context("Part 1: No solution found")?;
+    let p1 = bfs(state);
     state.floor[0] = state.floor[0].add(&Floor::new(2, 2));
-    let p2 = bfs(state).context("Part 2: No solution found")?;
+    let p2 = bfs(state);
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 
-fn bfs(start: State) -> Option<u32> {       
+fn bfs(start: State) -> u32 {       
     let moves = [Floor::new(1, 1), Floor::new(2, 0), Floor::new(0, 2), Floor::new(1, 0), Floor::new(0, 1)];
     let mut queue = VecDeque::new();
     let mut seen = HashSet::new();
     queue.push_back((start, 0));
     while let Some((state, dist)) = queue.pop_front() {
         if state.is_complete() {
-            return Some(dist);
+            return dist;
         }
         if !seen.insert(state) {
             continue;
@@ -147,5 +147,5 @@ fn bfs(start: State) -> Option<u32> {
             }
         }
     } 
-    None
+    unreachable!();
 }

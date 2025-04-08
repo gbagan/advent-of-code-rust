@@ -1,5 +1,5 @@
 use std::cmp::max;
-use crate::util::{coord::Coord, grid::Grid, iter::AOCIter, parallel::*};
+use crate::util::{coord::Coord, grid::Grid, parallel::*};
 
 type Point = Coord::<i32>;
 
@@ -136,7 +136,7 @@ fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> u64 {
             }
         }
     }
-    energized.vec.iter().count_if(|&&x| x) as u64
+    energized.vec.iter().filter(|&&x| x).count() as u64
 }
 
 fn part2(input: &Input) -> u64 {

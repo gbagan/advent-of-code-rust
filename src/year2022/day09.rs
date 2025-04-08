@@ -1,9 +1,8 @@
-use anyhow::*;
 use crate::util::{coord::Coord, grid::Grid, parser::*};
 
 type Point = Coord::<i32>;
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {    
+pub fn solve(input: &str) -> (u32, u32) {    
     let lengths = input.iter_unsigned::<i32>();
     let directions = input.bytes().filter(u8::is_ascii_uppercase).map(to_dir);
     let instrs: Vec<_> = directions.zip(lengths).collect();
@@ -24,7 +23,7 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         
     let p1 = simulate::<2>(&instrs, xmin, ymin, xmax, ymax);
     let p2 = simulate::<10>(&instrs, xmin, ymin, xmax, ymax);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn to_dir(c: u8) -> Point {

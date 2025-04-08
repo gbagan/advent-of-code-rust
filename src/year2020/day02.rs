@@ -1,6 +1,5 @@
-use anyhow::*;
-
-use crate::util::{iter::*, parser::*};
+use crate::util::parser::*;
+use itertools::Itertools;
 
 struct Password<'a> {
     value1: usize,
@@ -9,26 +8,26 @@ struct Password<'a> {
     pwd: &'a [u8]
 }
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
-    let passwords: Vec<_> = input.try_parse_lines_and_collect(parse_line)?;
+pub fn solve(input: &str) -> (usize, usize) {
+    let passwords: Vec<_> = input.lines().map(parse_line).collect();
 
-    let p1 = passwords.iter().count_if(|&pwd| check1(pwd));
-    let p2 = passwords.iter().count_if(|&pwd| check2(pwd));
+    let p1 = passwords.iter().filter(|&pwd| check1(pwd)).count();
+    let p2 = passwords.iter().filter(|&pwd| check2(pwd)).count();
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
-fn parse_line(line: &str) -> Result<Password> {
-    let (token1, token2, token3, token4) = line.try_split_into_tuple(&[' ', '-'])?;
-    let value1 = token1.try_unsigned()?;
-    let value2 = token2.try_unsigned()?;
+fn parse_line(line: &str) -> Password {
+    let (token1, token2, token3, token4) = line.split(&[' ', '-']).collect_tuple().unwrap();
+    let value1 = token1.try_unsigned().unwrap();
+    let value2 = token2.try_unsigned().unwrap();
     let letter = token3.as_bytes()[0];
     let pwd = token4.as_bytes();
-    Ok(Password{value1, value2, letter, pwd})
+    Password{value1, value2, letter, pwd}
 }
 
 fn check1(p: &Password) -> bool {
-    let freq = p.pwd.iter().count_if(|&&c| c == p.letter);
+    let freq = p.pwd.iter().filter(|&&c| c == p.letter).count();
     p.value1 <= freq && freq <= p.value2
 }
 

@@ -1,15 +1,14 @@
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> (usize, usize) {
     let numbers: Vec<_> = input.iter_unsigned().filter(|&n| n < 2020).collect();
     let mut table = vec![0; 2022];
     let mut round = 0;
 
-    let p1 = sum2(&numbers, &mut table, &mut round, 2020).context("Part 1: No solution found")?;
-    let p2 = part2(&numbers, &mut table, &mut round).context("Part 2: No solution found")?;
+    let p1 = sum2(&numbers, &mut table, &mut round, 2020).unwrap();
+    let p2 = part2(&numbers, &mut table, &mut round).unwrap();
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part2(numbers: &[usize], table: &mut [u32], round: &mut u32) -> Option<usize> {

@@ -1,4 +1,3 @@
-use anyhow::*;
 use itertools::Itertools;
 use crate::util::{boxes::Box, parser::*};
 
@@ -21,19 +20,20 @@ pub struct Input {
 }
 
 
-fn parse_instruction(line: &str) -> Result<Instruction> {
+fn parse_instruction(line: &str) -> Instruction {
     let (cmd, s) =
         if let Some(s) = line.strip_prefix("toggle ") { 
-            Some ((Command::Toggle, s))
+            (Command::Toggle, s)
         } else if let Some(s) = line.strip_prefix("turn on ") { 
-            Some ((Command::On, s))
+            (Command::On, s)
+        } else if let Some(s) = line.strip_prefix("turn off ") {
+            (Command::Off, s)
         } else {
-            line.strip_prefix("turn off ").map(|s| (Command::Off, s))
-        }.context("Line does not start with 'toggle', 'turn on' or 'turn off'")?;
-    let (xmin, ymin, xmax, ymax) = s.iter_unsigned().collect_tuple()
-                                    .context("Line must contains  4 integers")?;
+            panic!();
+        };
+    let (xmin, ymin, xmax, ymax) = s.iter_unsigned().collect_tuple().unwrap();
     let rectangle = Box { xmin, ymin, xmax, ymax };
-    Ok(Instruction { cmd, rectangle })
+    Instruction { cmd, rectangle }
 }
 
 fn do_cmd1(cmd: Command, v: &mut bool) {
@@ -52,9 +52,8 @@ fn do_cmd2(cmd: Command, v: &mut i32) {
     }
 }
 
-pub fn solve(input: &str) -> Result<(i32, i32)>
-{
-    let instrs: Vec<_> = input.try_parse_lines_and_collect(parse_instruction)?;
+pub fn solve(input: &str) -> (i32, i32) {
+    let instrs: Vec<_> = input.lines().map(parse_instruction).collect();
     
     let mut rect_xs: Vec<i32> = Vec::with_capacity(2*instrs.len());
     let mut rect_ys: Vec<i32> = Vec::with_capacity(2*instrs.len());
@@ -84,7 +83,7 @@ pub fn solve(input: &str) -> Result<(i32, i32)>
 
     let p1 = part1(&input);
     let p2 = part2(&input);
-    Ok((p1, p2))
+    (p1, p2)
 
 }
 

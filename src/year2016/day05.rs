@@ -1,4 +1,3 @@
-use anyhow::*;
 use std::sync::Mutex;
 use std::thread;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
@@ -15,7 +14,7 @@ struct Exclusive {
     mask: u8,
 }
 
-pub fn solve(input: &str) -> Result<(String, String)> {
+pub fn solve(input: &str) -> (String, String) {
     let input = input.trim();
     let shared = Shared {
         done: AtomicBool::new(false),
@@ -46,7 +45,7 @@ pub fn solve(input: &str) -> Result<(String, String)> {
     }
     let p2 = format!("{p2:08x}");
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn worker(input: &str, shared: &Shared, mutex: &Mutex<Exclusive>) {

@@ -1,18 +1,15 @@
-use anyhow::*;
-use std::collections::HashMap;
+use ahash::HashMap;
 use crate::util::parser::*;
-use itertools::Itertools;
 
 type Passport<'a> = HashMap<&'a str, &'a str>;
 
 const MANDATORY_FIELDS: [&str; 7] =  ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let mut p1 = 0;
     let mut p2 = 0;
     
     for passport in input.split("\n\n").map(parse_passport) {
-        let passport = passport?;
         if check1(&passport) {
             p1 += 1;
             if check2(&passport) {
@@ -21,14 +18,14 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         }
     }
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
-fn parse_passport(input: &str) -> Result<Passport> {
+fn parse_passport(input: &str) -> Passport {
     input
         .split_ascii_whitespace()
-        .map(|token| token.try_split_once(':'))
-        .try_collect()
+        .map(|token| token.split_once(':').unwrap())
+        .collect()
 }
 
 fn check1(passport: &Passport) -> bool {
@@ -46,7 +43,7 @@ fn check2(passport: &Passport) -> bool {
 }
 
 fn check_range(field: &str, min: u32, max: u32) -> bool {
-    if let Result::Ok(year) = field.try_unsigned::<u32>() {
+    if let Ok(year) = field.try_unsigned::<u32>() {
         if year >= min && year <= max {
             return true;
         } 

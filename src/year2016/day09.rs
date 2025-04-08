@@ -1,10 +1,8 @@
-use anyhow::*;
-
-pub fn solve(input: &str) -> Result<(usize, usize)> {
+pub fn solve(input: &str) -> (usize, usize) {
     let input = input.trim().as_bytes();
     let p1 = count(input, false);
     let p2 = count(input, true);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn parse_number(input: &[u8], i: usize, delim: u8) -> (usize, usize) {

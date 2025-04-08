@@ -1,6 +1,6 @@
-use std::collections::HashMap;
+use ahash::{HashMap, HashMapExt};
 use itertools::Itertools;
-use crate::util::parser::*;
+use crate::util::{foreach_permutation, parser::*};
 
 fn parse_line(s: &str) -> (&str, &str, u32) {
     let (city1, _, city2, _, dist) = s.split(' ').next_tuple().unwrap();
@@ -37,9 +37,11 @@ pub fn solve(input: &str) -> (u32, u32) {
     let mut min_travel = u32::MAX;
     let mut max_travel = 0;
 
-    for perm in (1..n).permutations(n-1) {
+    let mut init: Vec<usize> = (1..n).collect();
+    foreach_permutation(&mut init, |perm| {
+    //for perm in (1..n).permutations(n-1) {
         if perm[0] > perm[n-2] {
-            continue
+            return
         }
         let mut sum = table[perm[0]];
         let mut min = sum;
@@ -56,6 +58,6 @@ pub fn solve(input: &str) -> (u32, u32) {
         max = max.max(edge);
         min_travel = min_travel.min(sum - max);
         max_travel = max_travel.max(sum - min);
-    }
+    });
     (min_travel, max_travel)
 }
