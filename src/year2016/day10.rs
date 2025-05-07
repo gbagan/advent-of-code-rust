@@ -1,4 +1,5 @@
-use std::collections::HashMap;
+//use ahash::{HashMap, HashMapExt};
+use nohash_hasher::IntMap;
 use itertools::Itertools;
 use crate::util::parser::*;
 
@@ -15,7 +16,7 @@ pub fn solve(input: &str) -> (u32, u32) {
     
     let mut tokens = input.split_ascii_whitespace();
     let mut gifts = Vec::new();
-    let mut bots  = HashMap::new();
+    let mut bots = IntMap::default();
     while let Some(token) = tokens.next() {
         if token == "value" {
             let (value, _, _, bot, bot_no) = tokens.next_tuple().unwrap();

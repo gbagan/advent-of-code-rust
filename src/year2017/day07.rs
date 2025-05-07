@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use ahash::{HashMap, HashMapExt};
 use itertools::{Itertools, MinMaxResult};
 use crate::util::parser::*;
 

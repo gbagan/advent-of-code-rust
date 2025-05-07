@@ -1,6 +1,6 @@
-use anyhow::*;
-use std::collections::HashMap;
+use ahash::{HashMap, HashMapExt};
 use crate::util::parser::*;
+use itertools::Itertools;
 
 struct Instr<'a> {
     var1: &'a str,
@@ -14,8 +14,7 @@ struct Instr<'a> {
 pub fn solve(input: &str) -> (i32, i32) {
     let mut vars: HashMap<&str, i32> = HashMap::new();
     let mut max_value = 0;
-    // todo
-    for instr in input.lines().flat_map(parse_line) {
+    for instr in input.lines().map(parse_line) {
         let var2 = *vars.get(instr.var2).unwrap_or(&0);
         if compare(var2, instr.cmp, instr.val2) {
             let var1 = *vars.get(instr.var1).unwrap_or(&0);
@@ -33,11 +32,12 @@ pub fn solve(input: &str) -> (i32, i32) {
 }
 
 
-fn parse_line(line: &str) -> Result<Instr> {
-    let (var1, cmd, val1, _, var2, cmp, val2) = line.try_split_into_tuple(' ')?;
-    let val1 = val1.try_signed()?;
-    let val2 = val2.try_signed()?;
-    Ok(Instr {var1, cmd, val1, var2, cmp, val2})
+fn parse_line(line: &str) -> Instr {
+    let (var1, cmd, val1, _, var2, cmp, val2) =
+        line.split(' ').collect_tuple().unwrap();
+    let val1 = val1.try_signed().unwrap();
+    let val2 = val2.try_signed().unwrap();
+    Instr {var1, cmd, val1, var2, cmp, val2}
 }
 
 fn compare(a: i32, cmp: &str, b: i32) -> bool {
