@@ -10,8 +10,6 @@ pub fn solve(input: &str) -> (u32, u32) {
         odds = 2 * odds + (c2 == b'^') as u64;
     }
 
-    dbg!(len);
-
     let p1 = count_safes::<40>(evens, odds, len);
     let p2 = count_safes::<400000>(evens, odds, len);
     (p1, p2)
