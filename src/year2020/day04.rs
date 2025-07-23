@@ -43,7 +43,7 @@ fn check2(passport: &Passport) -> bool {
 }
 
 fn check_range(field: &str, min: u32, max: u32) -> bool {
-    if let Ok(year) = field.try_unsigned::<u32>() {
+    if let Some(year) = field.try_unsigned::<u32>() {
         if year >= min && year <= max {
             return true;
         } 

@@ -14,7 +14,7 @@ pub fn solve(input: &str) -> (u32, u32) {
         } else if line.starts_with("$ cd") {
             stack.push(0);
 
-        } else if let Result::Ok(size) = line.try_unsigned::<u32>() {
+        } else if let Some(size) = line.try_unsigned::<u32>() {
             let index = stack.len() - 1;
             stack[index] += size;
         }

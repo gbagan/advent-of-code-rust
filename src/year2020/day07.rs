@@ -1,4 +1,3 @@
-use anyhow::*;
 use crate::util::parser::*;
 use itertools::Itertools;
 use std::array::from_fn;
@@ -83,7 +82,7 @@ fn second_hash(attr: &str) -> usize {
     26 * a + b - 2619
 }
 
-pub fn solve(input: &str) -> Result<(usize, u32)> {
+pub fn solve(input: &str) -> (usize, u32) {
     let mut idx1 = [0; 676];
     let mut idx2 = [0; 676];
     
@@ -106,7 +105,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
         if let Some((attr1, attr2, _, _)) = it.next() {
             let index = perfect_hash(attr1, attr2);
             for (amount, attr1, attr2, _) in it {
-                let amount: u32 = amount.try_unsigned()?;
+                let amount: u32 = amount.try_unsigned().unwrap();
                 let index2 = perfect_hash(attr1, attr2);
                 bags[index].push(Contents {amount, bag_index: index2})
             }
@@ -117,7 +116,7 @@ pub fn solve(input: &str) -> Result<(usize, u32)> {
     let p1 = part1(&bags, shinygold);
     let p2 = part2(&bags, shinygold);
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 

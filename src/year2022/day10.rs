@@ -6,7 +6,7 @@ pub fn solve(input: &str) -> (i32, String) {
     let it = input.split_ascii_whitespace().scan(1, |acc, token| {
         match token {
             "noop" | "addx" => (),
-            _ => *acc += token.try_signed::<i32>().ok()?,
+            _ => *acc += token.try_signed::<i32>()?,
         };
         Some(*acc)
     }).take(240);

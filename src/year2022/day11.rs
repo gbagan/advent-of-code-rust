@@ -29,7 +29,7 @@ pub fn solve(input: &str) -> (u64, u64) {
             items.push((i, j));
         }
         let operation =
-            if let Result::Ok(val) = line3.try_unsigned() {
+            if let Some(val) = line3.try_unsigned() {
                 match line3.as_bytes()[23] {
                     b'+' => Operation::Add(val),
                     b'*' => Operation::Multiply(val),

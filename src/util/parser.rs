@@ -4,7 +4,6 @@ use std::fmt::Debug;
 use std::iter::Enumerate;
 use std::marker::PhantomData;
 use std::str::pattern::Pattern;
-use std::str::Bytes;
 use itertools::Itertools;
 use num_integer::Integer;
 use num_traits::{ConstZero, Signed};
@@ -25,7 +24,7 @@ macro_rules! ten {
 ten!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128);
 
 pub struct ParseUnsigned<'a, T> {
-    bytes: Bytes<'a>,
+    bytes: std::slice::Iter<'a, u8>,
     phantom: PhantomData<&'a T>,
 }
 
@@ -38,7 +37,7 @@ impl<T: Integer + Ten + From<u8>> Iterator for ParseUnsigned<'_, T> {
 }
 
 pub struct ParseSigned<'a, T> {
-    bytes: Bytes<'a>,
+    bytes: std::slice::Iter<'a, u8>,
     phantom: PhantomData<&'a T>,
 }
 
@@ -51,7 +50,7 @@ impl<T: Integer + Signed + ConstZero + Ten + From<u8>> Iterator for ParseSigned<
 }
 
 
-fn next_unsigned<T: Integer + Ten + From<u8>>(bytes: &mut Bytes<'_>) -> Option<T> {
+fn next_unsigned<T: Integer + Ten + From<u8>>(bytes: &mut std::slice::Iter<'_, u8>) -> Option<T> {
     let mut n = loop {
         let byte = bytes.next()?;
         let digit = byte.wrapping_sub(b'0');
@@ -74,9 +73,9 @@ fn next_unsigned<T: Integer + Ten + From<u8>>(bytes: &mut Bytes<'_>) -> Option<T
 }
 
 
-fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(bytes: &mut Bytes<'_>) -> Option<T> {
+fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(bytes: &mut std::slice::Iter<'_, u8>) -> Option<T> {
     let (mut n, negative) = loop {
-        let byte = bytes.next()?;
+        let &byte = bytes.next()?;
         if byte == b'-' {
             break (T::ZERO, true);
         }
@@ -101,7 +100,7 @@ fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(bytes: &mut Byte
 }
 
 
-fn next_lower_case_token<'a>(slice: &'a str, iter: &mut Enumerate<Bytes<'_>>) -> Option<&'a str> {
+fn next_lower_case_token<'a>(slice: &'a str, iter: &mut Enumerate<std::str::Bytes<'_>>) -> Option<&'a str> {
     let n = loop {
         let (i, byte) = iter.next()?;
         if byte.is_ascii_lowercase() {
@@ -122,7 +121,7 @@ fn next_lower_case_token<'a>(slice: &'a str, iter: &mut Enumerate<Bytes<'_>>) ->
 
 pub struct ParseLowercase<'a> {
     slice: &'a str,
-    bytes: Enumerate<Bytes<'a>>,
+    bytes: Enumerate<std::str::Bytes<'a>>,
 }
 
 impl<'a> Iterator for ParseLowercase<'a> {
@@ -133,7 +132,7 @@ impl<'a> Iterator for ParseLowercase<'a> {
     }
 }
 
-fn next_upper_case_token<'a>(slice: &'a str, iter: &mut Enumerate<Bytes<'_>>) -> Option<&'a str> {
+fn next_upper_case_token<'a>(slice: &'a str, iter: &mut Enumerate<std::str::Bytes<'_>>) -> Option<&'a str> {
     let n = loop {
         let (i, byte) = iter.next()?;
         if byte.is_ascii_uppercase() {
@@ -154,7 +153,7 @@ fn next_upper_case_token<'a>(slice: &'a str, iter: &mut Enumerate<Bytes<'_>>) ->
 
 pub struct ParseUppercase<'a> {
     slice: &'a str,
-    bytes: Enumerate<Bytes<'a>>,
+    bytes: Enumerate<std::str::Bytes<'a>>,
 }
 
 impl<'a> Iterator for ParseUppercase<'a> {
@@ -166,32 +165,56 @@ impl<'a> Iterator for ParseUppercase<'a> {
 }
 
 pub trait ParserIter {
-    fn try_unsigned<T: Integer + Ten + From<u8>>(&self) -> Result<T>;
-    fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Result<T>;
+    fn try_unsigned<T: Integer + Ten + From<u8>>(&self) -> Option<T>;
+    fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T>;
     fn iter_unsigned<T: Integer + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T>;
     fn iter_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> ParseSigned<'_, T>;
+}
+
+pub trait WordParserIter {
     fn iter_lowercase(&self) -> ParseLowercase<'_>;
     fn iter_uppercase(&self) -> ParseUppercase<'_>;
 }
 
-impl ParserIter for &str {
-    fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Result<T> {
-        try_signed(&mut self.bytes()).context("No integer found")
+impl ParserIter for &[u8] {
+    fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T> {
+        try_signed(&mut self.iter())
     }
     
-    fn try_unsigned<T: Integer + Ten + From<u8>>(&self) -> Result<T> {
-        next_unsigned(&mut self.bytes()).context("No integer found")
+    fn try_unsigned<T: Integer + Ten + From<u8>>(&self) -> Option<T> {
+        next_unsigned(&mut self.iter())
     }
 
 
     fn iter_unsigned<T: Integer + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T> {
-        ParseUnsigned { bytes: self.bytes(), phantom: PhantomData }
+        ParseUnsigned { bytes: self.iter(), phantom: PhantomData }
     }
 
     fn iter_signed<T: Integer + Signed + Ten + From<u8>>(&self) -> ParseSigned<'_, T> {
-        ParseSigned { bytes: self.bytes(), phantom: PhantomData }
+        ParseSigned { bytes: self.iter(), phantom: PhantomData }
+    }
+}
+
+impl ParserIter for &str {
+    fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T> {
+        try_signed(&mut self.as_bytes().iter())
+    }
+    
+    fn try_unsigned<T: Integer + Ten + From<u8>>(&self) -> Option<T> {
+        next_unsigned(&mut self.as_bytes().iter())
     }
 
+
+    fn iter_unsigned<T: Integer + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T> {
+        ParseUnsigned { bytes: self.as_bytes().iter(), phantom: PhantomData }
+    }
+
+    fn iter_signed<T: Integer + Signed + Ten + From<u8>>(&self) -> ParseSigned<'_, T> {
+        ParseSigned { bytes: self.as_bytes().iter(), phantom: PhantomData }
+    }
+}
+
+impl WordParserIter for &str {
     fn iter_lowercase(&self) -> ParseLowercase<'_> {
         ParseLowercase { slice: self, bytes: self.bytes().enumerate() }
     }
