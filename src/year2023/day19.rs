@@ -24,7 +24,7 @@ pub fn solve(input: &str) -> (u32, u64) {
 }
 
 
-fn parse_instr(s: &str) -> Instr {
+fn parse_instr(s: &str) -> Instr<'_> {
     match s {
         "A" => Instr::Accept,
         "R" => Instr::Reject,
@@ -32,7 +32,7 @@ fn parse_instr(s: &str) -> Instr {
     }
 }
 
-fn parse_workflow(line: &str) -> (&str, Vec<Step>) {
+fn parse_workflow(line: &str) -> (&str, Vec<Step<'_>>) {
     let (name, line) = line.split_once('{').unwrap();
     let workflow = line.split([',', ':', '}']).tuples().map(|(first, second)| {
         if second.is_empty() {

@@ -24,7 +24,7 @@ pub fn solve(input: &str) -> (u32, u32) {
 
 
 
-fn parse_room(line: &str) -> Room {
+fn parse_room(line: &str) -> Room<'_> {
     let len = line.len();
     let encrypted = &line[..len-11]; 
     let sector_id = (&line[len-10..len-7]).try_unsigned().unwrap();

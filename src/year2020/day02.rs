@@ -17,7 +17,7 @@ pub fn solve(input: &str) -> (usize, usize) {
     (p1, p2)
 }
 
-fn parse_line(line: &str) -> Password {
+fn parse_line(line: &str) -> Password<'_> {
     let (token1, token2, token3, token4) = line.split(&[' ', '-']).collect_tuple().unwrap();
     let value1 = token1.try_unsigned().unwrap();
     let value2 = token2.try_unsigned().unwrap();

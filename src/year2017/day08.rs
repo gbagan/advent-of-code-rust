@@ -32,7 +32,7 @@ pub fn solve(input: &str) -> (i32, i32) {
 }
 
 
-fn parse_line(line: &str) -> Instr {
+fn parse_line(line: &str) -> Instr<'_> {
     let (var1, cmd, val1, _, var2, cmp, val2) =
         line.split(' ').collect_tuple().unwrap();
     let val1 = val1.try_signed().unwrap();

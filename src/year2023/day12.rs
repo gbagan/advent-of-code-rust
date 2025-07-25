@@ -22,7 +22,7 @@ pub fn solve(input: &str) -> (u64, u64) {
             let max_spring_len = puzzles.iter().map(|p| p.0.len()*5+5).max().unwrap();
             let max_group_len = puzzles.iter().map(|p| p.1.len()*5).max().unwrap();
             let max_table_size = puzzles.iter().map(|p|
-                    ((p.0.len()*5+6)*(p.1.len()*5+1)))
+                    (p.0.len()*5+6)*(p.1.len()*5+1))
                 .max().unwrap();
 
             let mut springs2 = Vec::with_capacity(max_spring_len);

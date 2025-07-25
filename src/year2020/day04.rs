@@ -21,7 +21,7 @@ pub fn solve(input: &str) -> (u32, u32) {
     (p1, p2)
 }
 
-fn parse_passport(input: &str) -> Passport {
+fn parse_passport(input: &str) -> Passport<'_> {
     input
         .split_ascii_whitespace()
         .map(|token| token.split_once(':').unwrap())
