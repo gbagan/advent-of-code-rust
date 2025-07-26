@@ -94,8 +94,8 @@ fn next_secret(mut n: Simd<u32, LANES>) -> Simd<u32, LANES> {
 unsafe fn add_vector(v1: &mut [u16], v2: &[u16]) {
     let n = v1.len() / 32;
     for i in 0..n {
-        let s1 = u16x32::from_slice(v1.get_unchecked(32*i..));
-        let s2 = u16x32::from_slice(v2.get_unchecked(32*i..));
-        (s1 + s2).copy_to_slice(v1.get_unchecked_mut(32*i..))
+        let s1 = u16x32::from_slice( unsafe { v1.get_unchecked(32*i..) });
+        let s2 = u16x32::from_slice( unsafe { v2.get_unchecked(32*i..) });
+        (s1 + s2).copy_to_slice( unsafe { v1.get_unchecked_mut(32*i..) })
     }
 }

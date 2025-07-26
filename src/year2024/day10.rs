@@ -13,7 +13,7 @@ pub fn solve(input: &str) -> (u32, u32) {
 
     for (i, &c) in grid.iter().enumerate() {
         if c == b'9' {
-            let (a, b) = unsafe { hike_score(&grid, width, i, &mut stack, &mut level0) };
+            let (a, b) = hike_score(&grid, width, i, &mut stack, &mut level0);
             p1 += a;
             p2 += b;
         }
@@ -23,7 +23,7 @@ pub fn solve(input: &str) -> (u32, u32) {
 }
 
 #[inline(always)]
-unsafe fn hike_score(grid: &[u8], width: usize, start: usize, stack: &mut Vec<(usize, u8)>, level0: &mut HashSet<usize>) -> (u32, u32) {
+fn hike_score(grid: &[u8], width: usize, start: usize, stack: &mut Vec<(usize, u8)>, level0: &mut HashSet<usize>) -> (u32, u32) {
     let mut rating = 0;
     stack.push((start , b'9'));
     while let Some((current, level)) = stack.pop() {
@@ -33,22 +33,22 @@ unsafe fn hike_score(grid: &[u8], width: usize, start: usize, stack: &mut Vec<(u
             continue;
         }
         let next = current - 1;
-        if *grid.get_unchecked(next) == level - 1 {
+        if grid[next] == level - 1 {
             stack.push((next, level-1));
         }
         
         let next = current + 1;
-        if *grid.get_unchecked(next) == level - 1 {
+        if grid[next] == level - 1 {
             stack.push((next, level-1));
         }
 
         let next = current - width;
-        if *grid.get_unchecked(next) == level - 1 {
+        if grid[next] == level - 1 {
             stack.push((next, level-1));
         }
         
         let next = current + width;
-        if *grid.get_unchecked(next) == level - 1 {
+        if grid[next] == level - 1 {
             stack.push((next, level-1));
         }
     }

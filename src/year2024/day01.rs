@@ -74,8 +74,10 @@ unsafe fn radix_sort<const N: usize>(arr: &mut [u32; N]) {
     let mut highbits_count: [u16; 512] = [0; 512];
 
     for &x in arr.iter() {
-        *lowbits_count.get_unchecked_mut((x & 0xff) as usize) += 1;
-        *highbits_count.get_unchecked_mut((x >> 8) as usize) += 1;
+        unsafe {
+            *lowbits_count.get_unchecked_mut((x & 0xff) as usize) += 1;
+            *highbits_count.get_unchecked_mut((x >> 8) as usize) += 1;
+        }
     }
 
     let mut prev = 0;
@@ -93,15 +95,15 @@ unsafe fn radix_sort<const N: usize>(arr: &mut [u32; N]) {
     let mut tmp = [0u32; N];
 
     for &x in arr.iter() {
-        let y = lowbits_count.get_unchecked_mut((x & 0xff) as usize);
+        let y = unsafe { lowbits_count.get_unchecked_mut((x & 0xff) as usize) };
         *y -= 1;
-        *tmp.get_unchecked_mut(*y as usize) = x;
+        unsafe { *tmp.get_unchecked_mut(*y as usize) = x };
     }
 
     for &x in tmp.iter().rev() {
-        let y = highbits_count.get_unchecked_mut((x >> 8) as usize);
+        let y = unsafe { highbits_count.get_unchecked_mut((x >> 8) as usize) };
         *y -= 1;
-        *arr.get_unchecked_mut(*y as usize) = x;
+        unsafe { *arr.get_unchecked_mut(*y as usize) = x};
     }
 }
 
