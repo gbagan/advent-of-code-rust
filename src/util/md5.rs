@@ -1,3 +1,4 @@
+// copied from
 // https://github.com/maneatingape/advent-of-code-rust/blob/main/src/util/md5.rs
 
 use std::simd::{LaneCount, Simd, SupportedLaneCount};

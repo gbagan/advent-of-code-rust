@@ -78,39 +78,38 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
                 },
                 std::result::Result::Ok((p1, p2, mut elapsed)) => {
                     let microseconds = elapsed.as_micros();
-                    let mut iterations = 0;
 
-                    if !display_solution {
+                    solved += 1;
+                    
+
+                    if display_solution {
+                        println!("{year} Day {day}.");
+                    } else {
                         let mut elapsed_vec = Vec::new();
-                        iterations = if microseconds < 5000 {100} else {20};
+                        let iterations = if microseconds < 5000 {100} else {20};
                         for _ in 0..iterations {
                             let data = data.clone();
                             elapsed_vec.push(func(&data).unwrap().2);
                         }
                         elapsed = *elapsed_vec.select_nth_unstable(iterations/2-1).1;
-                    }
+                        duration += elapsed;
+                        let microseconds = elapsed.as_micros();
+                        let nanoseconds = elapsed.as_nanos();
 
-                    solved += 1;
-                    duration += elapsed;
-                    let microseconds = elapsed.as_micros();
-                    let nanoseconds = elapsed.as_nanos();
-
-                    let text = if microseconds <= 5 {
-                        format!("{nanoseconds} ns")
-                    } else {
-                        format!("{microseconds} μs")
-                    };
-                    let text =
-                        if microseconds < 1000 {
-                            Green.paint(text)
-                        } else if microseconds < 100_000 {
-                            Yellow.bold().paint(text)
+                        let text = if microseconds <= 5 {
+                            format!("{nanoseconds} ns")
                         } else {
-                            Red.bold().paint(text)
+                            format!("{microseconds} μs")
                         };
-                    if display_solution {
-                        println!("{year} Day {day} in {text}.");
-                    } else {
+                        let text =
+                            if microseconds < 1000 {
+                                Green.paint(text)
+                            } else if microseconds < 100_000 {
+                                Yellow.bold().paint(text)
+                            } else {
+                                Red.bold().paint(text)
+                            };
+
                         println!("{year} Day {day} in {text}, median over {iterations} iterations.");
                     }
                     if display_solution {
@@ -126,7 +125,9 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
     }
 
     println!("Solved: {solved}");
-    println!("Duration: {} μs", duration.as_micros());
+    if !display_solution {
+        println!("Duration: {} μs", duration.as_micros());
+    }
 }
 
 fn markdown(arg_year: String) {
@@ -329,6 +330,7 @@ fn solutions() -> Vec<Solution> {
         solution2!(year2021, day12),
         solution2!(year2021, day13),
         solution2!(year2021, day14),
+        solution2!(year2021, day15),
 
         solution2!(year2022, day01),
         solution2!(year2022, day02),
