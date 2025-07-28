@@ -18,7 +18,7 @@ fn dijkstra(grid: &Grid<u8>) -> u16 {
     let goal = ((grid.height - 1) * width - 2) as u32;
 
     let mut distance = vec![u16::MAX; grid.vec.len()];
-    let mut queue: [Vec<u32>; NB_BUCKETS]  = std::array::from_fn(|_| Vec::with_capacity(200));
+    let mut queue: [Vec<u32>; NB_BUCKETS] = std::array::from_fn(|_| Vec::with_capacity(200));
 
     queue[0].push(start);
 

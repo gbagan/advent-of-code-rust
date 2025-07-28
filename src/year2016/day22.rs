@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use crate::util::parser::*;
 
 // part 1 assumes that all non empty nodes have > 50% use
@@ -15,7 +14,7 @@ pub fn solve(input: &str) -> (usize, u32) {
         .as_bytes()
         .array_chunks::<48>()
         .map(|line| {
-            let (x, y) = (&line[16..22]).iter_unsigned().collect_tuple().unwrap();
+            let [x, y] = (&line[16..22]).iter_unsigned().next_chunk().unwrap();
             let used = (&line[30..33]).try_unsigned().unwrap();
             let avail = (&line[37..40]).try_unsigned().unwrap();
             Node { x, y, used, avail }

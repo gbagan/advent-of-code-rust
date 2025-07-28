@@ -48,18 +48,18 @@ fn do_operation(id: u64, mut it: impl Iterator<Item=u64>) -> u64 {
         2 => it.min().unwrap(),
         3 => it.max().unwrap(),
         5 => {
-            let x = it.next();
-            let y = it.next();
+            let x = it.next().unwrap();
+            let y = it.next().unwrap();
             (x > y) as u64
         }
         6 => {
-            let x = it.next();
-            let y = it.next();
+            let x = it.next().unwrap();
+            let y = it.next().unwrap();
             (x < y) as u64
         }
         7 => {
-            let x = it.next();
-            let y = it.next();
+            let x = it.next().unwrap();
+            let y = it.next().unwrap();
             (x == y) as u64
         }
         _ => unreachable!()

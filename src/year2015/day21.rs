@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use crate::util::parser::*;
 
 struct Boss {
@@ -38,9 +37,9 @@ const ITEMS: [Item; 18] = [
 ];
 
 pub fn solve(input: &str) -> (i32, i32) {
-    let (hp, damage, armor) = input
+    let [hp, damage, armor] = input
         .iter_unsigned()
-        .collect_tuple()
+        .next_chunk()
         .unwrap();
     let boss = Boss { hp, damage, armor};
 

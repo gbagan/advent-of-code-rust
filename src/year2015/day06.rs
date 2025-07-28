@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use crate::util::{boxes::Box, parser::*};
 
 #[derive(Clone, Copy)]
@@ -31,7 +30,7 @@ fn parse_instruction(line: &str) -> Instruction {
         } else {
             panic!();
         };
-    let (xmin, ymin, xmax, ymax) = s.iter_unsigned().collect_tuple().unwrap();
+    let [xmin, ymin, xmax, ymax] = s.iter_unsigned().next_chunk().unwrap();
     let rectangle = Box { xmin, ymin, xmax, ymax };
     Instruction { cmd, rectangle }
 }

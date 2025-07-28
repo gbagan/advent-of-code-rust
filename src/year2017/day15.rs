@@ -1,4 +1,4 @@
-use itertools::{iterate, Itertools};
+use itertools::iterate;
 use crate::util::{parser::*, power};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Mutex;
@@ -15,7 +15,7 @@ struct Block {
 }
 
 pub fn solve(input: &str) -> (usize, usize) {
-    let (a, b) = input.iter_unsigned().collect_tuple().unwrap();
+    let [a, b] = input.iter_unsigned().next_chunk().unwrap();
 
     let mutex = Mutex::new(Vec::with_capacity(NB_BLOCKS));
     let counter = AtomicUsize::new(0);

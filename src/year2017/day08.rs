@@ -1,6 +1,5 @@
 use ahash::{HashMap, HashMapExt};
 use crate::util::parser::*;
-use itertools::Itertools;
 
 struct Instr<'a> {
     var1: &'a str,
@@ -33,8 +32,8 @@ pub fn solve(input: &str) -> (i32, i32) {
 
 
 fn parse_line(line: &str) -> Instr<'_> {
-    let (var1, cmd, val1, _, var2, cmp, val2) =
-        line.split(' ').collect_tuple().unwrap();
+    let [var1, cmd, val1, _, var2, cmp, val2] =
+        line.split(' ').next_chunk().unwrap();
     let val1 = val1.try_signed().unwrap();
     let val2 = val2.try_signed().unwrap();
     Instr {var1, cmd, val1, var2, cmp, val2}

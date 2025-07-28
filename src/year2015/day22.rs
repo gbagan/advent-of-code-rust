@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use ahash::{HashSet, HashSetExt};
 use crate::util::{heap::MinHeap, parser::*};
 
@@ -13,7 +12,7 @@ struct State {
 }
 
 pub fn solve(input: &str) -> (i16, i16) {
-    let (boss_hp, boss_damage) = input.iter_unsigned().collect_tuple().unwrap();
+    let [boss_hp, boss_damage] = input.iter_unsigned().next_chunk().unwrap();
 
     let p1 = simulate::<false>(boss_hp, boss_damage);
     let p2 = simulate::<true>(boss_hp, boss_damage);
