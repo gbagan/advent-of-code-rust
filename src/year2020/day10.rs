@@ -1,16 +1,15 @@
 // dynamic programming
 
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(u32, u64)> {
+pub fn solve(input: &str) -> (u32, u64) {
     let mut numbers: Vec<_> = input.iter_unsigned().collect();
     numbers.push(0);
     numbers.sort_unstable();
     let p1 = part1(&numbers);
     let p2 = part2(&numbers);
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
 fn part1(numbers: &[usize]) -> u32 {

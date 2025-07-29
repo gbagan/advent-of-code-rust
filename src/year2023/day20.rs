@@ -1,9 +1,8 @@
 use ahash::HashMap;
 use arrayvec::ArrayVec;
-use crate::util::parser::*;
 
 fn parse_line(line: &str) -> (&str, (bool, ArrayVec<&str, 6>)) {
-    let (key, values) = line.try_split_once(" -> ").unwrap();
+    let (key, values) = line.split_once(" -> ").unwrap();
     let first_char = key.chars().next().unwrap();
     let key = key.trim_start_matches(['%', '&']);
     let values = values.split(", ").collect();

@@ -1,15 +1,14 @@
-use anyhow::*;
 use crate::util::parser::*;
 
-pub fn solve(input: &str) -> Result<(u64, u64)> {
+pub fn solve(input: &str) -> (u64, u64) {
     let numbers: Vec<u64> = input.iter_unsigned().collect();
-    let p1 = part1::<26>(&numbers)?;
-    let p2 = part2(&numbers, p1)?;
-    Ok((p1, p2))
+    let p1 = part1::<26>(&numbers);
+    let p2 = part2(&numbers, p1);
+    (p1, p2)
 }
 
-fn part1<const N: usize>(numbers: &[u64])-> Result<u64> {
-    numbers
+fn part1<const N: usize>(numbers: &[u64])-> u64 {
+    let table = numbers
         .array_windows::<N>()
         .find(|&slice| {
             let last = slice[N-1];
@@ -21,12 +20,12 @@ fn part1<const N: usize>(numbers: &[u64])-> Result<u64> {
                 }
             }
             true
-        })
-        .map(|slice| slice[N-1])
-        .context("Part 1: No solution found")
+        }).unwrap();
+
+    table[N-1]
 }
 
-fn part2(numbers: &[u64], target: u64) -> Result<u64> {
+fn part2(numbers: &[u64], target: u64) -> u64 {
     let n = numbers.len();
     let mut start = 0;
     let mut end = 2;
@@ -40,10 +39,7 @@ fn part2(numbers: &[u64], target: u64) -> Result<u64> {
             start += 1;
         }
     }
-    if sum == target {
-        let slice = &numbers[start..end];
-        Ok(slice.iter().min().unwrap() + slice.iter().max().unwrap())
-    } else {
-        bail!("Part 2: No solution found")
-    }
+    assert!(sum == target);
+    let slice = &numbers[start..end];
+    slice.iter().min().unwrap() + slice.iter().max().unwrap()
 }

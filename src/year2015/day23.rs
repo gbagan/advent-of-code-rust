@@ -1,6 +1,3 @@
-use anyhow::*;
-use crate::util::parser::*;
-
 pub enum Instr {
     Hlf(bool),
     Tpl(bool),
@@ -10,31 +7,31 @@ pub enum Instr {
     Jio(bool, i8)
 }
 
-pub fn solve(input: &str) -> Result<(u32, u32)> {
-    let program: Vec<_> = input.try_parse_lines_and_collect(parse_instr)?;
+pub fn solve(input: &str) -> (u32, u32) {
+    let program: Vec<_> = input.lines().map(parse_instr).collect();
     let p1 = run_program(&program, 0);
     let p2 = run_program(&program, 1);
-    Ok((p1, p2))
+    (p1, p2)
 }
 
-fn parse_instr(line: &str) -> Result<Instr> {
-    let (name, rest) = line.try_split_once(' ')?;
+fn parse_instr(line: &str) -> Instr {
+    let (name, rest) = line.split_once(' ').unwrap();
     match name {
-        "hlf" => Ok(Instr::Hlf(rest == "a")),
-        "tpl" => Ok(Instr::Tpl(rest == "a")),
-        "inc" => Ok(Instr::Inc(rest == "a")),
-        "jmp" => Ok(Instr::Jmp(rest.parse()?)),
+        "hlf" => Instr::Hlf(rest == "a"),
+        "tpl" => Instr::Tpl(rest == "a"),
+        "inc" => Instr::Inc(rest == "a"),
+        "jmp" => Instr::Jmp(rest.parse().unwrap()),
         "jie" | "jio" => {
-            let (reg, offset) = rest.try_split_once(", ")?;
+            let (reg, offset) = rest.split_once(", ").unwrap();
             let reg = reg == "a";
-            let offset = offset.parse()?;
+            let offset = offset.parse().unwrap();
             if name == "jie" {
-                Ok(Instr::Jie(reg, offset))
+                Instr::Jie(reg, offset)
             } else {
-                Ok(Instr::Jio(reg, offset))
+                Instr::Jio(reg, offset)
             }
         }
-        _ => bail!("Expecting hlf, tpl, inc, jmp, jie")
+        _ => panic!("Expecting hlf, tpl, inc, jmp, jie")
     }
 }
 

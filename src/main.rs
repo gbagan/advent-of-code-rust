@@ -1,4 +1,3 @@
-use anyhow::*;
 use std::path::Path;
 use std::env::args;
 use std::fs::{create_dir, read_to_string};
@@ -12,22 +11,7 @@ use aoc::*;
 struct Solution {
     year: String,
     day: String,
-    func: fn(&String) -> Result<(String, String, Duration)>,
-}
-
-macro_rules! solution {
-    ($year:tt, $day:tt) => {{
-        let year = stringify!($year).trim_matches(char::is_alphabetic).to_string(); 
-        let day = stringify!($day).trim_matches(char::is_alphabetic).to_string();
-        let func = |input: &String| {
-            let instant = Instant::now();
-            let (p1, p2) = $year::$day::solve(input)?;
-            let elapsed = instant.elapsed();
-            Ok((p1.to_string(), p2.to_string(), elapsed))
-        };
-
-        Solution { year, day, func }
-    }};
+    func: fn(&String) -> (String, String, Duration),
 }
 
 macro_rules! solution2 {
@@ -38,7 +22,7 @@ macro_rules! solution2 {
             let instant = Instant::now();
             let (p1, p2) = $year::$day::solve(input);
             let elapsed = instant.elapsed();
-            Ok((p1.to_string(), p2.to_string(), elapsed))
+            (p1.to_string(), p2.to_string(), elapsed)
         };
 
         Solution { year, day, func }
@@ -70,53 +54,46 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
         }
         
         let path = Path::new("inputs").join(year).join(day);
-        if let Result::Ok(data) = read_to_string(&path) {
-            match func(&data) {
-                Err(err) => {
-                    eprintln!("{err:?}");
-                    eprintln!("{year} Day {day:02}");
-                },
-                std::result::Result::Ok((p1, p2, mut elapsed)) => {
-                    let microseconds = elapsed.as_micros();
+        if let Ok(data) = read_to_string(&path) {
+            let (p1, p2, mut elapsed) = func(&data);
+            let microseconds = elapsed.as_micros();
 
-                    solved += 1;
+            solved += 1;
                     
 
-                    if display_solution {
-                        println!("{year} Day {day}.");
-                    } else {
-                        let mut elapsed_vec = Vec::new();
-                        let iterations = if microseconds < 5000 {100} else {20};
-                        for _ in 0..iterations {
-                            let data = data.clone();
-                            elapsed_vec.push(func(&data).unwrap().2);
-                        }
-                        elapsed = *elapsed_vec.select_nth_unstable(iterations/2-1).1;
-                        duration += elapsed;
-                        let microseconds = elapsed.as_micros();
-                        let nanoseconds = elapsed.as_nanos();
-
-                        let text = if microseconds <= 5 {
-                            format!("{nanoseconds} ns")
-                        } else {
-                            format!("{microseconds} μs")
-                        };
-                        let text =
-                            if microseconds < 1000 {
-                                Green.paint(text)
-                            } else if microseconds < 100_000 {
-                                Yellow.bold().paint(text)
-                            } else {
-                                Red.bold().paint(text)
-                            };
-
-                        println!("{year} Day {day} in {text}, median over {iterations} iterations.");
-                    }
-                    if display_solution {
-                        println!("    Part 1: {p1}");
-                        println!("    Part 2: {p2}");
-                    }
+            if display_solution {
+                println!("{year} Day {day}.");
+            } else {
+                let mut elapsed_vec = Vec::new();
+                let iterations = if microseconds < 5000 {100} else {20};
+                for _ in 0..iterations {
+                    let data = data.clone();
+                    elapsed_vec.push(func(&data).2);
                 }
+                elapsed = *elapsed_vec.select_nth_unstable(iterations/2-1).1;
+                duration += elapsed;
+                let microseconds = elapsed.as_micros();
+                let nanoseconds = elapsed.as_nanos();
+
+                let text = if microseconds <= 5 {
+                    format!("{nanoseconds} ns")
+                } else {
+                    format!("{microseconds} μs")
+                };
+                let text =
+                    if microseconds < 1000 {
+                        Green.paint(text)
+                    } else if microseconds < 100_000 {
+                        Yellow.bold().paint(text)
+                    } else {
+                        Red.bold().paint(text)
+                    };
+
+                println!("{year} Day {day} in {text}, median over {iterations} iterations.");
+            }
+            if display_solution {
+                println!("    Part 1: {p1}");
+                println!("    Part 2: {p2}");
             }
         } else {
             eprintln!("{year} Day {day:02}");
@@ -145,36 +122,29 @@ fn markdown(arg_year: String) {
         
         let path = Path::new("inputs").join(year).join(day);
         if let Result::Ok(data) = read_to_string(&path) {
-            match func(&data) {
-                Err(err) => {
-                    eprintln!("{err:?}");
-                    eprintln!("{year} Day {day:02}");
-                },
-                std::result::Result::Ok((_, _, mut elapsed)) => {
-                    let microseconds = elapsed.as_micros();
-                    let mut elapsed_vec = Vec::new();
-                    let iterations = if microseconds < 5000 {1000} else {20};
-                    for _ in 0..iterations {
-                        let data = data.clone();
-                        elapsed_vec.push(func(&data).unwrap().2);
-                    }
-                    elapsed = *elapsed_vec.select_nth_unstable(iterations/2-1).1;
-
-                    duration += elapsed;
-                    let microseconds = elapsed.as_micros();
-                    let nanoseconds = elapsed.as_nanos();
-
-                    let text = if microseconds <= 5 {
-                        format!("{nanoseconds} ns")
-                    } else {
-                        format!("{microseconds} μs")
-                    };
-                    let tmp = day.as_bytes();
-                    let day2 = if tmp[0] == b'0' { (tmp[1] as char).to_string() } else { day.clone() };
-
-                    println!("| [{day2}](https://adventofcode.com/{year}/day/{day2}) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year{year}/day{day}.rs) | {text} |");
-                }
+            let (_, _, elapsed) = func(&data);
+            let microseconds = elapsed.as_micros();
+            let mut elapsed_vec = Vec::new();
+            let iterations = if microseconds < 5000 {1000} else {20};
+            for _ in 0..iterations {
+                let data = data.clone();
+                elapsed_vec.push(func(&data).2);
             }
+            let elapsed = *elapsed_vec.select_nth_unstable(iterations/2-1).1;
+
+            duration += elapsed;
+            let microseconds = elapsed.as_micros();
+            let nanoseconds = elapsed.as_nanos();
+
+            let text = if microseconds <= 5 {
+                format!("{nanoseconds} ns")
+            } else {
+                format!("{microseconds} μs")
+            };
+            let tmp = day.as_bytes();
+            let day2 = if tmp[0] == b'0' { (tmp[1] as char).to_string() } else { day.clone() };
+
+            println!("| [{day2}](https://adventofcode.com/{year}/day/{day2}) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year{year}/day{day}.rs) | {text} |");
         } else {
             eprintln!("{year} Day {day:02}");
             eprintln!("    Missing input!");
@@ -250,7 +220,7 @@ fn solutions() -> Vec<Solution> {
         solution2!(year2015, day20),
         solution2!(year2015, day21),
         solution2!(year2015, day22),
-        solution!(year2015, day23),
+        solution2!(year2015, day23),
         solution2!(year2015, day24),
         solution2!(year2015, day25),
 
@@ -308,11 +278,11 @@ fn solutions() -> Vec<Solution> {
         solution2!(year2020, day03),
         solution2!(year2020, day04),
         solution2!(year2020, day05),
-        solution!(year2020, day06),
+        solution2!(year2020, day06),
         solution2!(year2020, day07),
-        solution!(year2020, day08),
-        solution!(year2020, day09),
-        solution!(year2020, day10),
+        solution2!(year2020, day08),
+        solution2!(year2020, day09),
+        solution2!(year2020, day10),
         solution2!(year2020, day11),
         solution2!(year2020, day18),
 
@@ -334,6 +304,7 @@ fn solutions() -> Vec<Solution> {
         solution2!(year2021, day16),
         solution2!(year2021, day17),
         solution2!(year2021, day18),
+        solution2!(year2021, day19),
 
         solution2!(year2022, day01),
         solution2!(year2022, day02),

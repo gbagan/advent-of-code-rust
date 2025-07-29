@@ -1,12 +1,8 @@
-use anyhow::*;
-use crate::util::parser::*;
-use itertools::Itertools;
-
-pub fn solve(input: &str) -> Result<(u32, u32)> {
+pub fn solve(input: &str) -> (u32, u32) {
     let answers: Vec<Vec<_>> = input
         .split("\n\n")
-        .map(|group| group.try_parse_lines_and_collect(parse_line))
-        .try_collect()?;
+        .map(|group| group.lines().map(parse_line).collect())
+        .collect();
     let mut p1 = 0;
     let mut p2 = 0;
 
@@ -15,15 +11,11 @@ pub fn solve(input: &str) -> Result<(u32, u32)> {
         p2 += group.iter().fold(u32::MAX, |x, &y| x & y).count_ones();
     }
 
-    Ok((p1, p2))
+    (p1, p2)
 }
 
-fn parse_line(line: &str) ->  Result<u32> {
-    line.bytes().try_fold(0, |acc, c| {
-        if c.is_ascii_lowercase() {
-            Ok(acc | 1 << (c - b'a')) 
-        } else {
-            bail!("Non lowercase character {}", c as char)
-        }
+fn parse_line(line: &str) ->  u32 {
+    line.bytes().fold(0, |acc, c| {
+        acc | 1 << (c - b'a')
     })
 }

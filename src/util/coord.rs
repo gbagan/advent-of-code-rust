@@ -178,12 +178,19 @@ impl Coord3 {
     pub const ORIGIN: Coord3 = Self { x: 0, y: 0, z: 0 };
 
     #[inline]
-    pub fn new(x: i32, y: i32, z: i32) -> Self {
+    pub const fn new(x: i32, y: i32, z: i32) -> Self {
         Self { x, y, z }
     }
 
+    #[inline]
     pub fn manhattan(&self, other: &Self) -> i32 {
         (self.x - other.x).abs() +  (self.y - other.y).abs() +  (self.z - other.z).abs()
+    }
+
+    #[inline]
+    pub fn euclidean(&self, other: &Self) -> i32 {
+        let Self { x, y, z } = *self - *other;
+        x * x + y * y + z * z
     }
 }
 
