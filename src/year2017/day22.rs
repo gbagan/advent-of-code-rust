@@ -4,7 +4,7 @@ const CLEAN: usize = 1;
 const INFECTED: usize = 3;
 
 pub fn solve(input: &str) -> (u32, u32) {
-    let grid = Grid::parse(input).unwrap();
+    let grid = Grid::parse(input);
     let p1 = simulate(&grid, 10_000, 2);
     let p2 = simulate(&grid, 10_000_000, 1);
     (p1, p2)

@@ -1,4 +1,3 @@
-use anyhow::*;
 use crate::util::coord::Coord;
 use std::ops::{Index, IndexMut};
 
@@ -209,21 +208,21 @@ impl<T> IndexMut<(usize, usize)> for Grid<T> {
 }
 
 impl Grid<u8> {
-    pub fn parse(input: &str) -> Result<Self> {
+    pub fn parse(input: &str) -> Self {
         let raw: Vec<_> = input.lines().map(str::as_bytes).collect();
         let width = raw[0].len();
         let height = raw.len();
         let mut vec = Vec::with_capacity(width * height);
         for slice in raw {
-            ensure!(slice.len() == width, "Two rows have different lengths ({width} and {})", slice.len());
+            debug_assert!(slice.len() == width, "Two rows have different lengths ({width} and {})", slice.len());
             vec.extend_from_slice(slice);
         }
-        ensure!(width > 0, "Grid width must be > 0");
-        ensure!(height > 0, "Height width must be > 0");
-        Ok(Grid { width, height, vec })
+        debug_assert!(width > 0, "Grid width must be > 0");
+        debug_assert!(height > 0, "Height width must be > 0");
+        Grid { width, height, vec }
     }
 
-    pub fn parse_with_padding(input: &str, pad: u8) -> Result<Self> {
+    pub fn parse_with_padding(input: &str, pad: u8) -> Self {
         let raw: Vec<_> = input.lines().map(str::as_bytes).collect();
         let width = raw[0].len()+2;
         let height = raw.len()+2;
@@ -234,7 +233,7 @@ impl Grid<u8> {
         
         for slice in raw {
             vec.push(pad);
-            ensure!(slice.len()+2 == width, "Two rows have different lengths ({width} and {})", slice.len());
+            debug_assert!(slice.len()+2 == width, "Two rows have different lengths ({width} and {})", slice.len());
             vec.extend_from_slice(slice);
             vec.push(pad);
         }
@@ -243,7 +242,7 @@ impl Grid<u8> {
             vec.push(pad);
         }
 
-        Ok(Grid { width, height, vec })
+        Grid { width, height, vec }
     }
 
     pub fn parse_with_padding2<const W: usize, const H: usize>(input: &str, pad: u8) -> Self {

@@ -2,7 +2,7 @@ use arrayvec::ArrayVec;
 use crate::util::{coord::*, grid::*};
 
 pub fn solve(input: &str) -> (usize, usize) {
-    let mut grid = Grid::parse(input).unwrap();
+    let mut grid = Grid::parse(input);
     let width = grid.width as i32;
     let height = grid.height as i32;
 

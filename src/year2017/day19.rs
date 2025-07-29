@@ -3,7 +3,7 @@ use crate::util::{coord::Coord,grid::Grid};
 type Point = Coord<i32>;
 
 pub fn solve(input: &str) -> (String, u32) {
-    let grid = Grid::parse(input).unwrap();
+    let grid = Grid::parse(input);
     let start = (0..grid.height).find_map(|i| {
         let c = Point::new(i as i32, 0);
         if grid[c] != b' ' { Some(c) } else { None }

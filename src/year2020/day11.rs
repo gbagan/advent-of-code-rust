@@ -1,7 +1,7 @@
 use crate::util::grid::Grid;
 
 pub fn solve(input: &str) -> (usize, usize) {
-    let grid = Grid::parse_with_padding(input, b'*').unwrap();
+    let grid = Grid::parse_with_padding(input, b'*');
     let p1 = part1(&grid);
     let p2 = part2(&grid);
     (p1, p2)

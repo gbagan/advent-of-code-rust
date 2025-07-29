@@ -5,7 +5,7 @@ use ahash::{HashSet, HashSetExt};
 enum Dir { North, South, West, East }
 
 pub fn solve(input: &str) -> (usize, usize) {
-    let mut grid = Grid::parse(input).unwrap();
+    let mut grid = Grid::parse(input);
     
     let mut start = (0, 0);
     'outer: for i in 0..grid.height {

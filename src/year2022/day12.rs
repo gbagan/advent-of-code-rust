@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 use crate::util::grid::Grid;
 
 pub fn solve(input: &str) -> (u32, u32) {
-    let mut grid = Grid::parse(input).unwrap();
+    let mut grid = Grid::parse(input);
     let start = grid.vec.iter().position(|&c| c == b'E').unwrap();
     grid[start] = b'z';
     let mut p2 = u32::MAX;

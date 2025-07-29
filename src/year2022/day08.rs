@@ -1,7 +1,7 @@
 use crate::util::grid::Grid;
 
 pub fn solve(input: &str) -> (usize, u32) {
-    let grid = Grid::parse(input).unwrap();
+    let grid = Grid::parse(input);
     let grid = grid.map(|v| (8 * (v - b'0')) as i8);
     let p1 = part1(&grid);
     let p2 = part2(&grid);

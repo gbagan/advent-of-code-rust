@@ -2,7 +2,7 @@ use crate::util::grid::Grid;
 use ahash::{HashSet, HashSetExt};
 
 pub fn solve(input: &str) -> (u32, u32) {
-    let grid = Grid::parse_with_padding(input, b'#').unwrap();
+    let grid = Grid::parse_with_padding(input, b'#');
     let width = grid.width;
     let grid = grid.vec;
 

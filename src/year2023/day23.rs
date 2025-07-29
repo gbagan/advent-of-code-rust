@@ -9,7 +9,7 @@ struct GridGraph {
 }
 
 pub fn solve(input: &str) -> (i32, i32) {
-    let mut grid = Grid::parse_with_padding(input, b'#').unwrap();
+    let mut grid = Grid::parse_with_padding(input, b'#');
     let graph = compress_grid(&mut grid);
     let grid = graph_to_grid(&graph);
     let p1 = part1(&grid);

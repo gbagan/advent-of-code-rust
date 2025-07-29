@@ -6,7 +6,7 @@ use crate::util::{coord::Coord, grid::Grid};
 type Point = Coord<usize>;
 
 pub fn solve(input: &str) -> (u16, u16) {
-    let grid= Grid::parse_with_padding(input, b'#').unwrap();
+    let grid= Grid::parse_with_padding(input, b'#');
     
     let mut queue  = vec![ArrayVec::new(); 100];
 

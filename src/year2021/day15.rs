@@ -3,7 +3,7 @@ use crate::util::grid::*;
 const NB_BUCKETS: usize = 10;
 
 pub fn solve(input: &str) -> (u16, u16) {
-    let grid = Grid::parse_with_padding(input, b'#').unwrap();
+    let grid = Grid::parse_with_padding(input, b'#');
     let p1 = dijkstra(&grid);
 
     let grid2 = expand_grid(&grid);

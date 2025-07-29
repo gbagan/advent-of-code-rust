@@ -1,7 +1,7 @@
 use crate::util::grid::Grid;
 
 pub fn solve(input: &str) -> (u64, u64) {
-    let grid = Grid::parse(input).unwrap();
+    let grid = Grid::parse(input);
     
     let p1 = toboggan(&grid, 3, 1);
     let p2 = p1

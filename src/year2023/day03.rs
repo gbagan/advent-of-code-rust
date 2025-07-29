@@ -4,7 +4,7 @@ use itertools::Itertools;
 use std::str;
 
 pub fn solve(input: &str) -> (u32, u32) {
-    let grid = Grid::parse_with_padding(input, b'.').unwrap();
+    let grid = Grid::parse_with_padding(input, b'.');
     let mut number_grid: Grid<Option<u32>> = grid.map(|_| None);
     let mut i = 0;
     let mut first_digit = None;

@@ -4,7 +4,7 @@ use std::collections::VecDeque;
 const NB_STEPS: u64 = 26_501_365;
 
 pub fn solve(input: &str) -> (u64, u64) {
-    let grid = Grid::parse_with_padding(input, b'#').unwrap();
+    let grid = Grid::parse_with_padding(input, b'#');
     let start = grid.width / 2 + grid.width *  (grid.height / 2);
     
     let (even_inside, odd_inside, even_outside, odd_outside) =

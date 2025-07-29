@@ -2,7 +2,7 @@ use crate::util::grid::*;
 
 pub fn solve(input: &str) -> (u32, u32) {
     let (grid, directions) = input.trim().split_once("\n\n").unwrap();
-    let grid = Grid::parse(grid).unwrap();
+    let grid = Grid::parse(grid);
     let start = grid.vec.iter().position(|&c| c == b'@').unwrap();
 
     let p1 = part1(&grid, start, directions.as_bytes());
