@@ -1,35 +1,36 @@
 use ahash::{HashMap, HashMapExt};
 use itertools::Itertools;
 
+#[derive(Clone, Copy)]
 enum Op {
     And, Or, LShift, RShift
 }
 
-enum Wire {
-    Signal(u16), Wire(String)
+enum Wire<'a> {
+    Signal(u16), Wire(&'a str)
 }
 
-enum Gate {
-    Const(Wire), Gate2(Wire, Op, Wire), Not(Wire)
+enum Gate<'a> {
+    Const(Wire<'a>), Gate2(Wire<'a>, Op, Wire<'a>), Not(Wire<'a>)
 }
 
-type Circuit = HashMap<String,Gate>;
+type Circuit<'a> = HashMap<&'a str,Gate<'a>>;
 
 pub fn solve(input: &str) -> (u16, u16) {
-    let mut circuit: HashMap<String, Gate> = input.lines().map(parse_line).collect();
+    let mut circuit: Circuit = input.lines().map(parse_line).collect();
     let p1 = eval_circuit(&circuit);
-    circuit.insert("b".to_string(), Gate::Const(Wire::Signal(p1)));
+    circuit.insert("b", Gate::Const(Wire::Signal(p1)));
     let p2 = eval_circuit(&circuit);
     (p1, p2)
 }
 
-fn parse_wire(s: &str) -> Wire {
+fn parse_wire(s: &str) -> Wire<'_> {
     s.parse::<u16>()
     .map(Wire::Signal)
-    .unwrap_or_else(|_| Wire::Wire(s.to_string()))
+    .unwrap_or_else(|_| Wire::Wire(s))
 }
 
-fn parse_gate(s: &str) -> Gate {
+fn parse_gate(s: &str) -> Gate<'_> {
     let mut words = s.split_ascii_whitespace();
     let first = words.next().unwrap();
     if first == "NOT" {
@@ -54,17 +55,17 @@ fn parse_gate(s: &str) -> Gate {
     }
 }
 
-fn parse_line(line: &str) -> (String, Gate) {
+fn parse_line(line: &str) -> (&str, Gate<'_>) {
     let (s1, s2) = line.split_once(" -> ").unwrap();
     let gate = parse_gate(s1);
-    (s2.to_string(), gate)
+    (s2, gate)
 }
 
 fn eval_circuit(circuit: &Circuit) -> u16 {
     let mut vals = HashMap::new();
     
-    fn get_val(circuit: &Circuit, vals: &mut HashMap<String,u16>, label: String) -> u16 {
-        match vals.get(&label) {
+    fn get_val<'a>(circuit: &'a Circuit, vals: &mut HashMap<&'a str,u16>, label: &'a str) -> u16 {
+        match vals.get(label) {
             Some(val) => *val,
             None => {
                 let val = eval_gate(circuit, vals, &circuit[&label]);
@@ -74,22 +75,22 @@ fn eval_circuit(circuit: &Circuit) -> u16 {
         }
     }
 
-    fn eval_gate(circuit: &Circuit, vals: &mut HashMap<String,u16>, gate: &Gate) -> u16 {
+    fn eval_gate<'a>(circuit: &'a Circuit, vals: &mut HashMap<&'a str,u16>, gate: &'a Gate) -> u16 {
         match gate {
             Gate::Const(wire) => eval_wire(circuit, vals, wire),
-            Gate::Gate2(wire1, op, wire2) => eval_op (circuit, vals, wire1, op, wire2),
+            Gate::Gate2(wire1, op, wire2) => eval_op (circuit, vals, wire1, *op, wire2),
             Gate::Not(wire) => ! eval_wire(circuit, vals, wire),
         }
     }
 
-    fn eval_wire(circuit: &Circuit, vals: &mut HashMap<String,u16>, wire: &Wire) -> u16 {
+    fn eval_wire<'a>(circuit: &'a Circuit, vals: &mut HashMap<&'a str,u16>, wire: &'a Wire) -> u16 {
         match wire {
             Wire::Signal(n) => *n,
-            Wire::Wire(label) => get_val(circuit, vals, label.clone())
+            Wire::Wire(label) => get_val(circuit, vals, label)
         }
     }
 
-    fn eval_op(circuit: &Circuit, vals: &mut HashMap<String,u16>, wire1: &Wire, op: &Op, wire2: &Wire) -> u16 {
+    fn eval_op<'a>(circuit: &'a Circuit, vals: &mut HashMap<&'a str,u16>, wire1: &'a Wire, op: Op, wire2: &'a Wire) -> u16 {
         let val1 = eval_wire(circuit, vals, wire1);
         let val2 = eval_wire(circuit, vals, wire2);
         match op {
@@ -100,5 +101,5 @@ fn eval_circuit(circuit: &Circuit) -> u16 {
         }
     }
     
-    get_val(circuit, &mut vals, "a".to_string())
+    get_val(circuit, &mut vals, "a")
 }
