@@ -5,6 +5,7 @@ pub fn solve(input: &str) -> (u32, u32) {
         .split("\n\n")
         .map(|text|text.iter_unsigned::<u32>().sum())
         .collect();
+    
     let mut top1 = 0;
     let mut top2 = 0;
     let mut top3 = 0;

@@ -1,10 +1,10 @@
 pub fn solve(input: &str) -> (usize, usize) {
-    let p1 = marker(input, 4).unwrap();
-    let p2 = marker(input, 14).unwrap();
+    let p1 = marker(input, 4);
+    let p2 = marker(input, 14);
     (p1, p2)
 }
 
-pub fn marker(input: &str, size: usize) -> Option<usize> {
+pub fn marker(input: &str, size: usize) -> usize {
     let mut seen = [0; 26];
     let mut last_duplicate = 0;
 
@@ -21,15 +21,15 @@ pub fn marker(input: &str, size: usize) -> Option<usize> {
         }
 
         if last_duplicate == size {
-            return Some(i);
+            return i;
         }
     }
-    None
+    unreachable!();
 }
 
 #[test]
 fn marker_test() {
-    assert_eq!(marker("bvwbjplbgvbhsrlpgdmjqwftvncz", 4), Some(5));
-    assert_eq!(marker("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 14), Some(19));
-    assert_eq!(marker("bvwbjplbgvbhsrlpgdmjqwftvncz", 14), Some(23));
+    assert_eq!(marker("bvwbjplbgvbhsrlpgdmjqwftvncz", 4), 5);
+    assert_eq!(marker("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 14), 19);
+    assert_eq!(marker("bvwbjplbgvbhsrlpgdmjqwftvncz", 14), 23);
 }

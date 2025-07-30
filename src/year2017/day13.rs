@@ -1,5 +1,4 @@
 use arrayvec::ArrayVec;
-use std::mem;
 use itertools::Itertools;
 use num_integer::Integer;
 use crate::util::parser::*;
@@ -51,7 +50,7 @@ fn part2(pairs: &[(i32, i32)]) -> i32 {
             }
         }
         lcm = next_lcm;
-        mem::swap(&mut current_sieve, &mut next_sieve);
+        std::mem::swap(&mut current_sieve, &mut next_sieve);
         next_sieve.clear();
     }
     
