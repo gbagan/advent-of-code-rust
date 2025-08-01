@@ -5,7 +5,6 @@
 #![feature(iter_intersperse)]
 #![feature(iter_map_windows)]
 #![feature(iter_next_chunk)]
-#![feature(pattern)]
 #![feature(portable_simd)]
 
 pub mod util;
@@ -126,6 +125,8 @@ pub mod year2021 {
     pub mod day20;
     pub mod day21;
     pub mod day22;
+    pub mod day23;
+    pub mod day24;
 }
 
 pub mod year2022 {

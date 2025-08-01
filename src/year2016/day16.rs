@@ -1,4 +1,3 @@
-use num_integer::Integer;
 use crate::util::iter::*;
 
 pub fn solve(input: &str) -> (String, String) {
@@ -16,7 +15,7 @@ fn checksum(input_ones: &[u32], n: u32) -> String {
 
     (0..q+1)
         .map(|i| count_ones(input_ones, i*p))
-        .map_windows(|&[w1, w2]| if (w2 - w1).is_even() { '1' } else { '0' })
+        .map_windows(|&[w1, w2]| if (w2 - w1) & 1 == 0 { '1' } else { '0' })
         .collect()
 } 
 

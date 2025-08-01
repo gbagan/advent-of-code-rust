@@ -8,7 +8,7 @@ pub fn solve(input: &str) -> (u32, u32) {
     let mut p1 = 0;
     let mut basins =  Vec::with_capacity(300);
 
-    for i in 0..grid.len() {
+    for i in width..grid.len()-width {
         let node = grid[i];
         if node == b'9' || node >= grid[i-1] || node >= grid[i+1] || node >= grid[i-width] || node >= grid[i+width] {
             continue;
@@ -17,7 +17,8 @@ pub fn solve(input: &str) -> (u32, u32) {
         basins.push(dfs(grid, width, i));
     }
 
-    basins.sort_unstable();
+    let n = basins.len();
+    basins.select_nth_unstable(n-3);
     let p2 = basins.iter().rev().take(3).product();
 
     (p1, p2)
