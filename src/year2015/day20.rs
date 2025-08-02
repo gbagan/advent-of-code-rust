@@ -25,8 +25,7 @@ fn part1(goal: u32, prime_index: usize) -> u32 {
 }
 
 fn part2_number(n: u32) -> u32 {
-    (1..50).filter_map(|i| (n % i == 0).then_some(n / i)).sum()
-
+    (1..50).filter_map(|i| n.is_multiple_of(i).then_some(n / i)).sum()
 }
 
 pub fn part2(goal: u32) -> u32 {

@@ -49,16 +49,16 @@ fn parse_grid(grid: &[u8], rows: &mut Vec<u32>, columns: &mut Vec<u32>) -> (usiz
         }
     }
 
-    let p1 = if let Some (v) = reflect(&columns) {
+    let p1 = if let Some (v) = reflect(columns) {
         v
-    } else if let Some(v) = reflect(&rows) {
+    } else if let Some(v) = reflect(rows) {
         v * 100
     } else {
         0
     };
-    let p2 = if let Some (v) = reflect2(&columns) {
+    let p2 = if let Some (v) = reflect2(columns) {
         v
-    } else if let Some(v) = reflect2(&rows) {
+    } else if let Some(v) = reflect2(rows) {
         v * 100
     } else {
         0

@@ -16,7 +16,7 @@ pub fn solve(input: &str) -> (String, String) {
             stack.push((i, b));
         } else {
             let (j, c) = stack.pop().unwrap();
-            let d = (a+c).abs() as u8;
+            let d = (a+c).unsigned_abs() as u8;
             if a > -c { 
                 p1[j] -= d;
                 p2[i] += d;

@@ -11,7 +11,7 @@ struct Item<'a> {
 }
 
 fn hash(string: &[u8]) -> u32 {
-    string.iter().fold(0, |n, &c| (n + c as u32) * 17 & 255)
+    string.iter().fold(0, |n, &c| ((n + c as u32) * 17) & 255)
 }
 
 fn focusing_power(boxes: &[ArrayVec<Item, CAP>]) -> u32 {

@@ -94,7 +94,7 @@ fn part2(input: &Input) -> i32 {
     let mut seen = HashMap::with_capacity(100);
     let rounded = &mut input.rounded.clone();
     let (i, j) = loop {
-        let state = step(rounded, &input);
+        let state = step(rounded, input);
         if let Some(prev) = seen.insert(state, seen.len()) {
             break (prev, seen.len());
         }
@@ -113,7 +113,7 @@ fn part2(input: &Input) -> i32 {
 
 fn tilt(rounded: &mut [i16], state: &mut Vec<i16>, cubes: &[i16], next_cube: &[i16], direction: i16) {
     state.clear();
-    state.extend_from_slice(&cubes);
+    state.extend_from_slice(cubes);
 
     for rock in rounded {
         let index = next_cube[*rock as usize] as usize;

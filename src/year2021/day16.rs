@@ -22,22 +22,20 @@ fn helper(stream: &mut BitStream, p1: &mut u64) -> u64 {
             }
         }
         value
+    } else if stream.next_chunk::<1>() == 0 {
+        let limit = stream.next_chunk::<15>() + stream.read;
+        let it = std::iter::from_fn(|| {
+            if stream.read >= limit {
+                None
+            } else {
+                Some(helper(stream, p1))
+            }
+        });
+        do_operation(id, it)
     } else {
-        if stream.next_chunk::<1>() == 0 {
-            let limit = stream.next_chunk::<15>() + stream.read;
-            let it = std::iter::from_fn(|| {
-                if stream.read >= limit {
-                    None
-                } else {
-                    Some(helper(stream, p1))
-                }
-            });
-            do_operation(id, it)
-        } else {
-            let nb_packets = stream.next_chunk::<11>();
-            let it = (0..nb_packets).map(|_| helper(stream, p1));
-            do_operation(id, it)
-        }
+        let nb_packets = stream.next_chunk::<11>();
+        let it = (0..nb_packets).map(|_| helper(stream, p1));
+        do_operation(id, it)
     }
 }
 
@@ -83,7 +81,7 @@ impl BitStream<'_> {
         BitStream { iterator: s.bytes(), buffer: 0, buffer_size: 0, read: 0 }
     }
     
-    fn next_chunk<const N: usize>(self: &mut Self) -> u64 {
+    fn next_chunk<const N: usize>(&mut self) -> u64 {
         while self.buffer_size < N {
             let c = self.iterator.next().unwrap();
             let bits = hexa_to_bits(c) as u64;

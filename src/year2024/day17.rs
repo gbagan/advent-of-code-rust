@@ -52,13 +52,11 @@ fn quine(program: &[u64], a: u64, idx: usize) -> Option<u64> {
     }
     for i in 0..8 {
         let ai = a << 3 | i;
-        if let Some(output) = run_first_value(program, ai, 0, 0) {
-            if output == program[idx-1] {
-                if let Some(q) = quine(program, ai, idx-1) {
-                    return Some(q)
-                }
+        if let Some(output) = run_first_value(program, ai, 0, 0) 
+            && output == program[idx-1]
+            && let Some(q) = quine(program, ai, idx-1) {
+                return Some(q)
             }
-        }
     }
     None
 }

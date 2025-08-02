@@ -30,10 +30,10 @@ fn reboot(cubes: &[Cube]) -> i64 {
             continue;
         }
 
-        cubes[i+1..]
+        intersected.extend(cubes[i+1..]
             .iter()
             .filter(|cube2| !cube2.disjoint(cube))
-            .for_each(|cube| intersected.push(*cube));
+        );
 
         total += include_exclude(cube, &intersected);
         intersected.clear();

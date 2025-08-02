@@ -77,7 +77,7 @@ enum Operation {
 }
 
 impl Operation {
-    pub fn inverse(self: &Self) -> Self {
+    pub fn inverse(&self) -> Self {
         match self {
             Operation::RotateLeft(d) => Operation::RotateRight(*d),
             Operation::RotateRight(d) => Operation::RotateLeft(*d),
@@ -87,7 +87,7 @@ impl Operation {
         }
     }
     
-    pub fn perform(self: &Self, puzzle: & mut Vec<u8>) {
+    pub fn perform(&self, puzzle: & mut Vec<u8>) {
         match self {
             Operation::SwapPosition(i, j) => puzzle.swap(*i, *j),
             Operation::SwapLetter(c1, c2) => {

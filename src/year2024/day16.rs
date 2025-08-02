@@ -10,7 +10,7 @@ pub fn solve(input: &str) -> (u32, u32) {
     let grid= input.as_bytes();
     let mut distances = vec![[u32::MAX; 2]; input.len()];
 
-    let p1 = part1(&grid, &mut distances);
+    let p1 = part1(grid, &mut distances);
     let p2 = part2(&distances);
     (p1, p2)
 }

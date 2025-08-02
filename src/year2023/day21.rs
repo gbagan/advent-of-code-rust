@@ -52,12 +52,12 @@ fn bfs(grid: &Grid<u8>, starts: &[usize], inside_limit: u64, limit: u64) -> (u64
 
         seen[index] = true;
         if dist <= inside_limit {
-            if dist % 2 == 0 {
+            if dist.is_multiple_of(2) {
                 even_inside += 1;
             } else {
                 odd_inside += 1;
             }
-        } else if dist % 2 == 0 {
+        } else if dist.is_multiple_of(2) {
             even_outside += 1;
         } else {
             odd_outside += 1;

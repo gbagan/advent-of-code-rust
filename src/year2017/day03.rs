@@ -18,7 +18,7 @@ fn part1(n: u32) -> u32 {
     let cycle = (n as f64).sqrt().floor() as u32;
     let start = n - cycle * cycle;
     let period = (cycle + 1) & !1;
-    (cycle+1)/2 + (start % period).abs_diff(cycle/2)
+    cycle.div_ceil(2) + (start % period).abs_diff(cycle/2)
 }
 
 fn fill(grid: &HashMap<Point,u32>, c: &Point) -> u32 {

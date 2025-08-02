@@ -8,8 +8,8 @@ pub fn solve(input: &str) -> (u32, u32) {
     for i in 0..width {
         let ones = count_ones(&grid, i);
         let majority = (ones + ones >= grid.len()) as u32;
-        gamma = 2 * gamma | majority;
-        epsilon = 2 * epsilon | (1 - majority);
+        gamma = gamma << 1 | majority;
+        epsilon = epsilon << 1 | (1 - majority);
     }
 
     let p1 = gamma * epsilon;
@@ -31,7 +31,7 @@ fn count_ones(grid: &[&[u8]], idx: usize) -> usize {
 fn to_int(bytes: &[u8]) -> u32 {
     let mut n = 0;
     for &b in bytes {
-        n = 2 * n | (b == b'1') as u32;
+        n = (2 * n) | (b == b'1') as u32;
     }
     n
 }

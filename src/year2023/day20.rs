@@ -18,7 +18,7 @@ pub fn solve(input: &str) -> (u64, u64) {
         let mut current = node;
         let conj = network[current].1.iter().find(|&&node| network[node].0).copied().unwrap(); 
         loop {
-            if network[current].1.iter().any(|&node| node == conj) {
+            if network[current].1.contains(&conj) {
                 number += offset;
             }
             offset *= 2;

@@ -13,7 +13,7 @@ fn part1(input: &[u8]) -> u64 {
     let mut available = 0;
     let mut to_copy = input.last().unwrap() - b'0';
     while left < right {
-        if left % 2 == 0 {
+        if left.is_multiple_of(2) {
             let id = (left / 2) as u64;
             let n = (input[left] - b'0') as u64;
             checksum += id * n * (2 * left_pos + (n-1)) / 2;

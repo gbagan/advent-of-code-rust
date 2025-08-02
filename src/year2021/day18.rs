@@ -84,7 +84,7 @@ impl Snailfish {
         Self { tree }
     }
 
-    fn add(self: &Self, other: &Self) -> Self {
+    fn add(&self, other: &Self) -> Self {
         let mut tree = [EMPTY; 63];
 
         tree[3..5].copy_from_slice(&self.tree[1..3]);
@@ -110,7 +110,7 @@ impl Snailfish {
         res
     }
 
-    fn explode(self: &mut Self, left: usize) {
+    fn explode(&mut self, left: usize) {
         let right = next_sibling(left);
         if left > 31 {
             let mut idx = left - 1;
@@ -132,13 +132,13 @@ impl Snailfish {
         self.tree[parent(left)] = 0;
     }
 
-    fn split(self: &mut Self) {
+    fn split(&mut self) {
         'outer: loop {
             for &idx in &TRAVERSAL_ORDER {
                 let v = self.tree[idx];
                 if v != EMPTY && v >= 10 {
                     self.tree[left_child(idx)] = v / 2;
-                    self.tree[right_child(idx)] = (v + 1) / 2;
+                    self.tree[right_child(idx)] = v.div_ceil(2);
                     self.tree[idx] = EMPTY;
                     if idx >= 15 {
                         self.explode(left_child(idx));
@@ -150,7 +150,7 @@ impl Snailfish {
         }
     }
 
-    fn magnitude(self: &mut Self) -> u32 {
+    fn magnitude(&mut self) -> u32 {
         for i in (0..31).rev() {
             if self.tree[i] == EMPTY {
                 self.tree[i] = 3 * self.tree[left_child(i)] + 2 * self.tree[right_child(i)];

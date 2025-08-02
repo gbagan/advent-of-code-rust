@@ -73,8 +73,7 @@ fn part2(position1: usize, position2: usize) -> u64 {
                 for position2 in 0..10 {
                     let mut win = 0;
                     let mut lose = 0;
-                    for dice in 3..10 {
-                        let freq = DICE_FREQ[dice];
+                    for (dice, &freq) in DICE_FREQ.iter().enumerate().skip(3) {
                         let next_position = (position1 + dice) % 10;
                         let next_score = score1 + next_position + 1;
                         let next_index = to_index(score2, next_score, position2, next_position);

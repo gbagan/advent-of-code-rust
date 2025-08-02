@@ -107,7 +107,7 @@ fn simulate_item(monkeys: &[Monkey], item: (usize, u64), rounds: usize, func: im
         };
         item = func(worry);
 
-        let to = if item % monkeys[owner].divided_by == 0 {
+        let to = if item.is_multiple_of(monkeys[owner].divided_by) {
                 monkeys[owner].if_true
             } else { 
                 monkeys[owner].if_false

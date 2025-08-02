@@ -93,7 +93,7 @@ struct Rotation {
 }
 
 impl Rotation {
-    const fn apply(self: Self, point: Coord3) -> Coord3 {
+    const fn apply(self, point: Coord3) -> Coord3 {
         let Coord3 {x, y, z} = point;
         match self.idx {
             0 => Coord3::new(x, y, z),
@@ -131,12 +131,12 @@ impl Rotation {
     }
 
     #[inline]
-    fn compose(self: Self, other: Self) -> Self {
+    fn compose(self, other: Self) -> Self {
         Self { idx: COMPOSITION[(self.idx * 24 + other.idx) as usize] }
     }
 
     #[inline]
-    fn inverse(self: Self) -> Self {
+    fn inverse(self) -> Self {
         Self { idx: INVERSE[self.idx as usize] }
     }
 
@@ -204,18 +204,18 @@ struct Transformation {
 
 impl Transformation {
     #[inline]
-    fn apply(self: &Self, point: Coord3) -> Coord3 {
+    fn apply(&self, point: Coord3) -> Coord3 {
         self.rotation.apply(point) + self.translation
     }
 
-    fn compose(self: &Self, other: &Self) -> Self {
+    fn compose(&self, other: &Self) -> Self {
         Transformation {
             rotation: self.rotation.compose(other.rotation),
             translation: other.rotation.apply(self.translation) + other.translation,
         }
     }
 
-    fn inverse(self: &Self) -> Self {
+    fn inverse(&self) -> Self {
         Transformation {
             rotation: self.rotation.inverse(),
             translation: -self.rotation.inverse().apply(self.translation)
@@ -252,7 +252,7 @@ impl Scanner {
         Scanner { beacons, distances }
     }
 
-    fn overlaps(self: &Self, other: &Self) -> Option<Transformation> {
+    fn overlaps(&self, other: &Self) -> Option<Transformation> {
         fn overlaps_helper(scan1: &Scanner, scan2: &Scanner, points: [Coord3; 4]) -> Option<Transformation> {
             let [p11, p12, p21, p22] = points;
 
@@ -289,7 +289,7 @@ impl Scanner {
         let mut nb_matchings: u32 = 0;
 
         for dist in self.distances.keys() {
-            if other.distances.contains_key(&dist) {
+            if other.distances.contains_key(dist) {
                 nb_matchings += 1;
                 if nb_matchings == 66 {
                     let [idx1, idx2] = self.distances[dist];

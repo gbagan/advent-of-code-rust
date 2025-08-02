@@ -3,8 +3,8 @@ use std::simd::prelude::*;
 
 pub fn solve(input: &str) -> (u32, u32) {
     let grid = input.as_bytes();
-    let p1 = part1(&grid);
-    let p2 = part2(&grid);
+    let p1 = part1(grid);
+    let p2 = part2(grid);
     (p1, p2)
 }
 
@@ -136,7 +136,7 @@ fn part2(input: &[u8]) -> u32 {
     let mut p2 = 0;
     while rest.len() >= 2 * 141 + 66 {
         let slice = &rest[..2 * 141 + 66];
-        let top_left = u8x64::from_slice(&slice);
+        let top_left = u8x64::from_slice(slice);
         let top_right = u8x64::from_slice(&slice[2..]);
         let center = u8x64::from_slice(&slice[142..]);
         let bottom_left = u8x64::from_slice(&slice[141*2..]);

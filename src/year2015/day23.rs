@@ -46,7 +46,7 @@ fn run_program(program: &[Instr], a: u32) -> u32 {
             Instr::Tpl(i) => {if i {a *= 3} else {b *= 3}}
             Instr::Inc(i) => {if i {a += 1} else {b += 1}},
             Instr::Jmp(o) => offset += o - 1,
-            Instr::Jie(i, o) => if (if i {a} else {b}) % 2 == 0 {offset += o - 1},
+            Instr::Jie(i, o) => if (if i {a} else {b}).is_multiple_of(2) {offset += o - 1},
             Instr::Jio(i, o) => if (if i {a} else {b}) == 1 {offset += o - 1},
         }
         offset += 1;

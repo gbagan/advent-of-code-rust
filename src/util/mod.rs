@@ -61,7 +61,7 @@ pub fn power<A,F>(mul: F, x: A, n: usize) -> A
     let mut p = x.clone();
     let mut x = x;
     while i > 0 {
-        if i % 2 > 0 {
+        if !i.is_multiple_of(2) {
             p = mul(&p, &x);
         }
         x = mul(&x, &x);

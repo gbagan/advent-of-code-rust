@@ -23,7 +23,7 @@ fn worker(input: &str, counter: &AtomicUsize, mutex: &Mutex<[[u8; 16]; 128]>) {
         if i >= 128 {
             break;
         }
-        let hash = knothash(&format!("{}-{}", input, i));
+        let hash = knothash(&format!("{input}-{i}"));
         let mut hashes = mutex.lock().unwrap();
         hashes[i] = hash;
     }

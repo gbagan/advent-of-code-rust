@@ -9,7 +9,7 @@ pub fn solve(input: &str) -> (usize, String) {
         .array_chunks::<2>()
         .collect();
     
-    let mut lines = (&input[idx-1..]).lines();
+    let mut lines = input[idx-1..].lines();
         
     fold(&mut dots, lines.next().unwrap());   
     dots.sort_unstable();

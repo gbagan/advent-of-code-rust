@@ -12,5 +12,19 @@ pub fn solve(input: &str) -> (i32, usize) {
 }
 
 fn is_prime(n: i32) -> bool {
-    n >= 2 && (2..(n as f64).sqrt() as i32).all(|i| n % i != 0)
+    if n <= 1 {
+        return false;
+    }
+
+    if n % 2 == 0 {
+        return false;
+    }
+    let mut i = 3;
+    while i * i <= n {
+        if n % i == 0 {
+            return false;
+        }
+        i += 2;
+    }
+    true
 }
