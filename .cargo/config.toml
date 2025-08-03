@@ -1,5 +1,5 @@
 [alias]
-download = "run --quiet --release -- download"
-solve = "run --quiet --release -- solve"
-markdown = "run --quiet --release -- markdown"
-time = "run --quiet --release -- time"
+download = "run --release -- download"
+solve = "run --release -- solve"
+markdown = "run --release -- markdown"
+time = "run --release -- time"

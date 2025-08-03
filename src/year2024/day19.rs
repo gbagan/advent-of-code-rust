@@ -1,6 +1,7 @@
 // dynamic programming
 
 pub fn solve(input: &str) -> (u32, u64) {
+    // todo
     let split = memchr::memmem::find(input.as_bytes(), b"\n\n").unwrap();
     let patterns = &input[..split];
     let designs = &input[split+2..];

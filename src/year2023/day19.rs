@@ -13,6 +13,7 @@ struct Step<'a> {
 }
 
 pub fn solve(input: &str) -> (u32, u64) {
+    // todo
     let sep = memmem::find(input.as_bytes(), b"\n\n").unwrap();
     let input1 = &input[..sep];
     let input2 = &input[sep+2..];

@@ -26,6 +26,7 @@ pub fn solve(input: &str) -> (u64, String) {
 fn parse_wires(input: &str) -> Vec<LWire> {
     let mut table = HashMap::with_capacity(350);
     let mut wires = Vec::with_capacity(350);
+    // todo
     let limit = memmem::find(input.as_bytes(),  b"\n\n").unwrap();
     let section1 = &input.as_bytes()[..limit+1];
     let section2 = &input.as_bytes()[limit+2..];

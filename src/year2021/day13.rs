@@ -1,15 +1,14 @@
 use crate::util::parser::*;
-use memchr::memchr;
 
 pub fn solve(input: &str) -> (usize, String) {
-    let idx = memchr(b'f', input.as_bytes()).unwrap() + 1;
-    
-    let mut dots: Vec<_> = (&input[0..idx-1])
+    let (section1, section2) = input.rsplit_once("\n\n").unwrap();
+
+    let mut dots: Vec<_> = section1
         .iter_unsigned::<u32>()
         .array_chunks::<2>()
         .collect();
     
-    let mut lines = input[idx-1..].lines();
+    let mut lines = section2.lines();
         
     fold(&mut dots, lines.next().unwrap());   
     dots.sort_unstable();
