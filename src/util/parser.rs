@@ -44,6 +44,9 @@ impl<T: Integer + Signed + ConstZero + Ten + From<u8>> Iterator for ParseSigned<
     }
 }
 
+fn to_unsigned<T: Integer + Ten + From<u8>>(bytes: &[u8]) -> T {
+    bytes.iter().fold(T::zero(), |acc, &n| T::TEN * acc + T::from(n - b'0'))
+}
 
 fn next_unsigned<T: Integer + Ten + From<u8>>(bytes: &mut std::slice::Iter<'_, u8>) -> Option<T> {
     let mut n = loop {
@@ -160,6 +163,7 @@ impl<'a> Iterator for ParseUppercase<'a> {
 }
 
 pub trait ParserIter {
+    fn to_unsigned<T: Integer + Ten + From<u8>>(&self) -> T;
     fn try_unsigned<T: Integer + Ten + From<u8>>(&self) -> Option<T>;
     fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T>;
     fn iter_unsigned<T: Integer + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T>;
@@ -172,6 +176,10 @@ pub trait WordParserIter {
 }
 
 impl ParserIter for &[u8] {
+    fn to_unsigned<T: Integer + Ten + From<u8>>(&self) -> T {
+        to_unsigned(self)
+    }
+    
     fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T> {
         try_signed(&mut self.iter())
     }
@@ -191,6 +199,10 @@ impl ParserIter for &[u8] {
 }
 
 impl ParserIter for &str {
+    fn to_unsigned<T: Integer + Ten + From<u8>>(&self) -> T {
+        to_unsigned(self.as_bytes())
+    }
+    
     fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T> {
         try_signed(&mut self.as_bytes().iter())
     }
