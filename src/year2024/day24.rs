@@ -24,12 +24,13 @@ pub fn solve(input: &str) -> (u64, String) {
 }
 
 fn parse_wires(input: &str) -> Vec<LWire> {
+    let input = input.as_bytes();
     let mut table = HashMap::with_capacity(350);
     let mut wires = Vec::with_capacity(350);
     // todo
-    let limit = memmem::find(input.as_bytes(),  b"\n\n").unwrap();
-    let section1 = &input.as_bytes()[..limit+1];
-    let section2 = &input.as_bytes()[limit+2..];
+    let limit = memmem::find(input,  b"\n\n").unwrap();
+    let section1 = &input[..limit+1];
+    let section2 = &input[limit+2..];
     for &[l1, l2, l3, _, _, b, _] in section1.array_chunks() {
         table.insert((l1, l2, l3), wires.len());
         wires.push(LWire {label: (l1, l2, l3), wire: Wire::Input(b == b'1')});

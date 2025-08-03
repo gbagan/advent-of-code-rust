@@ -21,7 +21,5 @@ pub fn solve(input: &str) -> (i32, i32) {
         .unwrap()
         .2;
 
-    let s = "é";
-
     (p1, p2)
 }

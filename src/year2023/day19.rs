@@ -1,11 +1,10 @@
-use ahash::HashMap;
+use ahash::{HashMap, HashMapExt};
 use itertools::Itertools;
-use memchr::memmem;
 use crate::util::parser::*;
 
-type Workflows<'a> = HashMap<&'a str, Vec<Step<'a>>>;
+type Workflows<'a> = HashMap<&'a [u8], Vec<Step<'a>>>;
 
-enum Instr<'a> { Accept, Reject, Goto(&'a str) }
+enum Instr<'a> { Accept, Reject, Goto(&'a [u8]) }
 enum Test { LT(usize, u16), GT(usize, u16), Otherwise }
 struct Step<'a> {
     test: Test,
@@ -13,43 +12,44 @@ struct Step<'a> {
 }
 
 pub fn solve(input: &str) -> (u32, u64) {
-    // todo
-    let sep = memmem::find(input.as_bytes(), b"\n\n").unwrap();
-    let input1 = &input[..sep];
-    let input2 = &input[sep+2..];
-    let workflows = input1.lines().map(parse_workflow).collect();
-    let ratings: Vec<_> = input2.iter_unsigned::<u16>().array_chunks::<4>().collect();
+    let mut lines = input.lines();
+    let mut workflows = HashMap::new();
+    while let Some(line) = lines.next() && !line.is_empty() {
+        let (k, v) = parse_workflow(line);
+        workflows.insert(k, v);
+    }
+    let ratings: Vec<_> = lines.remainder().unwrap().iter_unsigned::<u16>().array_chunks::<4>().collect();
     let p1 = part1(&workflows, &ratings);
     let p2 = part2(&workflows);
     (p1, p2)
 }
 
 
-fn parse_instr(s: &str) -> Instr<'_> {
+fn parse_instr(s: &[u8]) -> Instr<'_> {
     match s {
-        "A" => Instr::Accept,
-        "R" => Instr::Reject,
+        b"A" => Instr::Accept,
+        b"R" => Instr::Reject,
         _ => Instr::Goto(s),
     }
 }
 
-fn parse_workflow(line: &str) -> (&str, Vec<Step<'_>>) {
-    let (name, line) = line.split_once('{').unwrap();
-    let workflow = line.split([',', ':', '}']).tuples().map(|(first, second)| {
+fn parse_workflow(line: &str) -> (&[u8], Vec<Step<'_>>) {
+    let line = line.as_bytes();
+    let (name, line) = line.split_once(|&c| c == b'{').unwrap();
+    let workflow = line.split(|&c| matches!(c, b',' | b':' | b'}')).tuples().map(|(first, second)| {
         if second.is_empty() {
             Step{test: Test::Otherwise, instr: parse_instr(first)}
         } else {
-            let (c, rel) = first.chars().next_tuple().unwrap();
-            let c = match c {
-                'x' => 0,
-                'm' => 1,
-                'a' => 2,
-                's' => 3,
+            let c = match first[0] {
+                b'x' => 0,
+                b'm' => 1,
+                b'a' => 2,
+                b's' => 3,
                 _ => panic!()
             };
             let val = (&first[2..]).try_unsigned().unwrap();
-            let test = match rel {
-                '<' => Test::LT(c, val),
+            let test = match first[1] {
+                b'<' => Test::LT(c, val),
                 _ => Test::GT(c, val),
             };
             Step{test, instr: parse_instr(second)}
@@ -58,8 +58,8 @@ fn parse_workflow(line: &str) -> (&str, Vec<Step<'_>>) {
     (name, workflow)
 }
 
-fn accepts(rating: &[u16; 4], workflows: &HashMap<&str, Vec<Step>>) -> bool {
-    let mut current = "in";
+fn accepts(rating: &[u16; 4], workflows: &HashMap<&[u8], Vec<Step>>) -> bool {
+    let mut current = b"in".as_slice();
     loop {
         let workflow = &workflows[current];
         for step in workflow {
@@ -136,7 +136,7 @@ fn box_size(bx: &Box)  -> u64 {
 fn part2(workflows: &Workflows) -> u64 {
     let mut total = 0;
     let init = [(1, 4001); 4];
-    let mut stack = vec!(("in", init));
+    let mut stack = vec!((b"in".as_slice(), init));
     while let Some((name, mut bx)) = stack.pop() {
         let workflow = &workflows[name];
         for step in workflow {

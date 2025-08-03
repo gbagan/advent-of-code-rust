@@ -6,6 +6,9 @@
 #![feature(iter_map_windows)]
 #![feature(iter_next_chunk)]
 #![feature(portable_simd)]
+#![feature(slice_split_once)]
+#![feature(str_lines_remainder)]
+
 
 pub mod util;
 
