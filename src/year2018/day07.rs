@@ -19,10 +19,6 @@ pub fn solve(input: &str) -> (String, u32) {
         is_node[node2] = true;
     }
 
-    for adj in &mut graph {
-        adj.sort_unstable();
-    }
-
     let order = topological_ordering(&graph, in_degree, &is_node);
 
     let p1: String = order
