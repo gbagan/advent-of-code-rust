@@ -20,9 +20,7 @@ fn part1(ids: &[&[u8]]) -> u32 {
         }
         count2 += freq.contains(&2) as u32;
         count3 += freq.contains(&3) as u32;
-
     }
-
 
     count2 * count3
 }
@@ -47,5 +45,4 @@ fn part2(ids: &[&[u8]]) -> String {
     }
 
     unreachable!();
-
 }
