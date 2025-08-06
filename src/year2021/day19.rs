@@ -70,11 +70,7 @@ pub fn solve(input: &str) -> (usize, i32) {
 }
 
 fn worker(scanners: &[Scanner], tasks: &[[usize; 2]], counter: &AtomicUsize, mutex: &Mutex<Vec<Option<Transformation>>>) {
-    loop {
-        let start = counter.fetch_add(16, Ordering::Relaxed);
-        if start >= tasks.len() {
-            break;
-        }
+    while let start = counter.fetch_add(16, Ordering::Relaxed) && start < tasks.len() {
         for i in start..(start+16).min(tasks.len()) {
             let [idx1, idx2] = tasks[i];
             if let Some(transformation) = scanners[idx1].overlaps(&scanners[idx2]) {

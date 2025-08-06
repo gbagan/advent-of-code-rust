@@ -39,6 +39,47 @@ pub trait ParallelIterator: Sized + Send {
         FilterMap::new(self, f)
     }
 
+    fn for_each<F>(self, f: F)
+    where F: Fn(Self::Item) + Sync + Send,
+    Self: Sized + Send + Sync,
+    {
+        let counter = AtomicUsize::new(self.start());
+        thread::scope(|scope| {
+            for _ in 0..thread::available_parallelism().unwrap().get() {
+                scope.spawn(|| {
+                    while let i = counter.fetch_add(1, Ordering::Relaxed) && i < self.end() {
+                        if let Some(res) = self.get(i) {
+                            f(res);
+                        }
+                    }
+                });
+            }
+        })
+    }
+
+
+    fn reduce2<I, R>(self, id: I, r: R) -> Self::Item
+    where
+        I: Fn() -> Self::Item + Sync + Send,
+        R: Fn(&Self::Item, &Self::Item) -> Self::Item + Sync + Send,
+        Self: Sized + Send + Sync,
+    {
+        let n = thread::available_parallelism().unwrap().get();
+        let mut results: Vec<Self::Item> = (0..n).map(|_| id()).collect();
+        let counter = AtomicUsize::new(self.start());
+        thread::scope(|scope| {
+            for res in &mut results {
+                scope.spawn(|| {
+                    while let i = counter.fetch_add(1, Ordering::Relaxed) && i < self.end() {
+                        if let Some(x) = self.get(i) {
+                            *res = r(res, &x);
+                        }
+                    }
+                });
+            }
+        });
+        results.iter().fold(id(), |x, y| r(&x, &y))
+    }
 }
 
 macro_rules! parallel_iterator {
@@ -70,7 +111,7 @@ macro_rules! parallel_iterator {
                 shared.result.load(Ordering::Relaxed)
             }
 
-            fn sum(&self) -> $item
+            fn sum(self) -> $item
             where
                 Self: Sized + Send + Sync,
             {

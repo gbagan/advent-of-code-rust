@@ -18,11 +18,7 @@ pub fn solve(input: &str) -> (u32, usize) {
 }
 
 fn worker(input: &str, counter: &AtomicUsize, mutex: &Mutex<[[u8; 16]; 128]>) {
-    loop {
-        let i = counter.fetch_add(1, Ordering::Relaxed);
-        if i >= 128 {
-            break;
-        }
+    while let i = counter.fetch_add(1, Ordering::Relaxed)  && i <  128 {
         let hash = knothash(&format!("{input}-{i}"));
         let mut hashes = mutex.lock().unwrap();
         hashes[i] = hash;

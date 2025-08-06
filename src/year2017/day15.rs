@@ -89,12 +89,7 @@ fn nth_b(n: usize, x: u64) -> u64 {
 }
 
 fn worker(a: u64, b: u64, counter: &AtomicUsize, mutex: &Mutex<Vec<Option<Block>>>) {
-    loop {
-        let idx = counter.fetch_add(1, Ordering::Relaxed);
-        if idx >= NB_BLOCKS+EXTRA_BLOCKS {
-            break;
-        }
-
+    while let idx = counter.fetch_add(1, Ordering::Relaxed) && idx < NB_BLOCKS+EXTRA_BLOCKS {
         let mut p1 = 0;
         let mut div_by_4 = Vec::with_capacity(BLOCK_SIZE * 28 / 100);
         let mut div_by_8 = Vec::with_capacity(BLOCK_SIZE * 14 / 100);

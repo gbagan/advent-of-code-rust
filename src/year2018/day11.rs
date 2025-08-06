@@ -1,11 +1,56 @@
 use crate::util::parser::*;
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::Mutex;
 use std::thread;
 
 pub fn solve(input: &str) -> (String, String) {
     let serial_number = input.try_unsigned().unwrap();
-    
+    let table = build_table(serial_number);
+    let counter = AtomicUsize::new(1);
+    let n = thread::available_parallelism().unwrap().get();
+    let mut results = vec![(None, (0, 0, 0, i32::MIN)); n];
+
+    thread::scope(|scope| {
+        for res in &mut results {
+            scope.spawn(|| worker(&table, &counter, res));
+        }
+    });
+
+    let (p1, p2) = results
+        .iter()
+        .fold((None, (0, 0, 0, i32::MIN)), |(a1, a2) , &(b1, b2)| {
+            (a1.or(b1), if a2.3 > b2.3 { a2 } else { b2 })
+        });
+
+    let p1 = p1.unwrap();
+    let p1 = format!("{},{}", p1.0, p1.1);
+    let p2 = format!("{},{},{}", p2.0, p2.1, p2.2);
+
+    (p1, p2)
+}
+
+fn worker(table: &[i32], counter: &AtomicUsize, result: &mut (Option<(usize, usize)>, (usize, usize, usize, i32))) { 
+    let mut p1 = None;
+    let mut p2 = (0, 0, 0, i32::MIN);
+    while let size = counter.fetch_add(1, Ordering::Relaxed) && size <= 300 {  
+        let (x, y, power) = largest_square(&table, size);
+        if size == 3 {
+            p1 = Some((x, y));
+        }
+        if power > p2.3 {
+            p2 = (x, y, size, power)
+        }
+    }
+    *result = (p1, p2);
+}
+
+#[inline]
+fn power_level(serial_number: i32, x: i32, y: i32) -> i32 {
+    let rack_id = x + 10;
+    let level = (rack_id * y + serial_number) * rack_id;
+    (level / 100) % 10 - 5
+}
+
+fn build_table(serial_number: i32) -> Vec<i32> {
     let mut table = vec![0; 301*301];
     for y in 1..301 {
         for x in 1..301 {
@@ -14,28 +59,7 @@ pub fn solve(input: &str) -> (String, String) {
             table[index] = power_level + table[index-1] + table[index-301] - table[index-302];
         }
     }
-
-    let mutex = Mutex::new(((0, 0), (0, 0, 0, i32::MIN)));
-    let counter = AtomicUsize::new(1);
-
-    thread::scope(|scope| {
-        for _ in 0..thread::available_parallelism().unwrap().get() {
-            scope.spawn(|| worker(&table, &counter, &mutex));
-        }
-    });
-
-    let (p1, p2) = mutex.into_inner().unwrap();
-    let p1 = format!("{},{}", p1.0, p1.1);
-    let p2 = format!("{},{},{}", p2.0, p2.1, p2.2);
-
-    (p1, p2)
-}
-
-#[inline]
-fn power_level(serial_number: i32, x: i32, y: i32) -> i32 {
-    let rack_id = x + 10;
-    let level = (rack_id * y + serial_number) * rack_id;
-    (level / 100) % 10 - 5
+    table
 }
 
 #[inline]
@@ -63,46 +87,14 @@ fn largest_square(table: &[i32], size: usize) -> (usize, usize, i32) {
     (xmax, ymax, max_power)
 }
 
-fn worker(table: &[i32], counter: &AtomicUsize, mutex: &Mutex<((usize, usize), (usize, usize, usize, i32))>) {
-    loop {
-        let size = counter.fetch_add(1, Ordering::Relaxed);
-        if size > 300 {
-            break;
-        }
-
-        let (x, y, power) = largest_square(table, size);
-
-        let mut solution = mutex.lock().unwrap();
-        if size == 3 {
-            solution.0 = (x, y);
-        }
-        if power > solution.1.3 {
-            solution.1 = (x, y, size, power);
-        }
-    }
-}
-
-/*
-&[
-    -2984,
-    -2998,
-    -3003,
-    -2999,
-    -3004,
-    -3000,
-    -3025,
-    -3019,
-    -3026,
-    -3026,
-    -3023,
-    -3017,
-    -3022,
-    -3028,
-    -3028,
-    -3034,
-    -3249,
-    -3233,
-    -3230,
-    -3380,
-]
+    /*
+    // util::parallel::*
+    let (p1, p2) = (1..301)
+        .into_par_iter()
+        .map(|size| {
+            let (x, y, power) = largest_square(&table, size);
+            ((size == 3).then_some((x, y)), (x, y, size, power))
+        }).reduce2(|| (None, (0, 0, 0, i32::MIN)), |&(a1, a2) , &(b1, b2)| {
+            (a1.or(b1), if a2.3 > b2.3 { a2 } else { b2 })
+        });
     */
