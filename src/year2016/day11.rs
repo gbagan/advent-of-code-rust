@@ -26,37 +26,37 @@ impl Floor {
     }
 
     #[inline]
-    fn generators(&self) -> u8 {
+    fn generators(self) -> u8 {
         self.mask >> 4
     }
 
     #[inline]
-    fn microchips(&self) -> u8 {
+    fn microchips(self) -> u8 {
         self.mask & 15
     }
 
     #[inline]
-    fn is_empty(&self) -> bool {
+    fn is_empty(self) -> bool {
         self.mask == 0
     }
 
     #[inline]
-    fn is_valid(&self) -> bool {
+    fn is_valid(self) -> bool {
         self.generators() == 0 || self.microchips() <= self.generators()
     }
 
     #[inline]
-    fn leq(&self, other: &Self) -> bool {
+    fn leq(self, other: Self) -> bool {
         self.generators() <= other.generators() && self.microchips() <= other.microchips()
     }
 
     #[inline]
-    fn add(&self, other: &Self) -> Self {
+    fn add(self, other: Self) -> Self {
         Self { mask: self.mask + other.mask }
     }
 
     #[inline]
-    fn sub(&self, other: &Self) -> Self {
+    fn sub(self, other: Self) -> Self {
         Self { mask: self.mask - other.mask }
     }
 
@@ -72,7 +72,7 @@ pub fn solve(input: &str) -> (u32, u32) {
     }
     state.elevator = 0;
     let p1 = bfs(state);
-    state.floor[0] = state.floor[0].add(&Floor::new(2, 2));
+    state.floor[0] = state.floor[0].add(Floor::new(2, 2));
     let p2 = bfs(state);
 
     (p1, p2)
@@ -100,11 +100,11 @@ fn bfs(start: State) -> u32 {
         if state.elevator < 3 {
             let mut found = false;
 
-            for (i, mov) in moves.iter().enumerate() {
+            for (i, &mov) in moves.iter().enumerate() {
                 if i == 3 && found {
                     break
                 }
-                if !mov.leq(&current_floor) {
+                if !mov.leq(current_floor) {
                     continue
                 }
                 let new_floor = current_floor.sub(mov);
@@ -124,11 +124,11 @@ fn bfs(start: State) -> u32 {
         }
         if go_down {
             let mut found = false;
-            for (i, mov) in moves.iter().rev().enumerate() {
+            for (i, &mov) in moves.iter().rev().enumerate() {
                 if i == 2 && found {
                     break
                 }
-                if !mov.leq(&current_floor) {
+                if !mov.leq(current_floor) {
                     continue
                 }
                 let new_floor = current_floor.sub(mov);
