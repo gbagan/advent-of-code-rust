@@ -1,3 +1,5 @@
+// todo SIMD?
+
 use std::thread;
 use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
 
