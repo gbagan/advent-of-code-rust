@@ -59,11 +59,9 @@ fn bfs(grid: &Grid<u8>, starts: &[usize], inside_limit: u64, limit: u64) -> (u64
                 odd_outside += 1;
             }
             for next in [index-1, index+1, index-grid.width, index+grid.width] {
-                if grid[next] == b'.' {
-                    if !seen[next] {
-                        queue2.push(next);
-                        seen[next] = true;
-                    }
+                if grid[next] == b'.' && !seen[next] {
+                    queue2.push(next);
+                    seen[next] = true;
                 }
             }
         }

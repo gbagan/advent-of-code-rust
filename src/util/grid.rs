@@ -71,24 +71,6 @@ impl<T: Copy> Grid<T> {
 
         Grid { width, height: width, vec }
     }
-
-    #[inline]
-    pub fn foreach_adjacent_index(&self, idx: usize, mut f: impl FnMut(usize)) {
-        let x = idx % self.width;
-        let y = idx / self.width;
-        if x > 0 {
-            f(idx - 1);
-        }
-        if y > 0 {
-            f(idx - self.width);
-        }
-        if x < self.width - 1 {
-            f(idx + 1);
-        }
-        if y < self.height - 1 {
-            f(idx + self.width);
-        }
-    }
 }
 
 impl<T> Index<usize> for Grid<T> {
