@@ -1,7 +1,6 @@
 // part 1: BFS, part 2: DFS
 
 use crate::util::parser::*;
-use std::collections::VecDeque;
 
 const SIZE: usize = 73;
 const START: usize = SIZE+1;
@@ -29,22 +28,28 @@ fn part1(bytes: &[[u8; 2]]) -> u32 {
         grid[(y as usize + 1) * SIZE + x as usize + 1] = b'#';
     }
 
-    let mut queue = VecDeque::with_capacity(1000);
-    queue.push_back((0, START));
+    let mut queue1 = Vec::with_capacity(1000);
+    let mut queue2 = Vec::with_capacity(1000);
+    queue1.push(START);
     grid[START] = b'#';
 
-    while let Some((dist, node)) = queue.pop_front() {
-        if node == END {
-            return dist;
-        }
-        for next in [node + 1, node - 1, node + 73, node - 73] {
-            if grid[next] == b'.' {
-                grid[next] = b'#';
-                queue.push_back((dist+1, next));
+    let mut dist = 0;
+    loop {
+        for &node in &queue1 {
+            if node == END {
+                return dist;
+            }
+            for next in [node + 1, node - 1, node + 73, node - 73] {
+                if grid[next] == b'.' {
+                    grid[next] = b'#';
+                    queue2.push(next);
+                }
             }
         }
+        dist += 1;
+        std::mem::swap(&mut queue1, &mut queue2);
+        queue2.clear();
     }
-    unreachable!();
 }
 
 fn part2(bytes: &[[u8; 2]]) -> String {

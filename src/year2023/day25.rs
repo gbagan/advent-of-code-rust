@@ -1,7 +1,6 @@
 // Ford-Fulkerson algorithm
 
 use arrayvec::ArrayVec;
-use std::collections::VecDeque;
 
 type Graph = Vec<ArrayVec<usize, 10>>;
 
@@ -42,42 +41,52 @@ fn part1(graph: &mut Graph) -> usize {
     let mut parent: Vec<_> = vec![0; n];
     let source = 0;
     let mut sink = 0;
-    let mut i = 1;
     // choose the sink as the furthest vertex from the source
-    let mut queue = VecDeque::new();
-    queue.push_back(source);
-    while let Some(node) = queue.pop_front() {
-        if visited[node] == i {
-            continue;
+    let mut queue1 = Vec::new();
+    let mut queue2 = Vec::new();
+    queue1.push(source);
+    visited[source] = 1;
+    while !queue1.is_empty() {
+        for &node in &queue1 {
+            sink = node;
+            for &next in &graph[node] {
+                if visited[next] != 1 {
+                    visited[next] = 1;
+                    queue2.push(next);
+                }
+            }
         }
-        visited[node] = i;
-        sink = node;
-        for nbor in &graph[node] {
-            queue.push_back(*nbor);
-        }
+        std::mem::swap(&mut queue1, &mut queue2);
+        queue2.clear();
     }
+    let mut i = 1;
 
     loop {
         i += 1;
-        let mut queue = VecDeque::new();
-        queue.push_back((source, source));
+        queue1.clear();
+        queue2.clear();
+        queue1.push(source);
+        visited[source] = i;
+        parent[source] = source;
+
         let mut sink_reached = false;
 
-        while let Some((node, par)) = queue.pop_front() {
-            if node == sink {
-                sink_reached = true;
-                parent[node] = par;
-                break;
+        while !queue1.is_empty() {
+            for &node in &queue1 {
+                if node == sink {
+                    sink_reached = true;
+                    break;
+                }
+                for &next in &graph[node] {
+                    if visited[next] != i {
+                        visited[next] = i;
+                        parent[next] = node;
+                        queue2.push(next);
+                    }
+                }
             }
-            
-            if visited[node] == i {
-                continue;
-            }
-            visited[node] = i;
-            parent[node] = par;
-            for &nbor in &graph[node] {
-                queue.push_back((nbor, node));
-            }
+            std::mem::swap(&mut queue1, &mut queue2);
+            queue2.clear();
         }
 
         if sink_reached {

@@ -1,4 +1,3 @@
-use std::collections::VecDeque;
 use ahash::{HashSet, HashSetExt};
 
 #[derive(Clone, Copy, Default, PartialEq, Eq, Hash, Debug)]
@@ -81,71 +80,78 @@ pub fn solve(input: &str) -> (u32, u32) {
 
 fn bfs(start: State) -> u32 {       
     let moves = [Floor::new(1, 1), Floor::new(2, 0), Floor::new(0, 2), Floor::new(1, 0), Floor::new(0, 1)];
-    let mut queue = VecDeque::new();
+    let mut queue1 = Vec::new();
+    let mut queue2 = Vec::new();
     let mut seen = HashSet::new();
-    queue.push_back((start, 0));
-    while let Some((state, dist)) = queue.pop_front() {
-        if state.is_complete() {
-            return dist;
-        }
-        if !seen.insert(state) {
-            continue;
-        }
+    queue1.push(start);
+    let mut dist = 0;
+    while !queue1.is_empty() {
+        for &state in &queue1 {
+            if state.is_complete() {
+                return dist;
+            }
+            if !seen.insert(state) {
+                continue;
+            }
 
-        let elevator = state.elevator as usize;
-        let current_floor = state.floor[elevator];
-        let go_down = elevator > 0 &&
+            let elevator = state.elevator as usize;
+            let current_floor = state.floor[elevator];
+            let go_down = elevator > 0 &&
                             state.floor[0..elevator].iter().any(|floor| !floor.is_empty());
 
-        if state.elevator < 3 {
-            let mut found = false;
+            if state.elevator < 3 {
+                let mut found = false;
 
-            for (i, &mov) in moves.iter().enumerate() {
-                if i == 3 && found {
-                    break
+                for (i, &mov) in moves.iter().enumerate() {
+                    if i == 3 && found {
+                        break
+                    }
+                    if !mov.leq(current_floor) {
+                        continue
+                    }
+                    let new_floor = current_floor.sub(mov);
+                    if !new_floor.is_valid() {
+                        continue;
+                    }
+                    let above_floor = state.floor[elevator+1].add(mov);
+                    if above_floor.is_valid() {
+                        let mut new_state = state;
+                        new_state.floor[elevator] = new_floor;
+                        new_state.floor[elevator+1] = above_floor;
+                        new_state.elevator += 1;
+                        queue2.push(new_state);
+                        found = true;
+                    }
                 }
-                if !mov.leq(current_floor) {
-                    continue
-                }
-                let new_floor = current_floor.sub(mov);
-                if !new_floor.is_valid() {
-                    continue;
-                }
-                let above_floor = state.floor[elevator+1].add(mov);
-                if above_floor.is_valid() {
-                    let mut new_state = state;
-                    new_state.floor[elevator] = new_floor;
-                    new_state.floor[elevator+1] = above_floor;
-                    new_state.elevator += 1;
-                    queue.push_back((new_state, dist + 1));
-                    found = true;
+            }
+            if go_down {
+                let mut found = false;
+                for (i, &mov) in moves.iter().rev().enumerate() {
+                    if i == 2 && found {
+                        break
+                    }
+                    if !mov.leq(current_floor) {
+                        continue
+                    }
+                    let new_floor = current_floor.sub(mov);
+                    if !new_floor.is_valid() {
+                        continue;
+                    }
+                    let below_floor = state.floor[elevator-1].add(mov);
+                    if below_floor.is_valid() {
+                        let mut new_state = state;
+                        new_state.floor[elevator] = new_floor;
+                        new_state.floor[elevator-1] = below_floor;
+                        new_state.elevator -= 1;
+                        queue2.push(new_state);
+                        found = true;
+                    }
                 }
             }
         }
-        if go_down {
-            let mut found = false;
-            for (i, &mov) in moves.iter().rev().enumerate() {
-                if i == 2 && found {
-                    break
-                }
-                if !mov.leq(current_floor) {
-                    continue
-                }
-                let new_floor = current_floor.sub(mov);
-                if !new_floor.is_valid() {
-                    continue;
-                }
-                let below_floor = state.floor[elevator-1].add(mov);
-                if below_floor.is_valid() {
-                    let mut new_state = state;
-                    new_state.floor[elevator] = new_floor;
-                    new_state.floor[elevator-1] = below_floor;
-                    new_state.elevator -= 1;
-                    queue.push_back((new_state, dist + 1));
-                    found = true;
-                }
-            }
-        }
-    } 
+        dist += 1;
+        std::mem::swap(&mut queue1, &mut queue2);
+        queue2.clear();
+    }
     unreachable!();
 }

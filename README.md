@@ -63,9 +63,9 @@ On a laptop with a Intel Core i7-11850H processor.
 | [18](https://adventofcode.com/2023/day/18) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day18.rs) | 29 μs |
 | [19](https://adventofcode.com/2023/day/19) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day19.rs) | 113 μs |
 | [20](https://adventofcode.com/2023/day/20) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day20.rs) | 10 μs |
-| [21](https://adventofcode.com/2023/day/21) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day21.rs) | 339 μs |
+| [21](https://adventofcode.com/2023/day/21) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day21.rs) | 218 μs |
 | [22](https://adventofcode.com/2023/day/22) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day22.rs) | 171 μs |
 | [23](https://adventofcode.com/2023/day/23) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day23.rs) | 345 μs |
 | [24](https://adventofcode.com/2023/day/24) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day24.rs) | 310 μs |
-| [25](https://adventofcode.com/2023/day/25) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day25.rs) | 145 μs |
+| [25](https://adventofcode.com/2023/day/25) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day25.rs) | 112 μs |
  | Total |     | 8 ms |

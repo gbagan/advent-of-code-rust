@@ -1,6 +1,4 @@
 use crate::util::grid::Grid;
-use std::collections::VecDeque;
-
 const NB_STEPS: u64 = 26_501_365;
 
 pub fn solve(input: &str) -> (u64, u64) {
@@ -33,40 +31,45 @@ pub fn solve(input: &str) -> (u64, u64) {
 }
 
 fn bfs(grid: &Grid<u8>, starts: &[usize], inside_limit: u64, limit: u64) -> (u64, u64, u64, u64) {
-    let mut queue = VecDeque::new();
-    for &start in starts {
-        queue.push_back((start, 0));
-    }
+    let mut queue1 = Vec::new();
+    let mut queue2 = Vec::new();
     let mut seen = vec![false; grid.width * grid.height];
+    let mut dist = 0;
+    for &start in starts {
+        queue1.push(start);
+        seen[start] = true;
+    }
     let mut even_inside = 0;
     let mut even_outside = 0;
     let mut odd_inside = 0;
     let mut odd_outside = 0;
-    while let Some((index, dist)) = queue.pop_front() {
-        if dist > limit {
-            break;
-        }
-        if seen[index] {
-            continue
-        }
-
-        seen[index] = true;
-        if dist <= inside_limit {
-            if dist.is_multiple_of(2) {
-                even_inside += 1;
+    
+    while !queue1.is_empty() && dist <= limit {
+        for &index in &queue1 {
+            seen[index] = true;
+            if dist <= inside_limit {
+                if dist.is_multiple_of(2) {
+                    even_inside += 1;
+                } else {
+                    odd_inside += 1;
+                }
+            } else if dist.is_multiple_of(2) {
+                even_outside += 1;
             } else {
-                odd_inside += 1;
+                odd_outside += 1;
             }
-        } else if dist.is_multiple_of(2) {
-            even_outside += 1;
-        } else {
-            odd_outside += 1;
-        }
-        for next in [index-1, index+1, index-grid.width, index+grid.width] {
-            if grid[next] == b'.' {
-                queue.push_back((next, dist + 1));
+            for next in [index-1, index+1, index-grid.width, index+grid.width] {
+                if grid[next] == b'.' {
+                    if !seen[next] {
+                        queue2.push(next);
+                        seen[next] = true;
+                    }
+                }
             }
         }
+        dist += 1;
+        std::mem::swap(&mut queue1, &mut queue2);
+        queue2.clear();
     }
     (even_inside, odd_inside, even_outside, odd_outside)
 }
