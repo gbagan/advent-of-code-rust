@@ -1,4 +1,3 @@
-#![feature(array_chunks)]
 #![feature(array_windows)]
 #![feature(int_roundings)]
 #![feature(iter_array_chunks)]

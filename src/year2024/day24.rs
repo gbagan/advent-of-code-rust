@@ -31,7 +31,7 @@ fn parse_wires(input: &str) -> Vec<LWire> {
     let limit = memmem::find(input,  b"\n\n").unwrap();
     let section1 = &input[..limit+1];
     let section2 = &input[limit+2..];
-    for &[l1, l2, l3, _, _, b, _] in section1.array_chunks() {
+    for &[l1, l2, l3, _, _, b, _] in section1.as_chunks().0 {
         table.insert((l1, l2, l3), wires.len());
         wires.push(LWire {label: (l1, l2, l3), wire: Wire::Input(b == b'1')});
     }

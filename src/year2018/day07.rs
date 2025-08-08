@@ -10,7 +10,7 @@ pub fn solve(input: &str) -> (String, u32) {
     let mut in_degree = [0u32; 26];
     let mut is_node = [false; 26];
 
-    for line in input.array_chunks::<49>() {
+    for line in input.as_chunks::<49>().0 {
         let node1 = (line[5] - b'A') as usize;
         let node2 = (line[36] - b'A') as usize;
         graph[node1].push(node2);

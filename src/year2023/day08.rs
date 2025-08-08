@@ -8,7 +8,7 @@ pub fn solve(input: &str) -> (usize, usize) {
     let mut nodes = HashMap::with_capacity(750);
     let mut starting_nodes = Vec::new();
     
-    for chunk in rest.as_bytes().array_chunks::<17>() {
+    for chunk in rest.as_bytes().as_chunks::<17>().0 {
         let label1 = (chunk[0], chunk[1], chunk[2]);
         let label2 = (chunk[7], chunk[8], chunk[9]);
         let label3 = (chunk[12], chunk[13], chunk[14]);

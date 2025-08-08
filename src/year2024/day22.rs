@@ -40,7 +40,7 @@ fn worker(numbers: &[u32], chunks_size: usize, start: &AtomicUsize, mutex: &Mute
     let s6859 = Simd::splat(6859);
     let mut p1 = 0;
 
-    for secret0 in numbers[start..(start+LANES*chunks_size).min(numbers.len())].array_chunks::<LANES>() {
+    for secret0 in numbers[start..(start+LANES*chunks_size).min(numbers.len())].as_chunks::<LANES>().0 {
         seen.fill(0);
         let secret0 = Simd::from_slice(secret0);
         let secret1 = next_secret(secret0);

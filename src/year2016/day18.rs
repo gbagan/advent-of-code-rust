@@ -5,9 +5,10 @@ pub fn solve(input: &str) -> (u32, u32) {
 
     let mut odds = 0;
     let mut evens = 0;
-    for &[c1, c2] in input.array_chunks() {
-        evens = 2 * evens + (c1 == b'^') as u64;
-        odds = 2 * odds + (c2 == b'^') as u64;
+
+    for chunk in input.chunks(2) {
+        evens = 2 * evens + (chunk[0] == b'^') as u64;
+        odds = 2 * odds + (chunk[1] == b'^') as u64;
     }
 
     let p1 = count_safes::<40>(evens, odds, len);

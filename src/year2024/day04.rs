@@ -52,7 +52,7 @@ fn part1(grid: &[u8]) -> u32 {
     encode!(mut x33, mut m33, mut a33, mut s33, &line[RANGE3]);
     p1 += count_horizontal::<3>(x33, m33, a33, s33);
 
-    for line in grid[3 * 141..].array_chunks::<141>() {
+    for line in grid[3 * 141..].as_chunks::<141>().0 {
         encode!(x1, m1, a1, s1, &line[RANGE1]);
         p1 += count_horizontal::<1>(x1, m1, a1, s1);
         p1 += count_vertical::<1>(x11, m21, a31, s1, s11, a21, m31, x1);

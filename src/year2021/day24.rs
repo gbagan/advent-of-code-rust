@@ -9,7 +9,7 @@ pub fn solve(input: &str) -> (String, String) {
     
     let mut stack = Vec::new();
 
-    for (i, chunk) in lines.array_chunks::<18>().enumerate() {
+    for (i, chunk) in lines.as_chunks::<18>().0.iter().enumerate() {
         let a = chunk[5].try_signed::<i32>().unwrap();
         let b = chunk[15].try_signed::<i32>().unwrap();
         if a > 0 {

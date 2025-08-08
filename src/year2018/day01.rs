@@ -14,7 +14,8 @@ pub fn solve(input: &str) -> (i32, i32) {
     seen.sort_unstable();
 
     let p2 = seen
-        .array_chunks()
+        .as_chunks().0
+        .iter()
         .filter_map(|&[(rem1, freq1, idx1), (rem2, freq2, _)]|
             if rem1 != rem2 { None} else { Some((freq2 - freq1, idx1, freq2)) }
         ).min()

@@ -16,7 +16,7 @@ pub fn solve(input: &str) -> (u32, String) {
     let mut labels = Vec::with_capacity(n);
     let mut matrix = vec![false; n*n];
 
-    for &[l11, l12, _, l21, l22, _] in input.as_bytes().array_chunks() {
+    for &[l11, l12, _, l21, l22, _] in input.as_bytes().as_chunks().0 {
         let index = l11 as usize * 26 + l12 as usize - 2619;
         let mut i = table[index];
         if i == usize::MAX {

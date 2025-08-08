@@ -18,7 +18,7 @@ pub fn solve(input: &str) -> (usize, usize) {
             table[index1] = i;
             graph.push(ArrayVec::new());
         }
-        for &[_, l1, l2, l3] in line[4..].array_chunks() {
+        for &[_, l1, l2, l3] in line[4..].as_chunks().0 {
             let index2 = l1 as usize * 676 + l2 as usize * 26 + l3 as usize - 68191;
             let mut j = table[index2];
             if j == usize::MAX {

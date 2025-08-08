@@ -11,7 +11,8 @@ pub struct Node {
 
 pub fn solve(input: &str) -> (usize, u32) {
     let nodes = input.as_bytes()[28+48..]
-        .array_chunks::<48>()
+        .as_chunks::<48>().0
+        .iter()
         .map(|line| {
             let [x, y] = (&line[16..22]).iter_unsigned().next_chunk().unwrap();
             let used = (&line[30..33]).try_unsigned().unwrap();

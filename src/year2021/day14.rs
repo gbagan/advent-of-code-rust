@@ -24,7 +24,8 @@ pub fn solve(input: &str) -> (usize, usize) {
 
     let rules: Vec<_> = rules_str
         .as_bytes()
-        .array_chunks::<8>()
+        .as_chunks::<8>().0
+        .iter()
         .map(|chk| {
             let a = to_idx(chk[0]);
             let b = to_idx(chk[1]);

@@ -43,7 +43,7 @@ fn parse(input: &[u8]) -> ([bool; 32], State) {
     }
     
     let mut rules = [false; 32];
-    for line in input2[1..].array_chunks::<11>() {
+    for line in input2[1..].as_chunks::<11>().0 {
         let mut index = 0;
         for &c in &line[..5] {
             index = index << 1 | (c == b'#') as usize;
