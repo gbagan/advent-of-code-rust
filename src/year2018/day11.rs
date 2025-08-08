@@ -2,6 +2,8 @@ use crate::util::parser::*;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::thread;
 
+type Result = (Option<(usize, usize)>, (usize, usize, usize, i32));
+
 pub fn solve(input: &str) -> (String, String) {
     let serial_number = input.try_unsigned().unwrap();
     let table = build_table(serial_number);
@@ -28,11 +30,11 @@ pub fn solve(input: &str) -> (String, String) {
     (p1, p2)
 }
 
-fn worker(table: &[i32], counter: &AtomicUsize, result: &mut (Option<(usize, usize)>, (usize, usize, usize, i32))) { 
+fn worker(table: &[i32], counter: &AtomicUsize, result: &mut Result) { 
     let mut p1 = None;
     let mut p2 = (0, 0, 0, i32::MIN);
     while let size = counter.fetch_add(1, Ordering::Relaxed) && size <= 300 {  
-        let (x, y, power) = largest_square(&table, size);
+        let (x, y, power) = largest_square(table, size);
         if size == 3 {
             p1 = Some((x, y));
         }

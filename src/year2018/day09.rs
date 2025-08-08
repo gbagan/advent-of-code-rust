@@ -16,7 +16,7 @@ fn simulate(nb_players: usize, last_marble: usize) -> u64 {
     circle.push_back(0);
 
     for marble in 1..last_marble+1 {
-        if marble % 23 == 0 {
+        if marble.is_multiple_of(23) {
             circle.rotate_right(7);
             scores[marble % nb_players] += marble as u64 + circle.pop_back().unwrap() as u64;
             circle.rotate_left(1);

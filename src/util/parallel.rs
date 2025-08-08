@@ -78,7 +78,7 @@ pub trait ParallelIterator: Sized + Send {
                 });
             }
         });
-        results.iter().fold(id(), |x, y| r(&x, &y))
+        results.iter().fold(id(), |x, y| r(&x, y))
     }
 }
 

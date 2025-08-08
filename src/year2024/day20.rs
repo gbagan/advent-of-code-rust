@@ -49,9 +49,9 @@ pub fn solve(input: &str) -> (u32, u32) {
                 for i in 0..21 {
                     let min = nexty - (20-i).min(px - 2);
                     let max = nexty + (20-i).min(width - px - 2);
-                    for next in min..max+1 {
+                    for (next, &next_dist) in distances.iter().enumerate().take(max+1).skip(min) {
                         let j = next.abs_diff(nexty) as i16;
-                        if distances[next] <= dist - 100 - i as i16 - j {
+                        if next_dist <= dist - 100 - i as i16 - j {
                             acc2 += 1;
                         }
                     }
@@ -64,9 +64,9 @@ pub fn solve(input: &str) -> (u32, u32) {
                 for i in 1..21 {
                     let min = nexty - (20-i).min(px - 2);
                     let max = nexty + (20-i).min(width - px - 2);
-                    for next in min..max+1 {
+                    for (next, &next_dist) in distances.iter().enumerate().take(max+1).skip(min) {
                         let j = next.abs_diff(nexty) as i16;
-                        if distances[next] <= dist - 100 - i as i16 - j {
+                        if next_dist <= dist - 100 - i as i16 - j {
                             acc2 += 1;
                         }
                     }

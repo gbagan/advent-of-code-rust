@@ -18,8 +18,8 @@ pub fn solve(input: &str) -> (u32, u32) {
             27 => { // wakes up
                 let end = (&line[15..17]).to_unsigned();
                 let minutes = guards.entry(guard).or_insert_with(|| [0u32; 60]);
-                for i in start..end {
-                    minutes[i] += 1
+                for minute in minutes.iter_mut().take(end).skip(start) {
+                    *minute += 1
                 };
             },
             _ => { // shift

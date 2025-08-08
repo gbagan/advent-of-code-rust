@@ -145,7 +145,7 @@ fn part2(input: &Input, limit: i32) -> i32 {
     let go_below = |y: i32, tdist: i32| tdist - delta_y[y as usize];
     let go_above = |y: i32, tdist: i32| tdist + delta_y[y as usize+1];
 
-    let dist = total_distance(Coord::new(xmid, ymid), &points);
+    let dist = total_distance(Coord::new(xmid, ymid), points);
 
     let mut left = xmid;
     let mut dist_left = dist;

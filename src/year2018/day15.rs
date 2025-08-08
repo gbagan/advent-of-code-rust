@@ -36,7 +36,7 @@ pub fn solve(input: &str) -> (i32, i32) {
 fn worker(walls: &[u32; 32], units: &[Unit], done: &AtomicBool, counter: &AtomicI32, res: &mut (i32, i32)) {
     while !done.load(Ordering::Relaxed) {
         let power = counter.fetch_add(1, Ordering::Relaxed);
-        if let Some(score) = Game::new(&units, power, *walls).simulate::<true>() {
+        if let Some(score) = Game::new(units, power, *walls).simulate::<true>() {
             *res = (power, score);
             done.store(true, Ordering::Relaxed);
             return;
@@ -64,7 +64,7 @@ struct Game {
 }
 
 impl Game {
-    fn new<'a>(units: &[Unit], elf_power: i32, walls: [u32; 32]) -> Self {
+    fn new(units: &[Unit], elf_power: i32, walls: [u32; 32]) -> Self {
         let grid = vec![None; 32*32];
         let units = units.to_vec();
         Self { grid, units, elf_power, walls }
@@ -198,7 +198,7 @@ fn propagate(grid: &mut [u32; 32], obstacles: &[u32; 32]) -> bool {
         previous = current;
         changed |= current ^ grid[i];
     }
-    return changed != 0
+    changed != 0
 }
 
 #[inline]
