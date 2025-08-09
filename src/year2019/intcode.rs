@@ -106,6 +106,11 @@ impl IntCode {
     pub fn input(&mut self, val: i32) {
         self.input.push_back(val);
     }
+
+    pub fn reset(&mut self) {
+        self.ip = 0;
+        self.input.clear();
+    }
 }
 
 /*
