@@ -1,4 +1,4 @@
-use std::ops::{Add,AddAssign,Mul,Neg,Sub};
+use std::ops::{Add,AddAssign,Mul,Neg,Sub, SubAssign};
 use std::iter::Sum;
 use num_integer::Integer;
 use num_traits::{ConstOne, Signed};
@@ -91,10 +91,16 @@ impl<A: Integer> Add for Coord<A> {
 impl<A: Integer + Copy> AddAssign for Coord<A> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
-        *self = Self {
-            x: self.x + other.x,
-            y: self.y + other.y,
-        };
+        self.x = self.x + other.x;
+        self.y = self.y + other.y;
+    }
+}
+
+impl<A: Integer + Copy> SubAssign for Coord<A> {
+    #[inline]
+    fn sub_assign(&mut self, other: Self) {
+        self.x = self.x - other.x;
+        self.y = self.y - other.y;
     }
 }
 
