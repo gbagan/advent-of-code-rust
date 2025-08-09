@@ -2,26 +2,29 @@ use std::collections::VecDeque;
 use crate::util::parser::*;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub enum Status { Run, Halt, Input, Output(i32) }
+pub enum Status { Run, Halt, Input, Output(usize) }
 
 #[derive(Clone)]
 pub struct IntCode {
-    data: Vec<i32>,
+    data: Vec<usize>,
     ip: usize,
-    input: VecDeque<i32>,
+    base: usize,
+    input: VecDeque<usize>,
 }
 
 impl IntCode {
     pub fn new(input: &str) -> Self {
-        let data = input.iter_signed().collect();
-        Self { data, ip: 0, input: VecDeque::new() }
+        let mut data: Vec<_> = input.iter_signed::<i64>().map(|x| x as usize).collect();
+        let n = data.len();
+        data.resize(n + 2000, 0);
+        Self { data, ip: 0, base: 0, input: VecDeque::new() }
     }
 
-    pub fn set(&mut self, index: usize, val: i32) {
+    pub fn set(&mut self, index: usize, val: usize) {
         self.data[index] = val;
     }
 
-    pub fn get(&self, index: usize) -> i32 {
+    pub fn get(&self, index: usize) -> usize {
         self.data[index]
     }
 
@@ -79,15 +82,20 @@ impl IntCode {
                     let a = self.address(1, (instr / 100) % 10);
                     let b = self.address(2, (instr / 1000) % 10);
                     let c = self.address(3, instr / 10000);
-                    self.data[c] = (self.data[a] < self.data[b]) as i32;
+                    self.data[c] = ((self.data[a] as i64) < (self.data[b] as i64)) as usize;
                     self.ip += 4;
                 }
                 8 => {
                     let a = self.address(1, (instr / 100) % 10);
                     let b = self.address(2, (instr / 1000) % 10);
                     let c = self.address(3, instr / 10000);
-                    self.data[c] = (self.data[a] == self.data[b]) as i32;
+                    self.data[c] = (self.data[a] == self.data[b]) as usize;
                     self.ip += 4;
+                }
+                9 => {
+                    let a = self.address(1, instr / 100);
+                    self.base += self.data[a] as usize;
+                    self.ip += 2;
                 }
                 99 => return Status::Halt,
                 c => panic!("invalid instruction {c}")
@@ -95,15 +103,16 @@ impl IntCode {
         }
     }
 
-    fn address(&self, offset: usize, mode: i32) -> usize {
+    fn address(&self, offset: usize, mode: usize) -> usize {
         match mode {
             0 => self.data[self.ip + offset] as usize,
             1 => self.ip + offset,
+            2 => self.base + self.data[self.ip + offset] as usize,
             _ => panic!("invalid mode: {mode}")
         }   
     }
 
-    pub fn input(&mut self, val: i32) {
+    pub fn input(&mut self, val: usize) {
         self.input.push_back(val);
     }
 

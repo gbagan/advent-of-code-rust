@@ -1,6 +1,6 @@
 use crate::{util::foreach_permutation, year2019::intcode::*};
 
-pub fn solve(input: &str) -> (i32, i32) {
+pub fn solve(input: &str) -> (usize, usize) {
     let machine = IntCode::new(input);
     
     let p1 = part1(&machine);
@@ -9,7 +9,7 @@ pub fn solve(input: &str) -> (i32, i32) {
     (p1, p2)
 }
 
-fn part1(machine: &IntCode) -> i32 {
+fn part1(machine: &IntCode) -> usize {
     let mut highest_signal = 0;
     let mut machine = machine.clone();
     foreach_permutation(&mut [0, 1, 2, 3, 4], |sequence| {
@@ -28,7 +28,7 @@ fn part1(machine: &IntCode) -> i32 {
     highest_signal
 }
 
-fn part2(machine: &IntCode) -> i32 {
+fn part2(machine: &IntCode) -> usize {
     let mut highest_signal = 0;
     let mut machines: [IntCode; 5] = std::array::from_fn(|_| machine.clone());
     
