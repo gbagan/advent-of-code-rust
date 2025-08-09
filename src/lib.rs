@@ -106,8 +106,17 @@ pub mod year2018 {
     //pub mod day14;
     pub mod day15;
     pub mod day16;
+    pub mod day17;
     pub mod day19;
     pub mod day25;
+}
+
+pub mod year2019 {
+    pub mod intcode;
+    pub mod day01;
+    pub mod day02;
+    pub mod day03;
+    pub mod day04;
 }
 
 pub mod year2020 {
