@@ -130,7 +130,7 @@ impl<'a> Iterator for ParseLowercase<'a> {
     }
 }
 
-fn next_upper_case_token<'a>(slice: &'a str, iter: &mut Enumerate<std::str::Bytes<'_>>) -> Option<&'a str> {
+fn next_upper_case_token<'a>(slice: &'a [u8], iter: &mut Enumerate<std::str::Bytes<'_>>) -> Option<&'a [u8]> {
     let n = loop {
         let (i, byte) = iter.next()?;
         if byte.is_ascii_uppercase() {
@@ -155,10 +155,10 @@ pub struct ParseUppercase<'a> {
 }
 
 impl<'a> Iterator for ParseUppercase<'a> {
-    type Item = &'a str;
+    type Item = &'a [u8];
 
     fn next(&mut self) -> Option<Self::Item> {
-        next_upper_case_token(self.slice, &mut self.bytes)
+        next_upper_case_token(self.slice.as_bytes(), &mut self.bytes)
     }
 }
 

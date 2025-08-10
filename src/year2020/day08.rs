@@ -9,7 +9,9 @@ pub enum Instruction {
 pub fn solve(input: &str) -> (i32, i32) {
     let instructions: Vec<_> =
         input
-        .iter_lowercase()
+        .as_bytes()
+        .split(|c| !c.is_ascii_lowercase())
+        .filter(|c| !c.is_empty())
         .zip(input.iter_signed::<i32>())
         .map(|(a, b)| to_instr(a, b))
         .collect();
@@ -18,12 +20,12 @@ pub fn solve(input: &str) -> (i32, i32) {
     (p1, p2)
 }
 
-fn to_instr(a: &str, b: i32) -> Instruction {
+fn to_instr(a: &[u8], b: i32) -> Instruction {
     match a {
-        "acc" => Instruction::Acc(b),
-        "jmp" => Instruction::Jmp(b),
-        "nop" => Instruction::Nop(b),
-        _ => panic!("Invalid instruction: {a}"),
+        b"acc" => Instruction::Acc(b),
+        b"jmp" => Instruction::Jmp(b),
+        b"nop" => Instruction::Nop(b),
+        _ => panic!("Invalid instruction"),
     }
 }
 
