@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 use crate::util::parser::*;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub enum Status { Run, Halt, Input, Output(usize) }
+pub enum Status { Halt, Input, Output(usize) }
 
 #[derive(Clone)]
 pub struct IntCode {
