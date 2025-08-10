@@ -1,6 +1,6 @@
 use crate::year2019::intcode::*;
 
-pub fn solve(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (i64, i64) {
     let mut machine = IntCode::new(input);
     let mut machine2 = machine.clone();
     

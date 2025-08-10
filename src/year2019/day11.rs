@@ -17,7 +17,7 @@ pub fn solve(input: &str) -> (usize, String) {
     (p1, p2)
 }
 
-fn paint(machine: &mut IntCode, painted: &mut HashMap<Point, usize>) {
+fn paint(machine: &mut IntCode, painted: &mut HashMap<Point, i64>) {
     let mut position = Point::new(0, 0);
     let mut direction = Point::NORTH;
    

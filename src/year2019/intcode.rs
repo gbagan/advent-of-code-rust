@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 use crate::util::parser::*;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub enum Status { Halt, Input, Output(usize) }
+pub enum Status { Halt, Input, Output(i64) }
 
 #[derive(Clone)]
 pub struct IntCode {
@@ -58,7 +58,7 @@ impl IntCode {
                 4 => {
                     let a = self.address(1, instr / 100);
                     self.ip += 2;
-                    return Status::Output(self.data[a]);
+                    return Status::Output(self.data[a] as i64);
                 }
                 5 => {
                     let a = self.address(1, (instr / 100) % 10);
@@ -112,12 +112,13 @@ impl IntCode {
         }   
     }
 
-    pub fn input(&mut self, val: usize) {
-        self.input.push_back(val);
+    pub fn input(&mut self, val: i64) {
+        self.input.push_back(val as usize);
     }
 
     pub fn reset(&mut self) {
         self.ip = 0;
+        self.base = 0;
         self.input.clear();
     }
 }
