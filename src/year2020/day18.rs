@@ -12,7 +12,7 @@ fn part1(line: &str) -> u64 {
     eval_expr(&mut line.bytes().filter(|&c| c != b' '))
 }
 
-fn eval_expr<I>(bytes: &mut I) -> u64 where I: Iterator::<Item=u8> {
+fn eval_expr(bytes: &mut impl Iterator::<Item=u8>) -> u64 {
     let mut total = next_value(bytes);
     while let Some(c) = bytes.next() {
         match c {
@@ -25,7 +25,7 @@ fn eval_expr<I>(bytes: &mut I) -> u64 where I: Iterator::<Item=u8> {
     total
 }
 
-fn next_value<I>(bytes: &mut I) -> u64 where I: Iterator::<Item=u8> {
+fn next_value(bytes: &mut impl Iterator::<Item=u8>) -> u64 {
     let c = bytes.next().unwrap();
     match c {
         b'0'..=b'9' => (c - b'0') as u64,
@@ -38,7 +38,7 @@ fn part2(line: &str) -> u64 {
     eval_expr2(&mut line.bytes().filter(|&c| c != b' '))
 }
 
-fn eval_expr2<I>(bytes: &mut I) -> u64 where I: Iterator::<Item=u8> {
+fn eval_expr2(bytes: &mut impl Iterator::<Item=u8>) -> u64 {
     let mut total = 1;
     let mut sum = next_value2(bytes);
     while let Some(c) = bytes.next() {
@@ -53,7 +53,7 @@ fn eval_expr2<I>(bytes: &mut I) -> u64 where I: Iterator::<Item=u8> {
     total
 }
 
-fn next_value2<I>(bytes: &mut I) -> u64 where I: Iterator::<Item=u8> {
+fn next_value2(bytes: &mut impl Iterator::<Item=u8>) -> u64 {
     let c = bytes.next().unwrap();
     match c {
         b'0'..=b'9' => (c - b'0') as u64,

@@ -141,6 +141,12 @@ impl IntCode {
         self.input.push_back(val as usize);
     }
 
+    pub fn output_as_bytes(&mut self, output: &mut Vec<u8>) {
+        while let Status::Output(v) = self.run() {
+            output.push(v as u8);
+        }
+    }
+
     pub fn reset(&mut self) {
         self.ip = 0;
         self.base = 0;

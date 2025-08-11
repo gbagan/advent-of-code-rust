@@ -17,9 +17,7 @@ fn toboggan(grid: &Grid<u8>, slope_right: usize, slope_down: usize) -> u64 {
     let mut counter = 0;
     let mut x = 0;
     for y in (0..grid.height).step_by(slope_down) {
-        if grid[(x, y)] == b'#' {
-            counter += 1;
-        }
+        counter += (grid[(x, y)] == b'#') as u64;
         x += slope_right;
         if x >= grid.width {
             x -= grid.width;

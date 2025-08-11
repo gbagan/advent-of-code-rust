@@ -13,8 +13,7 @@ fn parse_id(line: &str) -> u32 {
     line.bytes().fold(0, |acc, c|
         match c {
             b'F' | b'L' => 2*acc,
-            b'B' | b'R' => 2*acc+1,
-            _ => panic!("Unexpected character {}", c as char)
+            _ => 2*acc+1,
         }
     )
 }
