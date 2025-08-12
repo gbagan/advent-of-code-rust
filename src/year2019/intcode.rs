@@ -14,9 +14,14 @@ pub struct IntCode {
 
 impl IntCode {
     pub fn new(input: &str) -> Self {
+        let data: Vec<_> = input.iter_signed::<i64>().map(|x| x as usize).collect();
+        Self { data, ip: 0, base: 0, input: VecDeque::new() }
+    }
+
+    pub fn with_extra_capacity(input: &str, extra: usize) -> Self {
         let mut data: Vec<_> = input.iter_signed::<i64>().map(|x| x as usize).collect();
         let n = data.len();
-        data.resize(n + 2000, 0);
+        data.resize(n + extra, 0);
         Self { data, ip: 0, base: 0, input: VecDeque::new() }
     }
 

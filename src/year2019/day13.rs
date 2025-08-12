@@ -3,7 +3,7 @@ use crate::year2019::intcode::*;
 use Status::*;
 
 pub fn solve(input: &str) -> (u32, i64) {
-    let mut machine = IntCode::new(input);
+    let mut machine = IntCode::with_extra_capacity(input, 100);
     let mut machine2 = machine.clone();
 
     let p1 = part1(&mut machine);

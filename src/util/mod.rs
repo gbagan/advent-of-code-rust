@@ -3,6 +3,7 @@ use core::hash::Hash;
 use itertools::iterate;
 use crate::util::iter::*;
 
+pub mod bits;
 pub mod boxes;
 pub mod coord;
 pub mod graph;

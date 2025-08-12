@@ -1,7 +1,7 @@
 use crate::year2019::intcode::*;
 
 pub fn solve(input: &str) -> (i64, i64) {
-    let mut machine = IntCode::new(input);
+    let mut machine = IntCode::with_extra_capacity(input, 1000);
     let mut machine2 = machine.clone();
 
     machine.input(1);

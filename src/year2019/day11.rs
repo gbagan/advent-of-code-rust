@@ -6,7 +6,7 @@ type Point = Coord<i32>;
 use Status::*;
 
 pub fn solve(input: &str) -> (usize, String) {
-    let mut machine = IntCode::new(input);
+    let mut machine = IntCode::with_extra_capacity(input, 1000);
     let mut machine2 = machine.clone();
 
     let mut painted = HashMap::new();

@@ -7,7 +7,6 @@ enum Direction {Left, Right}
 use Direction::*;
 use Status::*;
 
-
 struct Program<'a> {
     routine: Vec<usize>,
     functions: [&'a [(Direction, usize)]; 3],
@@ -15,7 +14,7 @@ struct Program<'a> {
 
 
 pub fn solve(input: &str) -> (usize, i64) {
-    let mut machine = IntCode::new(input);
+    let mut machine = IntCode::with_extra_capacity(input, 2000);
     machine.set(0, 2);
     let mut grid = Vec::new();
     machine.output_as_bytes(&mut grid);
