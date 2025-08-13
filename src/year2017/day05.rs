@@ -7,9 +7,9 @@ pub fn solve(input: &str) -> (u32, u32) {
     (p1, p2)
 }
 
-fn part1(jumps: &[i32]) -> u32 {
+fn part1(jumps: &[i64]) -> u32 {
     let mut jumps = jumps.to_vec();
-    let n = jumps.len() as i32;
+    let n = jumps.len() as i64;
 
     let mut steps = 0;
     let mut offset = 0;
@@ -22,7 +22,7 @@ fn part1(jumps: &[i32]) -> u32 {
     steps
 }
 
-fn part2(jumps: &[i32]) -> u32 {
+fn part2(jumps: &[i64]) -> u32 {
     let mut jumps = jumps.to_vec();
     let mut steps = 0;
     let mut offset = 0;

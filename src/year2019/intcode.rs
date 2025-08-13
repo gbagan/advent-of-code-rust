@@ -178,7 +178,7 @@ macro_rules! a0 {
             let b = self.data[self.ip+2];
             let c= self.data[self.ip+3];
 
-            match instr % 100 {
+            match instr {
                 1 =>     { a0!(c) = a0!(a) + a0!(b); self.ip += 4 },
                 101 =>   { a0!(c) = a1!(a) + a0!(b); self.ip += 4 },
                 201 =>   { a0!(c) = a2!(a) + a0!(b); self.ip += 4 },

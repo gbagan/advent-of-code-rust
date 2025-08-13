@@ -33,16 +33,23 @@ macro_rules! solution {
 fn main() {
     let (command, arg_year, arg_day) = (args().nth(1), args().nth(2), args().nth(3));
     match command.as_deref() {
-        Some("solve") => solve(arg_year, arg_day, true),
-        Some("time") => solve(arg_year, arg_day, false),
+        Some("solve") => solve(arg_year, arg_day, Cmd::Solve),
+        Some("time") => solve(arg_year, arg_day, Cmd::Time),
+        Some("slowest") => solve(arg_year, arg_day, Cmd::Slowest),
         Some("markdown") => markdown(arg_year.unwrap()),
         Some("download") => download(&arg_year, &arg_day),
         _ => println!("Invalid command."),
     }
 }
 
-fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bool) {
+#[derive(PartialEq, Eq)]
+enum Cmd { Time, Solve, Slowest }
+
+
+fn solve(arg_year: Option<String>, arg_day: Option<String>, cmd: Cmd) {
     let solutions = solutions();
+
+    let mut times = Vec::new();
 
     let mut solved = 0;
     let mut duration = Duration::ZERO;
@@ -61,7 +68,7 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
             solved += 1;
                     
 
-            if display_solution {
+            if cmd == Cmd::Solve {
                 println!("{year} Day {day}.");
             } else {
                 let mut elapsed_vec = Vec::new();
@@ -72,26 +79,31 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
                 }
                 elapsed = *elapsed_vec.select_nth_unstable(iterations/2-1).1;
                 duration += elapsed;
-                let microseconds = elapsed.as_micros();
-                let nanoseconds = elapsed.as_nanos();
+                
+                if cmd == Cmd::Time {
+                    let microseconds = elapsed.as_micros();
+                    let nanoseconds = elapsed.as_nanos();
 
-                let text = if microseconds <= 5 {
-                    format!("{nanoseconds} ns")
-                } else {
-                    format!("{microseconds} μs")
-                };
-                let text =
-                    if microseconds < 1000 {
-                        Green.paint(text)
-                    } else if microseconds < 100_000 {
-                        Yellow.bold().paint(text)
+                    let text = if microseconds <= 5 {
+                        format!("{nanoseconds} ns")
                     } else {
-                        Red.bold().paint(text)
+                        format!("{microseconds} μs")
                     };
+                    let text =
+                        if microseconds < 1000 {
+                            Green.paint(text)
+                        } else if microseconds < 100_000 {
+                            Yellow.bold().paint(text)
+                        } else {
+                            Red.bold().paint(text)
+                        };
 
-                println!("{year} Day {day} in {text}, median over {iterations} iterations.");
+                    println!("{year} Day {day} in {text}, median over {iterations} iterations.");
+                } else if cmd == Cmd::Slowest {
+                    times.push((elapsed, year, day));
+                }
             }
-            if display_solution {
+            if cmd == Cmd::Solve {
                 println!("    Part 1: {p1}");
                 println!("    Part 2: {p2}");
             }
@@ -102,8 +114,16 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, display_solution: bo
     }
 
     println!("Solved: {solved}");
-    if !display_solution {
-        println!("Duration: {} μs", duration.as_micros());
+    match cmd {
+        Cmd::Solve => {},
+        Cmd::Time => println!("Duration: {} μs", duration.as_micros()),
+        Cmd::Slowest => {
+            times.sort_unstable_by_key(|p| p.0);
+            for (i, &(duration, year, day)) in times.iter().rev().take(10).enumerate() {
+                println!("{}: {}ms year {} day {}", i+1, duration.as_millis(), year, day);
+            }
+        }
+    
     }
 }
 
@@ -246,6 +266,7 @@ fn solutions() -> Vec<Solution> {
         solution!(year2016, day20),
         solution!(year2016, day21),
         solution!(year2016, day22),
+        // todo
 
         solution!(year2017, day01),
         solution!(year2017, day02),
