@@ -126,8 +126,7 @@ fn compress<'a>(path: &'a [(Direction, usize)], program: &mut Program<'a>, depth
     for i in 0..depth {
         program.routine.push(i);
         let function = program.functions[i];
-        let (prefix, path2) = path.split_at(function.len());
-        if prefix == function && compress(&path2, program, depth) {
+        if let Some(path2) = path.strip_prefix(function) && compress(&path2, program, depth) {
             return true;
         }
         program.routine.pop();
