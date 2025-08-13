@@ -4,7 +4,7 @@ use crate::util::{coord::Coord, parser::*};
 type Point = Coord<i32>;
 
 pub fn solve(input: &str) -> (u32, u32) {
-    let n = input.try_unsigned().unwrap();
+    let n = input.trim().to_unsigned();
     let p1 = part1(n);
     let p2 = part2(n);
     (p1, p2)
@@ -15,30 +15,30 @@ fn part1(n: u32) -> u32 {
         return 0;
     }
     let n = n - 1;
-    let cycle = (n as f64).sqrt().floor() as u32;
+    let cycle = n.isqrt();
     let start = n - cycle * cycle;
     let period = (cycle + 1) & !1;
     cycle.div_ceil(2) + (start % period).abs_diff(cycle/2)
 }
 
-fn fill(grid: &HashMap<Point,u32>, c: &Point) -> u32 {
-    c.surrounding().iter().filter_map(|a| grid.get(a)).sum()
+fn fill(grid: &HashMap<Point,u32>, position: &Point) -> u32 {
+    position.surrounding().iter().filter_map(|a| grid.get(a)).sum()
 }
 
 fn part2(n: u32) -> u32 {
     let mut grid = HashMap::new();
-    let mut c = Point::ORIGIN;
-    grid.insert(c, 1);
+    let mut position = Point::ORIGIN;
+    grid.insert(position, 1);
     let mut k = 1;
     loop {
-        for (steps, dir) in [(k, Point::EAST), (k, Point::NORTH), (k+1, Point::WEST), (k+1, Point::WEST)] {
+        for (steps, dir) in [(k, Point::EAST), (k, Point::NORTH), (k+1, Point::WEST), (k+1, Point::SOUTH)] {
             for _ in 0..steps {
-                c += dir;
-                let r = fill(&grid, &c);
+                position += dir;
+                let r = fill(&grid, &position);
                 if r > n {
                     return r;
                 }
-                grid.insert(c, r);
+                grid.insert(position, r);
             }
         }
         k += 2;

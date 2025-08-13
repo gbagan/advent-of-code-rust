@@ -54,7 +54,7 @@ impl<const N: i128> Affine<N> {
     }
 
     fn inverse(self) -> Self {
-        let a1 = modular_inverse(self.a, N);
+        let a1 = self.a.modular_inverse(N);
         Self { a: a1, b: -a1 * self.b }
     }
 

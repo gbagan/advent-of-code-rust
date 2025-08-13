@@ -64,25 +64,29 @@ fn extgcd_test() {
     assert_eq!(a * x + b * y, g);
 }
 
-pub fn modular_inverse<A>(a: A, m: A) -> A where A: Integer + Signed + Copy  {
-    let (mut t, mut t1) = (A::zero(), A::one());
-    let (mut r, mut r1) = (m, a);
+pub trait MathInteger {
+    fn modular_inverse(self, m: Self) -> Self where Self: Integer + Signed + Copy  {
+        let (mut t, mut t1) = (Self::zero(), Self::one());
+        let (mut r, mut r1) = (m, self);
 
-    while !r1.is_zero() {
-        let q = r / r1;
-        (t, t1) = (t1, t - q * t1);
-        (r, r1) = (r1, r - q * r1);
-    }
+        while !r1.is_zero() {
+            let q = r / r1;
+            (t, t1) = (t1, t - q * t1);
+            (r, r1) = (r1, r - q * r1);
+        }
 
-    if t.is_negative() {
-        t = t + m;
+        if t.is_negative() {
+            t = t + m;
+        }
+        t
     }
-    t
 }
+
+impl<A: Integer + Signed + Copy> MathInteger for A {}
 
 #[test]
 fn modular_inverse_test() {
-    assert_eq!(modular_inverse(3i64, 11), 4);
+    assert_eq!(3i64.modular_inverse(11), 4);
 }
 
 

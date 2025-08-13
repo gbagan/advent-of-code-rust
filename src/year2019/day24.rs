@@ -27,7 +27,7 @@ const fn mk_mask(bits: &[usize]) -> u64 {
 fn part1(mut grid: u64) -> u32 {
 	let mut seen = HashSet::new();
     while seen.insert(grid) {
-        grid = step(grid, neighbors(grid), GRID_MASK)
+        grid = step(grid, neighbors(grid)) & GRID_MASK
     }
     to_u32(grid)
 }
@@ -61,10 +61,10 @@ fn neighbors(grid: u64) -> u64 {
 	saturating_add(nbor, (grid & LEFT_MASK) >> 2)
 }
 
-fn step(grid: u64, nbor: u64, mask: u64) -> u64 {
+fn step(grid: u64, nbor: u64) -> u64 {
 	let survived =  grid & nbor & !(nbor >> 1);
 	let born = !grid & (nbor ^ (nbor >> 1));
-	(survived | born) & mask
+	survived | born
 }
 
 fn to_u32(grid: u64) -> u32 {
@@ -127,5 +127,5 @@ fn part2_step(inner: u64, grid: u64, outer: u64) -> u64 {
 	nbor = saturating_add(nbor, ((in_ud >> 4 & UP_DOWN_MASK) | in_lr >> 20) & INNER_MASK);
 	nbor = saturating_add(nbor, ((in_ud << 4 & UP_DOWN_MASK) | in_lr << 20) & INNER_MASK);
 
-	step(grid, nbor, NOT_CENTER_MASK)
+	step(grid, nbor) & NOT_CENTER_MASK
 }
