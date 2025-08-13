@@ -38,9 +38,7 @@ where A: Ord + Num + Signed + Copy + AddAssign + DivAssign
 // Return (g, x, y) such that g is the gcd of a and b
 // and ax + by = gcd(a,b)
 pub fn extgcd<A>(a: A, b: A) -> (A, A, A) where A: Integer + Signed + Copy {
-    if a.is_zero() && b.is_zero() {
-        panic!("extgcd(0, 0) is undefined")
-    }
+    assert!(!a.is_zero() || !b.is_zero(), "extgcd(0, 0) is undefined");
     let mut x = A::one();
     let mut y = A::zero();
     let mut x1 = A::zero();
@@ -65,6 +63,29 @@ fn extgcd_test() {
     assert_eq!(g, 5);
     assert_eq!(a * x + b * y, g);
 }
+
+pub fn modular_inverse<A>(a: A, m: A) -> A where A: Integer + Signed + Copy  {
+    let (mut t, mut t1) = (A::zero(), A::one());
+    let (mut r, mut r1) = (m, a);
+
+    while !r1.is_zero() {
+        let q = r / r1;
+        (t, t1) = (t1, t - q * t1);
+        (r, r1) = (r1, r - q * r1);
+    }
+
+    if t.is_negative() {
+        t = t + m;
+    }
+    t
+}
+
+#[test]
+fn modular_inverse_test() {
+    assert_eq!(modular_inverse(3i64, 11), 4);
+}
+
+
 
 // Given a slice of (ri, mi)
 // returns a tuple (q, m) where {q + j m | j in Z} is the set of solutions
