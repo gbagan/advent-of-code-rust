@@ -49,7 +49,7 @@ enum Cmd { Time, Solve, Slowest }
 fn solve(arg_year: Option<String>, arg_day: Option<String>, cmd: Cmd) {
     let solutions = solutions();
 
-    let mut times = Vec::new();
+    let mut durations = Vec::new();
 
     let mut solved = 0;
     let mut duration = Duration::ZERO;
@@ -100,7 +100,7 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, cmd: Cmd) {
 
                     println!("{year} Day {day} in {text}, median over {iterations} iterations.");
                 } else if cmd == Cmd::Slowest {
-                    times.push((elapsed, year, day));
+                    durations.push((elapsed, year, day));
                 }
             }
             if cmd == Cmd::Solve {
@@ -118,9 +118,11 @@ fn solve(arg_year: Option<String>, arg_day: Option<String>, cmd: Cmd) {
         Cmd::Solve => {},
         Cmd::Time => println!("Duration: {} μs", duration.as_micros()),
         Cmd::Slowest => {
-            times.sort_unstable_by_key(|p| p.0);
-            for (i, &(duration, year, day)) in times.iter().rev().take(10).enumerate() {
-                println!("{}: {}ms year {} day {}", i+1, duration.as_millis(), year, day);
+            durations.sort_unstable_by_key(|p| p.0);
+            for (i, &(elapsed, year, day)) in durations.iter().rev().take(10).enumerate() {
+                println!("{}: {}ms year {} day {} {}%", i+1, elapsed.as_millis(), year, day,
+                    elapsed.as_micros() * 100 / duration.as_micros()
+                );
             }
         }
     
@@ -285,7 +287,7 @@ fn solutions() -> Vec<Solution> {
         solution!(year2017, day15),
         solution!(year2017, day16),
         solution!(year2017, day17),
-        // todo
+        solution!(year2017, day18),
         solution!(year2017, day19),
         solution!(year2017, day20),
         solution!(year2017, day21),
@@ -314,6 +316,8 @@ fn solutions() -> Vec<Solution> {
         // todo
         solution!(year2018, day19),
         // todo
+        solution!(year2018, day23),
+        //
         solution!(year2018, day25),
 
         solution!(year2019, day01),
@@ -339,6 +343,7 @@ fn solutions() -> Vec<Solution> {
         solution!(year2019, day22),
         // todo
         solution!(year2019, day24),
+        // todo
 
         solution!(year2020, day01),
         solution!(year2020, day02),
@@ -351,7 +356,9 @@ fn solutions() -> Vec<Solution> {
         solution!(year2020, day09),
         solution!(year2020, day10),
         solution!(year2020, day11),
+        // todo
         solution!(year2020, day18),
+        // todo
 
         solution!(year2021, day01),
         solution!(year2021, day02),
@@ -395,6 +402,7 @@ fn solutions() -> Vec<Solution> {
         solution!(year2022, day14),
         solution!(year2022, day15),
         // solution2!(year2022, day16),
+        // todo
 
         solution!(year2023, day01),
         solution!(year2023, day02),

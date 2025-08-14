@@ -1,32 +1,94 @@
-use crate::util::parser::*;
+use core::mem::transmute;
+use std::simd::prelude::*;
+use crate::util::{bits::*, parser::*};
 
-type Point = [i16; 4];
+const LEN: usize = 1280;
 
-pub fn solve(input: &str) -> (u32, u32) {
-    let mut points: Vec<Point> = input.iter_signed().array_chunks().collect();
-
-    let mut constellations = 0;
-    let mut stack = Vec::with_capacity(100);
-
-     while let Some(start) = points.pop() {
-        constellations += 1;
-        stack.push(start);
-
-        while let Some(point) = stack.pop() {
-            let mut i = 0;
-            while i < points.len() {
-                if adjacent(&point, &points[i]) {
-                    stack.push(points.swap_remove(i));
-                } else {
-                    i += 1;
-                }
-            }
-        }
-    }
-
-    (constellations, 0)
+#[repr(align(64))]
+struct Input {
+    data: [i8; LEN*4]
 }
 
-fn adjacent(p1: &Point, p2: &Point) -> bool {
-    (p1[0] - p2[0]).abs() + (p1[1] - p2[1]).abs() + (p1[2] -p2[2]).abs() + (p1[3] - p2[3]).abs() <= 3
+pub fn solve(input: &str) -> (usize, u32) {
+    let mut points = Input { data: [0; _]};
+    
+    for (i, v) in input.iter_signed::<i16>().enumerate() {
+        points.data[i] = v as i8;
+    }
+
+    let mut uf = UnionFind::new(LEN);
+    let mut ptr = points.data.as_ptr().cast::<u32>();
+    let four = u32x16::splat(4);
+    for i in 0..LEN {
+        let point: i8x64 = unsafe { transmute(u32x16::splat(*ptr)) };
+        let i2 = i & !15;
+        let mut ptr2 = points.data[4*i2..].as_ptr().cast::<i8x64>();
+        for j in (i2..LEN).step_by(16) {
+            let dist = (point - unsafe { *ptr2 }).abs();
+            let mut dist: u32x16 = unsafe { transmute(dist) };
+            dist = dist + (dist >> 8);
+            dist = (dist + (dist >> 16)) & Simd::splat(255);
+            let mask = dist.simd_lt(four).to_bitmask();
+            if mask != 0 {
+                for b in mask.biterator() {
+                    let k = j + b;
+                    if i < k {
+                        uf.union(i, k);
+                    }
+                }
+            }
+            ptr2 = unsafe { ptr2.add(1) };
+        }
+        ptr = unsafe { ptr.add(1) };
+    }
+
+    let p1 = uf.count;
+
+    (p1, 0)
+}
+
+pub struct UnionFind {
+    parent: Vec<usize>,
+    size: Vec<u32>,
+    count: usize,
+}
+
+impl UnionFind {
+    pub fn new(n: usize) -> Self {
+        let parent = (0..n).collect();
+        let size = vec![1; n];
+        Self { parent, size, count: n }
+    }
+
+    pub fn find(&mut self, mut x: usize) -> usize {
+        let mut root = x;
+        while self.parent[root] != root {
+            root = self.parent[root];
+        }
+        while self.parent[x] != x {
+            let p = self.parent[x];
+            self.parent[x] = root;
+            x = p;
+        }
+        root
+    }
+
+    pub fn union(&mut self, a: usize, b: usize) -> bool {
+        let mut ra = self.find(a);
+        let mut rb = self.find(b);
+        if ra == rb {
+            return false;
+        }
+        if self.size[ra] < self.size[rb] {
+            std::mem::swap(&mut ra, &mut rb);
+        }
+        self.parent[rb] = ra;
+        self.size[ra] += self.size[rb];
+        self.count -= 1;
+        true
+    }
+
+    pub fn connected(&mut self, a: usize, b: usize) -> bool {
+        self.find(a) == self.find(b)
+    }
 }

@@ -4,7 +4,7 @@
 use std::simd::{LaneCount, Simd, SupportedLaneCount};
 use std::simd::num::SimdUint;
 
-pub fn multiple_hash<const N: usize>(
+pub fn simd_hash<const N: usize>(
     buffers: &mut [[u8; 64]],
     size: usize,
 ) -> ([u32; N], [u32; N], [u32; N], [u32; N])
@@ -129,9 +129,8 @@ where LaneCount<N>: SupportedLaneCount {
 fn message<const N: usize>(buffers: &mut [[u8; 64]], i: usize) -> Simd<u32, N>
 where LaneCount<N>: SupportedLaneCount {
     let start = 4 * i;
-    let end = start + 4;
     Simd::from_array(std::array::from_fn(|lane| {
-        let slice = &buffers[lane][start..end];
+        let slice = &buffers[lane][start..start+4];
         u32::from_le_bytes(slice.try_into().unwrap())
     }))
 }

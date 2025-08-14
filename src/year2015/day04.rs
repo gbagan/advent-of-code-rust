@@ -1,9 +1,9 @@
 use std::thread;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::simd::{LaneCount, SupportedLaneCount};
-use crate::util::md5::multiple_hash;
+use crate::util::md5::simd_hash;
 
-pub struct Shared {
+pub struct Atomics {
     done: AtomicBool,
     counter: AtomicU32,
     p1: AtomicU32,
@@ -12,7 +12,7 @@ pub struct Shared {
 
 pub fn solve(input: &str) -> (u32, u32) {
     let input = input.trim();
-    let shared = Shared {
+    let shared = Atomics {
         done: AtomicBool::new(false),
         counter: AtomicU32::new(1000),
         p1: AtomicU32::new(u32::MAX),
@@ -30,19 +30,22 @@ pub fn solve(input: &str) -> (u32, u32) {
     (p1, p2)
 }
 
-fn worker(input: &str, shared: &Shared) {
+fn worker(input: &str, shared: &Atomics) {
     while !shared.done.load(Ordering::Relaxed) {
-        let counter = shared.counter.fetch_add(1000, Ordering::Relaxed);
+        let mut counter = shared.counter.fetch_add(1000, Ordering::Relaxed);
         let string = format!("{input}{counter}");
         let len = string.len();
         let mut buffer = [0; 64];
         buffer[0..len].copy_from_slice(string.as_bytes());
         let mut buffers = [buffer; 16];
+        
+        let mut digits = (b'0', b'0', b'0');
 
-        for i in (0..992).step_by(16) {
-            check_hash::<16>(&mut buffers, len, counter, i, shared);
+        for _ in 0..992/16 {
+            check_hash::<16>(&mut buffers, len, counter, &mut digits, shared);
+            counter += 16;
         }
-        check_hash::<8>(&mut buffers, len, counter, 992, shared);
+        check_hash::<8>(&mut buffers, len, counter, &mut digits, shared);
     }
 }
 
@@ -50,23 +53,36 @@ fn check_hash<const N: usize>(
     buffers: &mut [[u8; 64]],
     len: usize,
     counter: u32,
-    offset: u32,
-    shared: &Shared
+    digits: &mut (u8, u8, u8),
+    shared: &Atomics
 ) where LaneCount<N>: SupportedLaneCount {
-    for (i, buffer) in buffers.iter_mut().enumerate() {
-        let n = offset + i as u32;
-        buffer[len - 3] = b'0' + (n / 100) as u8;
-        buffer[len - 2] = b'0' + ((n / 10) % 10) as u8;
-        buffer[len - 1] = b'0' + (n % 10) as u8;
+    for buffer in buffers.iter_mut().take(N) {
+        buffer[len - 3] = digits.0;
+        buffer[len - 2] = digits.1;
+        buffer[len - 1] = digits.2;
+        increment(digits);
     }
-    let result = multiple_hash::<N>(buffers, len).0;
+    let result = simd_hash::<N>(buffers, len).0;
 
     for (i, res) in result.iter().enumerate() {
         if res & 0xffffff00 == 0 {
-            shared.p2.fetch_min(counter + offset + i as u32, Ordering::Relaxed);
+            shared.p2.fetch_min(counter + i as u32, Ordering::Relaxed);
             shared.done.store(true, Ordering::Relaxed);
         } else if result[i] & 0xfffff000 == 0 {
-            shared.p1.fetch_min(counter + offset + i as u32, Ordering::Relaxed);
+            shared.p1.fetch_min(counter + i as u32, Ordering::Relaxed);
         }       
     }
+}
+
+fn increment((a, b, c): &mut (u8, u8, u8)) {
+    *c += 1;
+    if * c > b'9' {
+        *c = b'0';
+        *b += 1;
+        if *b > b'9' {
+            *b = b'0';
+            *a += 1;
+        }
+    }
+
 }

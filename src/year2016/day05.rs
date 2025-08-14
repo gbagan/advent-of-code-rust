@@ -2,9 +2,9 @@ use std::sync::Mutex;
 use std::thread;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::simd::{LaneCount, SupportedLaneCount};
-use crate::util::md5::multiple_hash;
+use crate::util::md5::simd_hash;
 
-pub struct Shared {
+pub struct Atomics {
     done: AtomicBool,
     counter: AtomicU32,
 }
@@ -14,18 +14,20 @@ struct Exclusive {
     mask: u8,
 }
 
+// todo: manage the first 1000
+
 pub fn solve(input: &str) -> (String, String) {
     let input = input.trim();
-    let shared = Shared {
+    let atomics = Atomics {
         done: AtomicBool::new(false),
-        counter: AtomicU32::new(100),
+        counter: AtomicU32::new(1000),
     };
 
     let mutex = Mutex::new(Exclusive { hashes: vec![], mask: 0 });
 
     thread::scope(|scope| {
         for _ in 0..thread::available_parallelism().unwrap().get() {
-            scope.spawn(|| worker(input, &shared, &mutex));
+            scope.spawn(|| worker(input, &atomics, &mutex));
         }
     });
 
@@ -48,38 +50,49 @@ pub fn solve(input: &str) -> (String, String) {
     (p1, p2)
 }
 
-fn worker(input: &str, shared: &Shared, mutex: &Mutex<Exclusive>) {
-    while !shared.done.load(Ordering::Relaxed) {
-        let counter = shared.counter.fetch_add(1000, Ordering::Relaxed);
+fn worker(input: &str, atomics: &Atomics, mutex: &Mutex<Exclusive>) {
+    while !atomics.done.load(Ordering::Relaxed) {        
+        let mut counter = atomics.counter.fetch_add(1000, Ordering::Relaxed);
         let string = format!("{input}{counter}");
         let len = string.len();
+
         let mut buffer = [0; 64];
         buffer[0..len].copy_from_slice(string.as_bytes());
         let mut buffers = [buffer; 16];
 
-        for i in (0..992).step_by(16) {
-            check::<16>(&mut buffers, len, counter, i, shared, mutex);
+        let mut digits = (b'0', b'0', b'0');
+
+        for _ in 0..992/16 {
+            for buffer in buffers.iter_mut() {
+                buffer[len - 3] = digits.0;
+                buffer[len - 2] = digits.1;
+                buffer[len - 1] = digits.2;
+                increment(&mut digits);
+            }
+
+            check::<16>(&mut buffers, len, counter, atomics, mutex);
+            counter += 16;
         }
-        check::<8>(&mut buffers, len, counter, 992, shared, mutex);
+        for buffer in buffers.iter_mut().take(8) {
+            buffer[len - 3] = digits.0;
+            buffer[len - 2] = digits.1;
+            buffer[len - 1] = digits.2;
+            increment(&mut digits);
+        }
+        check::<8>(&mut buffers, len, counter, atomics, mutex);
     }
 }
 
-fn check<const N: usize>(buffers: &mut [[u8; 64]], len: usize, counter: u32, offset: u32, shared: &Shared, mutex: &Mutex<Exclusive>)
+fn check<const N: usize>(buffers: &mut [[u8; 64]], len: usize, counter: u32, shared: &Atomics, mutex: &Mutex<Exclusive>)
 where LaneCount<N>: SupportedLaneCount {
-    for (i, buffer) in buffers.iter_mut().enumerate() {
-        let n = offset + i as u32;
-        buffer[len - 3] = b'0' + (n / 100) as u8;
-        buffer[len - 2] = b'0' + ((n / 10) % 10) as u8;
-        buffer[len - 1] = b'0' + (n % 10) as u8;
-    }
-    let result = multiple_hash::<N>(buffers, len).0;
+    let result = simd_hash::<N>(buffers, len).0;
 
     for (i, res) in result.iter().enumerate() {
         if res & 0xfffff000 == 0 {
             let mut exclusive = mutex.lock().unwrap();
-            let sixth = ((result[i] >> 8) & 0xf) as u8;
-            let seventh = ((result[i] >> 4) & 0xf) as u8;
-            exclusive.hashes.push((counter + offset + i as u32, sixth, seventh));
+            let sixth = ((res >> 8) & 0xf) as u8;
+            let seventh = ((res >> 4) & 0xf) as u8;
+            exclusive.hashes.push((counter + i as u32, sixth, seventh));
             if sixth <= 7 {
                 exclusive.mask |= 1 << sixth;
 
@@ -87,6 +100,18 @@ where LaneCount<N>: SupportedLaneCount {
                     shared.done.store(true, Ordering::Relaxed);
                 }
             }
+        }
+    }
+}
+
+fn increment((a, b, c): &mut (u8, u8, u8)) {
+    *c += 1;
+    if * c > b'9' {
+        *c = b'0';
+        *b += 1;
+        if *b > b'9' {
+            *b = b'0';
+            *a += 1;
         }
     }
 }
