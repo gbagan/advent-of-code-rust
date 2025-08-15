@@ -70,6 +70,8 @@ On a laptop with a Intel Core i7-11850H processor.
 | [25](https://adventofcode.com/2023/day/25) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day25.rs) | 112 μs | | | |
  | Total |     | 8 ms | | | |
 
+*Year 2021*
+
 | Day   | Source | Benchmark | Thread | SIMD | unsafe |
 |:--------:|:--------:|:------:|:--------:|:-----:|:------:|
 | [1](https://adventofcode.com/2021/day/1) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2021/day01.rs) | 5.4 μs | | | |
@@ -89,8 +91,8 @@ On a laptop with a Intel Core i7-11850H processor.
 | [15](https://adventofcode.com/2021/day/15) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2021/day15.rs) | 2837 μs | | | |
 | [16](https://adventofcode.com/2021/day/16) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2021/day16.rs) | 2 μs | | | |
 | [17](https://adventofcode.com/2021/day/17) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2021/day17.rs) | 6 μs | | | |
-| [18](https://adventofcode.com/2021/day/18) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2021/day18.rs) | 441 μs | | | |
-| [19](https://adventofcode.com/2021/day/19) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2021/day19.rs) | 514 μs | | | |
+| [18](https://adventofcode.com/2021/day/18) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2021/day18.rs) | 441 μs |✓ | | |
+| [19](https://adventofcode.com/2021/day/19) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2021/day19.rs) | 514 μs |✓ | | |
 | [20](https://adventofcode.com/2021/day/20) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2021/day20.rs) | 1446 μs | | | |
 | [21](https://adventofcode.com/2021/day/21) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2021/day21.rs) | 164 μs | | | |
 | [22](https://adventofcode.com/2021/day/22) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2021/day22.rs) | 890 μs | | | |
