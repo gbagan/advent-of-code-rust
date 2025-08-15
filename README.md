@@ -42,7 +42,7 @@ On a laptop with a Intel Core i7-11850H processor.
 *Year 2023*
 
 | Day   | Solution | Benchmark |
-|:--------|:--------:|:------:|
+|:--------:|:--------:|:------:|
 | [1](https://adventofcode.com/2023/day/1) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day01.rs) | 56 μs |
 | [2](https://adventofcode.com/2023/day/2) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day02.rs) | 2 μs |
 | [3](https://adventofcode.com/2023/day/3) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2023/day03.rs) | 69 μs |
