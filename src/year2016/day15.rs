@@ -1,5 +1,4 @@
-use itertools::Itertools;
-use crate::util::{math::chinese_remainder2, parser::*};
+use crate::util::{math::chinese_remainder2, iter::*, parser::*};
 
 pub fn solve(input: &str) -> (i64, i64) {
     let pairs: Vec<_> = input

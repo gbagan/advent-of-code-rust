@@ -1,5 +1,4 @@
-use itertools::Itertools;
-use crate::util::parser::*;
+use crate::util::{iter::*, parser::*};
 
 pub fn solve(input: &str) -> (i32, usize) {
     let (x, _, _, _, y, z, t) = input.iter_signed::<i32>().next_tuple().unwrap();

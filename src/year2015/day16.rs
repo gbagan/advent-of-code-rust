@@ -1,5 +1,4 @@
-use itertools::Itertools;
-use crate::util::parser::*;
+use crate::util::{iter::*, parser::*};
 
 pub struct Aunt {
     number: u32,
@@ -11,7 +10,7 @@ fn parse_aunt(line: &str) -> Aunt {
     let (_, number) = words.next_tuple().unwrap();
     let number = number.try_unsigned().unwrap();
     let mut compounds = Vec::new();
-    while let Some((compound, nbr)) = words.next_tuple() {
+    for (compound, nbr) in words.tuples() {
         let compound = compound.trim_end_matches(':');
         let nbr = nbr.try_unsigned().unwrap();
         compounds.push((to_index(compound.as_bytes()) , nbr));

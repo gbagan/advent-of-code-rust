@@ -1,6 +1,5 @@
 use ahash::{HashMap, HashMapExt};
-use itertools::Itertools;
-use crate::util::{coord::Coord3, parser::*};
+use crate::util::{coord::*, iter::*, parser::*};
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
 struct Particle {

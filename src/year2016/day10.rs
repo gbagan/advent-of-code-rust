@@ -1,7 +1,6 @@
 //use ahash::{HashMap, HashMapExt};
 use nohash_hasher::IntMap;
-use itertools::Itertools;
-use crate::util::parser::*;
+use crate::util::{iter::*, parser::*};
 
 struct Bot<'a> {
     low: (&'a str, u32), 

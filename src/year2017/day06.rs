@@ -1,4 +1,3 @@
-use itertools::iterate;
 use crate::util::{iter::*, parser::*};
 
 const SPREAD: [u64; 16] = [

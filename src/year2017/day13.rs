@@ -1,7 +1,6 @@
 use arrayvec::ArrayVec;
-use itertools::Itertools;
 use num_integer::Integer;
-use crate::util::parser::*;
+use crate::util::{iter::*, parser::*};
 
 pub fn solve(input: &str) -> (i32, i32) {
     let mut pairs: Vec<(i32, i32)> = input.iter_unsigned().tuples().collect();

@@ -1,6 +1,5 @@
 use ahash::{HashMap, HashMapExt};
-use itertools::Itertools;
-use crate::util::parser::*;
+use crate::util::{iter::*, parser::*};
 
 type Workflows<'a> = HashMap<&'a [u8], Vec<Step<'a>>>;
 

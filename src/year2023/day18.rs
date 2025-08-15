@@ -1,7 +1,6 @@
 // shoelace formula and Pick theorem
 
-use itertools::Itertools;
-use crate::util::coord::Coord;
+use crate::util::{coord::*, iter::*};
 
 type Point = Coord<i32>;
 

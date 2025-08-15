@@ -1,6 +1,5 @@
 use ahash::{HashMap, HashMapExt};
-use itertools::Itertools;
-use crate::util::foreach_permutation;
+use crate::util::{foreach_permutation, iter::*};
 
 fn parse_line(s: &str) -> (&str, i32, &str) {
     let s = s.trim_end_matches('.');

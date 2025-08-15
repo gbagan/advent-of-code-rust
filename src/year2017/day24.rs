@@ -1,5 +1,4 @@
-use crate::util::parser::*;
-use itertools::Itertools;
+use crate::util::{iter::*, parser::*};
 
 #[derive(Clone, Copy)]
 struct Edge {

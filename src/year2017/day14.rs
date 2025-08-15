@@ -56,7 +56,7 @@ fn part2(hashes: &[[u8;16]]) -> usize {
                     continue;
                 }
                 seen[current] = true;
-                for next in current.adjacent() {
+                for next in current.adjacent4() {
                     if grid.contains(next) && grid[next] {
                         stack.push(next);
                     }

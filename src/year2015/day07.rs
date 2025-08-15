@@ -1,5 +1,5 @@
+use crate::util::iter::*;
 use ahash::{HashMap, HashMapExt};
-use itertools::Itertools;
 
 #[derive(Clone, Copy)]
 enum Op {

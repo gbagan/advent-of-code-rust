@@ -1,6 +1,5 @@
-use itertools::Itertools;
 use ordered_float::OrderedFloat;
-use crate::util::{math::solve_linear_system, parser::*};
+use crate::util::{iter::*, math::solve_linear_system, parser::*};
 
 struct Hailstone {
     px: i64,

@@ -1,6 +1,5 @@
 use crate::util::grid::Grid;
 use crate::util::coord::Coord;
-use itertools::Itertools;
 use std::str;
 
 pub fn solve(input: &str) -> (u32, u32) {
@@ -49,7 +48,7 @@ pub fn solve(input: &str) -> (u32, u32) {
                 let p = Coord::new(x, y);
                 adj_numbers.clear();
                 adj_numbers.extend(
-                    p.surrounding()
+                    p.adjacent8()
                      .iter()
                      .filter_map(|&p| number_grid[p])
                 );
@@ -79,10 +78,10 @@ fn bytes_to_int(bytes: &[u8]) -> u32 {
 }
 
 fn part_member(grid: &Grid<u8>, y: i64, x1: i64, x2: i64, i: usize) -> Option<u32> {
-    let it_x = (x1-1).max(0)..(x2+2).min(grid.height as i64);
+    let mut it_x = (x1-1).max(0)..(x2+2).min(grid.height as i64);
     let it_y = (y-1).max(0)..(y+2).min(grid.height as i64);
-    let test = it_x.cartesian_product(it_y).any(|(x, y)| is_symbol(grid[(x, y)]));
-    if test {
+    
+    if it_x.any(|x| it_y.clone().any(|y| is_symbol(grid[(x, y)]))) {
         let i2 = i - (x2 - x1 + 1) as usize;
         Some(bytes_to_int(&grid.vec[i2..i]))
     } else {

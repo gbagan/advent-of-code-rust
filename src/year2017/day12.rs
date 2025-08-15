@@ -2,10 +2,9 @@
 
 use crate::util::parser::*;
 use arrayvec::ArrayVec;
-use itertools::Itertools;
 
 pub fn solve(input: &str) -> (u32, u32) {
-    let graph = input.lines().map(parse_node).collect_vec();
+    let graph: Vec<_> = input.lines().map(parse_node).collect();
     let n = graph.len();
     let mut p1 = 0;
     let mut p2 = 0;

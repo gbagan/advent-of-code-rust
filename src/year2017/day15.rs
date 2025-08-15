@@ -1,5 +1,4 @@
-use itertools::iterate;
-use crate::util::{parser::*, power};
+use crate::util::{iter::*, parser::*, power};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Mutex;
 use std::thread;

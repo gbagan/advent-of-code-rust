@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use crate::util::parser::*;
 
 pub fn solve(input: &str) -> (i32, String) {
@@ -20,16 +19,13 @@ pub fn solve(input: &str) -> (i32, String) {
         .map(|(i, v)| (i+1) as i32 * v)
         .sum();
 
-    let mut p2 = values
-        .chunks_exact(40)
-        .map(|chunk|
-            chunk
-                .iter()
-                .enumerate()
-                .map(|(i, &c)| draw_pixel(i, c))
-                .collect::<String>()
-        ).join("\n");
-    p2.insert(0, '\n');
+    let mut p2 = String::new();
+    for chunk in values.chunks_exact(40) {
+        p2.push('\n');
+        for (i, &c) in chunk.iter().enumerate() {
+            p2.push(draw_pixel(i, c));
+        }
+    }
 
     (p1, p2)
 }

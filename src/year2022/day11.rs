@@ -1,6 +1,5 @@
-use itertools::Itertools;
 use num_integer::Integer;
-use crate::util::{parallel::*, parser::*};
+use crate::util::{iter::*, parallel::*, parser::*};
 use std::sync::Mutex;
 
 pub enum Operation {

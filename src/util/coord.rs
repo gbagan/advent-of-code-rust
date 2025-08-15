@@ -13,7 +13,7 @@ pub struct Coord<A> {
     pub x: A,
 }
 
-impl<A: Copy + Ord + Integer + ConstOne> Coord<A> {
+impl<A: Copy + Integer + ConstOne> Coord<A> {
     #[inline]
     pub fn new(x: A, y: A) -> Coord<A> {
         Coord { x, y }
@@ -22,14 +22,6 @@ impl<A: Copy + Ord + Integer + ConstOne> Coord<A> {
     pub fn manhattan(&self, other: Self) -> A {
         distance(self.x, other.x) +  distance(self.y, other.y)
     }
-
-    /*
-    pub const ORIGIN: Coord = Coord { x: 0, y: 0 };
-    pub const NORTH: Coord = Coord { x: 0, y: -1 };
-    pub const SOUTH: Coord = Coord { x: 0, y: 1 };
-    pub const WEST: Coord = Coord { x: -1, y: 0 };
-    pub const EAST: Coord = Coord { x: 1, y: 0 };
-    */
 
     #[inline]
     pub fn left(&self) -> Self {
@@ -52,8 +44,8 @@ impl<A: Copy + Ord + Integer + ConstOne> Coord<A> {
     }
 
     #[inline]
-    pub fn adjacent(&self) -> Vec<Self> {
-        vec!( self.left(), self.right(), self.above(), self.below())
+    pub fn adjacent4(&self) -> [Self; 4] {
+        [self.left(), self.right(), self.above(), self.below()]
     }
 }
 
@@ -69,10 +61,10 @@ impl<A: Copy + Ord + Integer + Signed + ConstOne> Coord<A> {
     }
 
     #[inline]
-    pub fn surrounding(&self) -> Vec<Self> {
+    pub fn adjacent8(&self) -> [Self; 8] {
         let left = self.left();
         let right = self.right();
-        vec!(left, right, self.above(), self.below(), left.above(), left.below(), right.above(), right.below())
+        [left, right, self.above(), self.below(), left.above(), left.below(), right.above(), right.below()]
     }
 }
 

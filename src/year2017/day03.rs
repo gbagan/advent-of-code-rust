@@ -22,7 +22,7 @@ fn part1(n: u32) -> u32 {
 }
 
 fn fill(grid: &HashMap<Point,u32>, position: &Point) -> u32 {
-    position.surrounding().iter().filter_map(|a| grid.get(a)).sum()
+    position.adjacent8().iter().filter_map(|a| grid.get(a)).sum()
 }
 
 fn part2(n: u32) -> u32 {

@@ -1,5 +1,4 @@
-use itertools::Itertools;
-use crate::util::{parser::*, range::Range};
+use crate::util::{iter::*, parser::*, range::Range};
 
 pub fn solve(input: &str) -> (u32, u32) {
     let mut p1 = 0;

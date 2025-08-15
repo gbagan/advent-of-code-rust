@@ -1,6 +1,5 @@
 use std::array::from_fn;
-use itertools::Itertools;
-use crate::util::parser::*;
+use crate::util::{iter::*, parser::*};
 
 struct Transition {
     write: bool,

@@ -1,6 +1,5 @@
 use ahash::{HashSet, HashSetExt};
-use itertools::Itertools;
-use crate::util::{coord::Coord, parser::*, range::Range};
+use crate::util::{coord::*, parser::*, range::*};
 
 struct Scan {
     sensor: Coord<i32>,

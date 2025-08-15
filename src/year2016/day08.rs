@@ -1,5 +1,4 @@
-use itertools::Itertools;
-use crate::util::{coord::Coord, grid::Grid, parser::*};
+use crate::util::{coord::Coord, grid::Grid, iter::*, parser::*};
 
 type Pixel = Coord<i32>;
 

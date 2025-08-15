@@ -1,6 +1,5 @@
 use ahash::{HashMap, HashMapExt};
-use itertools::Itertools;
-use crate::util::{foreach_permutation, parser::*};
+use crate::util::{foreach_permutation, iter::*, parser::*};
 
 fn parse_line(s: &str) -> (&str, &str, u32) {
     let (city1, _, city2, _, dist) = s.split(' ').next_tuple().unwrap();
@@ -46,7 +45,7 @@ pub fn solve(input: &str) -> (u32, u32) {
         let mut sum = table[perm[0]];
         let mut min = sum;
         let mut max = sum; 
-        for (i, j) in perm.iter().tuple_windows() {
+        for [i, j] in perm.array_windows() {
             let edge = table[i*n+j];
             sum += edge;
             min = min.min(edge);

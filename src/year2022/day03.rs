@@ -1,4 +1,4 @@
-use itertools::Itertools;
+use crate::util::iter::*;
 
 pub fn solve(input: &str) -> (u32, u32) {
     let lines: Vec<_> = input.lines().map(str::as_bytes).collect();

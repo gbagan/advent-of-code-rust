@@ -1,5 +1,4 @@
-use itertools::Itertools;
-use crate::util::parser::*;
+use crate::util::{iter::*, parser::*};
 
 pub fn solve(input: &str) -> (String, String) {
     let (input1, input2) = input.split_once("\n\n").unwrap();

@@ -1,5 +1,4 @@
-use crate::util::parser::*;
-use itertools::Itertools;
+use crate::util::{iter::*, parser::*};
 
 pub fn solve(input: &str) -> (usize, usize) {
     let numbers: Vec<_> = input.iter_unsigned().collect();

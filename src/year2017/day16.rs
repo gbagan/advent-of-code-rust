@@ -1,5 +1,4 @@
-use itertools::Itertools;
-use crate::util::parser::*;
+use crate::util::{iter::*, parser::*};
 use crate::util::permutation::Permutation;
 use crate::util::power;
 

@@ -1,5 +1,4 @@
-use itertools::Itertools;
-use crate::util::{grid::Grid, parser::*};
+use crate::util::{grid::*, iter::*, parser::*};
 
 fn parse_line(line: &str) -> Vec<(usize, usize)> {
     line.iter_unsigned().tuples().collect()

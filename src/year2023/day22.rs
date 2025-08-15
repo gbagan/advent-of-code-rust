@@ -2,8 +2,7 @@
 // https://en.wikipedia.org/wiki/Dominator_(graph_theory)
 
 use ahash::{HashMap, HashMapExt};
-use itertools::Itertools;
-use crate::util::{coord::Coord3, grid::Grid, parser::*};
+use crate::util::{coord::*, grid::*, iter::*, parser::*};
 
 type Dominators = Vec<(usize, u32)>;
 
