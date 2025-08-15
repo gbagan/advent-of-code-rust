@@ -1,5 +1,5 @@
 use ahash::{HashSet, HashSetExt};
-use crate::util::{coord::*, parser::*, range::*};
+use crate::util::{coord::*, iter::*, parser::*, range::*};
 
 struct Scan {
     sensor: Coord<i32>,
@@ -20,7 +20,7 @@ pub fn solve(input: &str) -> (i32, u64) {
         .collect();
 
     let p1 = part1(&scans);
-    let p2 = part2(&scans).unwrap();
+    let p2 = part2(&scans);
     (p1, p2)
     
 }
@@ -64,7 +64,7 @@ fn is_not_detected(point: Coord<i32>, scans: &[Scan]) -> bool {
     )
 }
 
-fn part2(scans: &[Scan]) -> Option<u64> {
+fn part2(scans: &[Scan]) -> u64 {
     let range = 0..4_000_000;
     let mut top = HashSet::new();
     let mut left = HashSet::new();
@@ -77,18 +77,16 @@ fn part2(scans: &[Scan]) -> Option<u64> {
         right.insert(sensor.x - sensor.y + distance + 1);
     }
     
-    let xs: Vec<_> = left.intersection(&right).collect();
-    let ys: Vec<_> = top.intersection(&bottom).collect();
+    let xs: Vec<_> = left.intersection(&right).copied().collect();
+    let ys: Vec<_> = top.intersection(&bottom).copied().collect();
 
-    let point =
-            xs
-            .iter()
-            .cartesian_product(&ys)
-            .map(|(&&x, &&y)| Coord::new((x + y) / 2, (y - x) / 2))
-            .find(|p|
-                range.contains(&p.x)
-                && range.contains(&p.y)
-                && is_not_detected(*p, scans)
-            )?;
-    Some(point.x as u64 * 4_000_000 + point.y as u64)
+    for x in xs {
+        for &y in &ys {
+            let p = Coord::new((x + y) / 2, (y - x) / 2);
+            if range.contains(&p.x) && range.contains(&p.y) && is_not_detected(p, scans) {
+                return p.x as u64 * 4_000_000 + p.y as u64
+            }
+        }
+    }
+    unreachable!();
 }

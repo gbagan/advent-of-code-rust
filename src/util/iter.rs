@@ -65,6 +65,16 @@ pub trait AOCIter: Iterator+Sized {
         None
     }
 
+    fn minmax(mut self) -> Option<(Self::Item, Self::Item)> where Self::Item: Ord+Copy {
+        let Some(mut min) = self.by_ref().next() else { return None };
+        let mut max = min;
+        for x in self {
+            min = min.min(x);
+            max = max.max(x);
+        }
+        Some((min, max))
+    }
+
     fn with_putback(self) -> WithPutBack<Self::Item, Self> {
         WithPutBack { iter: self, back: Vec::new() }
     }

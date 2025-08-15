@@ -1,6 +1,5 @@
 use ahash::{HashMap, HashMapExt};
-use itertools::{Itertools, MinMaxResult};
-use crate::util::parser::*;
+use crate::util::{iter::*, parser::*};
 
 struct Node<'a> {
     id: &'a str,
@@ -9,7 +8,7 @@ struct Node<'a> {
     children: Vec<usize>,
 }
 
-pub fn solve(input: &str) -> (String, u32) {
+pub fn solve(input: &str) -> (&str, u32) {
     let raw_nodes: Vec<_> = input.lines().map(parse_line).collect();
     let mut tree = Vec::with_capacity(raw_nodes.len());
     let mut has_parent = vec![false; raw_nodes.len()];
@@ -27,15 +26,15 @@ pub fn solve(input: &str) -> (String, u32) {
     }
     
     let root = has_parent.iter().position(|b| !b).unwrap();
-    let p1 = tree[root].id.to_string();
+    let p1 = tree[root].id;
     let mut p2 = 0;
 
     let ordering: Vec<usize> = dfs(&tree, root);
-    for node in ordering.iter().rev() {
-        match tree[*node].children.iter().map(|&n| tree[n].total_weight).minmax() {
-            MinMaxResult::MinMax(min, max) if min < max => {
+    for &node in ordering.iter().rev() {
+        match tree[node].children.iter().map(|&n| tree[n].total_weight).minmax() {
+            Some((min, max)) if min < max => {
                 let (mins, maxs): (Vec<usize>, Vec<usize>) =
-                    tree[*node].children.iter().partition(|&n| tree[*n].total_weight == min);
+                    tree[node].children.iter().partition(|&&n| tree[n].total_weight == min);
                 p2 = if mins.len() == 1 {
                     tree[mins[0]].weight + max - min
                 } else {
@@ -44,8 +43,8 @@ pub fn solve(input: &str) -> (String, u32) {
                 break;
             }
             _ => {
-                tree[*node].total_weight +=
-                    tree[*node].children.iter().map(|&n| tree[n].total_weight).sum::<u32>();
+                tree[node].total_weight +=
+                    tree[node].children.iter().map(|&n| tree[n].total_weight).sum::<u32>();
             }
         }
     }

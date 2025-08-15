@@ -13,7 +13,6 @@ overflow-checks = false
 ahash = "0.8.12"
 ansi_term = "0.12.1"
 arrayvec = "0.7.6"
-itertools = "0.13.0"
 memchr = "2.7.5"
 nohash-hasher = "0.2.0"
 num-integer = "0.1.46"
