@@ -11,7 +11,7 @@ On a laptop with a Intel Core i7-11850H processor.
 *Year 2024*
 
 | Day   | Solution | Benchmark | threads | simd | unsafe |
-|:--------|:--------:|:------:|:--------|:--------:|:------:|
+|:--------:|:--------:|:------:|:--------:|:--------:|:------:|
 | [1](https://adventofcode.com/2024/day/1) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2024/day01.rs) | 10 μs | | | ✓|
 | [2](https://adventofcode.com/2024/day/2) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2024/day02.rs) | 25 μs | | | |
 | [3](https://adventofcode.com/2024/day/3) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year2024/day03.rs) | 11 μs | | | |
