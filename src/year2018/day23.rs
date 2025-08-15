@@ -50,7 +50,7 @@ impl Box {
         x + y + z <= bot.radius
     }
 
-    fn min_dist(&self) -> i32 {
+    fn distance_to_origin(&self) -> i32 {
         let x = self.x1.abs().min(self.x2.abs());
         let y = self.y1.abs().min(self.y2.abs());
         let z = self.z1.abs().min(self.z2.abs());
@@ -100,12 +100,12 @@ pub fn solve(input: &str) -> (usize, i32) {
     let p2 = loop {
         let Some((_, cube)) = heap.pop() else { panic!("no solution found")}; 
         if cube.size() == 1 {
-            break cube.min_dist();
+            break cube.distance_to_origin();
         }
         for next in cube.split() {
             let in_range = bots.iter().filter(|nb| next.in_range(nb)).count();
-            let key = (bots.len() - in_range, next.min_dist(), next.size());
-            heap.push(key, next);
+            let priority = (bots.len() - in_range, next.distance_to_origin(), next.size());
+            heap.push(priority, next);
         }
     };
 

@@ -48,7 +48,7 @@ fn apply_effects(state: &mut State) -> bool {
 
 fn dijkstra<const HM: bool>(boss_damage: i16, state: &State) -> i16 {
     let mut queue = MinHeap::new();
-    let mut seen = HashSet::new();
+    let mut seen = HashSet::with_capacity(8000);
     queue.push(0, state.clone());
     
     while let Some((consumed_mana, state)) = queue.pop() {

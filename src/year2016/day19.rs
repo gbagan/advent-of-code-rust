@@ -1,7 +1,7 @@
 use crate::util::parser::*;
 
 pub fn solve(input: &str) -> (u32, u32) {
-    let n = input.try_unsigned::<u32>().unwrap();
+    let n = input.trim().to_unsigned();
     let p1 = part1(n);
     let p2 = part2(n);
     (p1, p2)

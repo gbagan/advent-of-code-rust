@@ -19,6 +19,7 @@ pub fn solve(input: &str) -> (usize, u32) {
     let mut uf = UnionFind::new(LEN);
     let mut ptr = points.data.as_ptr().cast::<u32>();
     let four = u32x16::splat(4);
+    let ff = u32x16::splat(0xff);
     for i in 0..LEN {
         let point: i8x64 = unsafe { transmute(u32x16::splat(*ptr)) };
         let i2 = i & !15;
@@ -27,10 +28,10 @@ pub fn solve(input: &str) -> (usize, u32) {
             let dist = (point - unsafe { *ptr2 }).abs();
             let mut dist: u32x16 = unsafe { transmute(dist) };
             dist = dist + (dist >> 8);
-            dist = (dist + (dist >> 16)) & Simd::splat(255);
+            dist = (dist + (dist >> 16)) & ff;
             let mask = dist.simd_lt(four).to_bitmask();
             if mask != 0 {
-                for b in mask.biterator() {
+                for b in mask.bit_iterator() {
                     let k = j + b;
                     if i < k {
                         uf.union(i, k);

@@ -124,8 +124,8 @@ fn dijkstra(matrix: &[[Edge; 30]; 30], robots: u32, missing_keys: u32) -> u32 {
             return total;
         }
 
-        for from in positions.biterator() {
-            for to in missing_keys.biterator() {
+        for from in positions.bit_iterator() {
+            for to in missing_keys.bit_iterator() {
                 let Edge { distance, doors } = matrix[from][to];
 
                 if distance != u32::MAX && missing_keys & doors == 0 {

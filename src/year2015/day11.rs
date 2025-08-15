@@ -1,5 +1,3 @@
-use std::str::from_utf8;
-
 pub fn solve(input: &str) -> (String, String) {
     let pwd = input
         .trim()
@@ -7,9 +5,9 @@ pub fn solve(input: &str) -> (String, String) {
         .try_into()
         .unwrap();
     let pwd = next_password(pwd);
-    let p1 =  from_utf8(&pwd).map(|p| p.to_string()).unwrap();
+    let p1 =  String::from_utf8(pwd.to_vec()).unwrap();
     let pwd = next_password(pwd);
-    let p2 =  from_utf8(&pwd).map(|p| p.to_string()).unwrap();
+    let p2 =  String::from_utf8(pwd.to_vec()).unwrap();
     (p1, p2)
 }
 
