@@ -134,8 +134,8 @@ fn markdown(arg_year: String) {
 
     let mut duration = Duration::ZERO;
 
-    println!("| Day   | Source | Benchmark |");
-    println!("|:--------|:--------:|:------:|");
+    println!("| Day   | Source | Benchmark | Thread | SIMD | unsafe |");
+    println!("|:--------:|:--------:|:------:|:--------:|:-----:|:------:|");
 
     for Solution { year, day, func } in &solutions {
         if arg_year.as_str() != year {
@@ -166,13 +166,13 @@ fn markdown(arg_year: String) {
             let tmp = day.as_bytes();
             let day2 = if tmp[0] == b'0' { (tmp[1] as char).to_string() } else { day.clone() };
 
-            println!("| [{day2}](https://adventofcode.com/{year}/day/{day2}) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year{year}/day{day}.rs) | {text} |");
+            println!("| [{day2}](https://adventofcode.com/{year}/day/{day2}) | [source](https://github.com/gbagan/advent-of-code-rust/blob/master/src/year{year}/day{day}.rs) | {text} | | | |");
         } else {
             eprintln!("{year} Day {day:02}");
             eprintln!("    Missing input!");
         }
     }
-    println!(" | Total |     | {} μs |", duration.as_micros());
+    println!(" | Total |     | {} μs | | | |", duration.as_micros());
 }
 
 
