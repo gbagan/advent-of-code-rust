@@ -1,6 +1,5 @@
 use std::simd::prelude::*;
-use num_integer::Integer;
-use crate::util::parser::*;
+use crate::util::{math::*, parser::*};
 
 pub fn solve(input: &str) -> (i16, u64) {
     let n = input.iter_signed::<i16>().next_chunk::<12>().unwrap();
@@ -61,5 +60,5 @@ fn part2(mut pos: i16x16, mut vel: i16x16) -> u64 {
         }
     }
 
-    2 * x.lcm(&y).lcm(&z)
+    2 * x.lcm(y).lcm(z)
 }

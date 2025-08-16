@@ -1,9 +1,5 @@
 use crate::util::{grid::*, iter::*, parser::*};
 
-fn parse_line(line: &str) -> Vec<(usize, usize)> {
-    line.iter_unsigned().tuples().collect()
-}
-
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 enum Kind {Empty, Rock, Falling, Sand}
@@ -41,6 +37,10 @@ pub fn solve(input: &str) -> (u32, u32) {
     let p2 = p1 + part2(&mut grid);
 
     (p1, p2)
+}
+
+fn parse_line(line: &str) -> Vec<(usize, usize)> {
+    line.iter_unsigned().tuples().collect()
 }
 
 fn fall(grid: &mut Grid<Kind>, counter: &mut u32, index: usize) -> Kind {
