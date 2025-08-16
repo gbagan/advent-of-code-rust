@@ -18,7 +18,7 @@ const fn mk_mask(bits: &[usize]) -> u64 {
 	let mut mask = 0;
 	let mut i = 0;
 	while i < bits.len() {
-		mask |= 1 << 2 * bits[i];
+		mask |= 1 << (2 * bits[i]);
 		i += 1;
 	}
 	mask

@@ -66,7 +66,7 @@ pub trait AOCIter: Iterator+Sized {
     }
 
     fn minmax(mut self) -> Option<(Self::Item, Self::Item)> where Self::Item: Ord+Copy {
-        let Some(mut min) = self.by_ref().next() else { return None };
+        let mut min = self.next()?;
         let mut max = min;
         for x in self {
             min = min.min(x);
@@ -270,11 +270,11 @@ impl<A> WindowTuple for (A, A) where A: Clone {
 
     fn window_from_enumerator(prev: &mut Option<Self::Prev>, it: &mut impl Iterator<Item=<Self as WindowTuple>::Item>) -> Option<Self> {
         if let Some(a) = prev.clone() {
-            let Some(b) = it.next() else { return None };
+            let b = it.next()?;
             *prev = Some(b.clone());
             Some((a, b))
         } else {
-            let Some((a, b)) = Self::from_iterator(it) else { return None };
+            let (a, b) = Self::from_iterator(it)?;
             *prev = Some(b.clone());
             Some((a, b))
         }
@@ -286,7 +286,7 @@ pub struct Tuples<A, I: Iterator<Item=A>, T: Tuple<Item=A>> {
 }
 
 
-impl<'a, A, I, T> Iterator for Tuples<A, I, T> where I: Iterator<Item=A>, T: Tuple<Item=A> {
+impl<A, I, T> Iterator for Tuples<A, I, T> where I: Iterator<Item=A>, T: Tuple<Item=A> {
     type Item = T;
 
     #[inline]
@@ -301,7 +301,7 @@ pub struct TupleWindows<A, I: Iterator<Item=A>, T: WindowTuple<Item=A>> {
     phantom: PhantomData<T>
 }
 
-impl<'a, A, I, T> Iterator for TupleWindows<A, I, T> where I: Iterator<Item=A>, T: WindowTuple<Item=A> {
+impl<A, I, T> Iterator for TupleWindows<A, I, T> where I: Iterator<Item=A>, T: WindowTuple<Item=A> {
     type Item = T;
 
     #[inline]
@@ -314,8 +314,8 @@ impl<'a, A, I, T> Iterator for TupleWindows<A, I, T> where I: Iterator<Item=A>, 
 fn tuples_test() {
     let mut it = (0..5).tuples();
     let (a, b) = it.next().unwrap();
-    assert_eq!(a, 1);
-    assert_eq!(b, 2);
+    assert_eq!(a, 0);
+    assert_eq!(b, 1);
 }
 
 
@@ -410,7 +410,6 @@ pub struct Iterate<A, F> {
 impl<A, F> Iterator for Iterate<A, F> where F: FnMut(&A) -> A, {
     type Item = A;
 
-
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let next_state = (self.f)(&self.state);
@@ -418,11 +417,8 @@ impl<A, F> Iterator for Iterate<A, F> where F: FnMut(&A) -> A, {
     }
 
     #[inline]
-
     fn size_hint(&self) -> (usize, Option<usize>) {
-
         (usize::MAX, None)
-
     }
 
 }

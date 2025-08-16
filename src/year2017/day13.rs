@@ -1,6 +1,5 @@
 use arrayvec::ArrayVec;
-use num_integer::Integer;
-use crate::util::{iter::*, parser::*};
+use crate::util::{iter::*, math::*, parser::*};
 
 pub fn solve(input: &str) -> (i32, i32) {
     let mut pairs: Vec<(i32, i32)> = input.iter_unsigned().tuples().collect();
@@ -40,10 +39,10 @@ fn part2(pairs: &[(i32, i32)]) -> i32 {
     let mut next_sieve = Vec::new();
 
     for (period, forbidden) in forbiddens {
-        let next_lcm = lcm.lcm(&period);
+        let next_lcm = lcm.lcm(period);
         for i in (0..next_lcm).step_by(lcm as usize) {
             for j in &current_sieve {
-                if !forbidden.contains(&(-i - j).mod_floor(&period)) {
+                if !forbidden.contains(&(-i - j).rem_euclid(period)) {
                     next_sieve.push(i + j);
                 }
             }

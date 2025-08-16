@@ -1,5 +1,5 @@
 use ahash::{HashMap, HashMapExt};
-use num_integer::Integer;
+use crate::util::math::*;
 
 pub fn solve(input: &str) -> (usize, usize) {
     let (directions, rest) = input.split_once("\n\n").unwrap();
@@ -31,9 +31,9 @@ pub fn solve(input: &str) -> (usize, usize) {
             counter += 1;
         }
         if current1 == (b'Z', b'Z', b'Z') || current2 == (b'Z', b'Z', b'Z') {
-            p1 = p1.lcm(&counter);
+            p1 = p1.lcm(counter);
         }
-        p2 = p2.lcm(&counter);
+        p2 = p2.lcm(counter);
     }
 
     (p1, p2)

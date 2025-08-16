@@ -104,7 +104,7 @@ fn parse_segments(line: &str) -> (BTreeMap<i32, Segment>, BTreeMap<i32, Segment>
             _  => Point::SOUTH,
         };
         let next = current + delta * length;
-        let segment = Segment { start: current, end: next, distance: distance };
+        let segment = Segment { start: current, end: next, distance };
         if next.y == current.y {
             horizontal.insert(current.y, segment);
         } else {

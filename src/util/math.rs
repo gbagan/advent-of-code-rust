@@ -1,6 +1,5 @@
-use std::ops::{AddAssign, DivAssign, MulAssign};
-use num_integer::Integer;
-use num_traits::{Num, Signed};
+use std::ops::{AddAssign, SubAssign, DivAssign, MulAssign, ShlAssign, ShrAssign};
+use num_traits::{Euclid, Num, PrimInt, Signed};
 
 pub fn solve_linear_system<A, const N: usize>(mat: &[[A; N]]) -> Option<Vec<A>>
 where A: Ord + Num + Signed + Copy + AddAssign + DivAssign
@@ -37,7 +36,7 @@ where A: Ord + Num + Signed + Copy + AddAssign + DivAssign
 
 // Return (g, x, y) such that g is the gcd of a and b
 // and ax + by = gcd(a,b)
-pub fn extgcd<A>(a: A, b: A) -> (A, A, A) where A: Integer + Signed + Copy {
+pub fn extgcd<A>(a: A, b: A) -> (A, A, A) where A: Num + Signed + Copy {
     assert!(!a.is_zero() || !b.is_zero(), "extgcd(0, 0) is undefined");
     let mut x = A::one();
     let mut y = A::zero();
@@ -64,8 +63,37 @@ fn extgcd_test() {
     assert_eq!(a * x + b * y, g);
 }
 
+fn binary_gcd<A>(mut a: A, mut b: A) -> A where  A: PrimInt + SubAssign + ShlAssign<u32> + ShrAssign<u32> {
+    if a.is_zero() { return b };
+    if b.is_zero() { return a };
+
+    let shift = (a | b).trailing_zeros();
+    a >>= a.trailing_zeros();
+    b >>= b.trailing_zeros();
+
+    while a != b {
+        if a > b {
+            a -= b;
+            a >>= a.trailing_zeros();
+        } else {
+            b -= a;
+            b >>= b.trailing_zeros();
+        }
+    }
+    a <<= shift;
+    a
+}
+
+
 pub trait MathInteger {
-    fn modular_inverse(self, m: Self) -> Self where Self: Integer + Signed + Copy  {
+    fn gcd(self, other: Self) -> Self;
+
+    fn lcm(self, other: Self) -> Self where Self: PrimInt + ShlAssign<u32> + ShrAssign<u32> {
+        let gcd = self.gcd(other);
+        self * (other / gcd)
+    }
+    
+    fn modular_inverse(self, m: Self) -> Self where Self: Num + Signed + Copy  {
         let (mut t, mut t1) = (Self::zero(), Self::one());
         let (mut r, mut r1) = (m, self);
 
@@ -82,7 +110,36 @@ pub trait MathInteger {
     }
 }
 
-impl<A: Integer + Signed + Copy> MathInteger for A {}
+macro_rules! unsigned_integer_impl {
+    ($($t:ty)*) => ($(
+        impl MathInteger for $t {
+            fn gcd(self, other: Self) -> Self {
+                binary_gcd(self, other)
+            }
+        }
+    )*)
+}
+
+macro_rules! signed_integer_impl {
+    ($($t:ty)*) => ($(
+        impl MathInteger for $t {
+            fn gcd(self, other: Self) -> Self {
+                let a = self.abs();
+                let b = other.abs();
+                binary_gcd(a, b)
+            }
+        }
+    )*)
+}
+
+unsigned_integer_impl!(u8 u16 u64 u128 usize);
+signed_integer_impl!(i8 i16 i32 i64 i128);
+
+#[test]
+fn gcd_test() {
+    assert_eq!(24.gcd(32), 8);
+}
+
 
 #[test]
 fn modular_inverse_test() {
@@ -97,7 +154,7 @@ fn modular_inverse_test() {
 // It is not necessary that all mi are pairwise coprime
 // returns Nothing if there is no solution
 pub fn chinese_remainder<A>(pairs: &[(A, A)]) -> Option<(A, A)> 
-    where A: Integer + Signed + Copy
+    where A: Num + Euclid + Signed + Copy
 {
     let mut a = A::zero();
     let mut n = A::one();
@@ -110,22 +167,22 @@ pub fn chinese_remainder<A>(pairs: &[(A, A)]) -> Option<(A, A)>
         n = (n * m) / g;
         a = x % n;
     }
-    Some((a.mod_floor(&n), n))
+    Some((a.rem_euclid(&n), n))
 }
 
 
 // same as chinese_remainder but only works if all mi are pairwise coprime
 // faster than chinese_remainder if the mi are small
 pub fn chinese_remainder2<A>(pairs: &[(A, A)]) -> Option<(A, A)> 
-    where A: Integer + Signed + Copy + AddAssign + MulAssign
+    where A: Num + Euclid + Signed + Copy + AddAssign + MulAssign
 {
     if pairs.is_empty() {
         return None
     }
     let (mut a, mut n) = pairs[0];
-    a = a.mod_floor(&n);
+    a = a.rem_euclid(&n);
     for &(b, m) in &pairs[1..] {
-        let b = b.mod_floor(&m);
+        let b = b.rem_euclid(&m);
         while a % m != b {
             a += n;
         }

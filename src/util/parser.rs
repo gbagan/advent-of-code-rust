@@ -1,7 +1,6 @@
 use std::iter::Enumerate;
 use std::marker::PhantomData;
-use num_integer::Integer;
-use num_traits::{ConstZero, Signed};
+use num_traits::{ConstZero, Num, Signed};
 
 
 pub trait Ten {
@@ -23,7 +22,7 @@ pub struct ParseUnsigned<'a, T> {
     phantom: PhantomData<&'a T>,
 }
 
-impl<T: Integer + Ten + From<u8>> Iterator for ParseUnsigned<'_, T> {
+impl<T: Num + Ten + From<u8>> Iterator for ParseUnsigned<'_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -36,7 +35,7 @@ pub struct ParseSigned<'a, T> {
     phantom: PhantomData<&'a T>,
 }
 
-impl<T: Integer + Signed + ConstZero + Ten + From<u8>> Iterator for ParseSigned<'_, T> {
+impl<T: Signed + ConstZero + Ten + From<u8>> Iterator for ParseSigned<'_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -44,11 +43,11 @@ impl<T: Integer + Signed + ConstZero + Ten + From<u8>> Iterator for ParseSigned<
     }
 }
 
-fn to_unsigned<T: Integer + Ten + From<u8>>(bytes: &[u8]) -> T {
+fn to_unsigned<T: Num + Ten + From<u8>>(bytes: &[u8]) -> T {
     bytes.iter().fold(T::zero(), |acc, &n| T::TEN * acc + T::from(n - b'0'))
 }
 
-fn next_unsigned<T: Integer + Ten + From<u8>>(bytes: &mut std::slice::Iter<'_, u8>) -> Option<T> {
+fn next_unsigned<T: Num + Ten + From<u8>>(bytes: &mut std::slice::Iter<'_, u8>) -> Option<T> {
     let mut n = loop {
         let byte = bytes.next()?;
         let digit = byte.wrapping_sub(b'0');
@@ -71,7 +70,7 @@ fn next_unsigned<T: Integer + Ten + From<u8>>(bytes: &mut std::slice::Iter<'_, u
 }
 
 
-fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(bytes: &mut std::slice::Iter<'_, u8>) -> Option<T> {
+fn try_signed<T: Signed + ConstZero + Ten + From<u8>>(bytes: &mut std::slice::Iter<'_, u8>) -> Option<T> {
     let (mut n, negative) = loop {
         let &byte = bytes.next()?;
         if byte == b'-' {
@@ -163,11 +162,11 @@ impl<'a> Iterator for ParseUppercase<'a> {
 }
 
 pub trait ParserIter {
-    fn to_unsigned<T: Integer + Ten + From<u8>>(&self) -> T;
-    fn try_unsigned<T: Integer + Ten + From<u8>>(&self) -> Option<T>;
-    fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T>;
-    fn iter_unsigned<T: Integer + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T>;
-    fn iter_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> ParseSigned<'_, T>;
+    fn to_unsigned<T: Num + Ten + From<u8>>(&self) -> T;
+    fn try_unsigned<T: Num + Ten + From<u8>>(&self) -> Option<T>;
+    fn try_signed<T: Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T>;
+    fn iter_unsigned<T: Num + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T>;
+    fn iter_signed<T: Signed + ConstZero + Ten + From<u8>>(&self) -> ParseSigned<'_, T>;
 }
 
 pub trait WordParserIter {
@@ -176,47 +175,47 @@ pub trait WordParserIter {
 }
 
 impl ParserIter for &[u8] {
-    fn to_unsigned<T: Integer + Ten + From<u8>>(&self) -> T {
+    fn to_unsigned<T: Num + Ten + From<u8>>(&self) -> T {
         to_unsigned(self)
     }
     
-    fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T> {
+    fn try_signed<T: Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T> {
         try_signed(&mut self.iter())
     }
     
-    fn try_unsigned<T: Integer + Ten + From<u8>>(&self) -> Option<T> {
+    fn try_unsigned<T: Num + Ten + From<u8>>(&self) -> Option<T> {
         next_unsigned(&mut self.iter())
     }
 
 
-    fn iter_unsigned<T: Integer + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T> {
+    fn iter_unsigned<T: Num + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T> {
         ParseUnsigned { bytes: self.iter(), phantom: PhantomData }
     }
 
-    fn iter_signed<T: Integer + Signed + Ten + From<u8>>(&self) -> ParseSigned<'_, T> {
+    fn iter_signed<T: Num + Signed + Ten + From<u8>>(&self) -> ParseSigned<'_, T> {
         ParseSigned { bytes: self.iter(), phantom: PhantomData }
     }
 }
 
 impl ParserIter for &str {
-    fn to_unsigned<T: Integer + Ten + From<u8>>(&self) -> T {
+    fn to_unsigned<T: Num + Ten + From<u8>>(&self) -> T {
         to_unsigned(self.as_bytes())
     }
     
-    fn try_signed<T: Integer + Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T> {
+    fn try_signed<T: Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T> {
         try_signed(&mut self.as_bytes().iter())
     }
     
-    fn try_unsigned<T: Integer + Ten + From<u8>>(&self) -> Option<T> {
+    fn try_unsigned<T: Num + Ten + From<u8>>(&self) -> Option<T> {
         next_unsigned(&mut self.as_bytes().iter())
     }
 
 
-    fn iter_unsigned<T: Integer + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T> {
+    fn iter_unsigned<T: Num + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T> {
         ParseUnsigned { bytes: self.as_bytes().iter(), phantom: PhantomData }
     }
 
-    fn iter_signed<T: Integer + Signed + Ten + From<u8>>(&self) -> ParseSigned<'_, T> {
+    fn iter_signed<T: Signed + Ten + From<u8>>(&self) -> ParseSigned<'_, T> {
         ParseSigned { bytes: self.as_bytes().iter(), phantom: PhantomData }
     }
 }

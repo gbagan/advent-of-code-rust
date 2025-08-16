@@ -50,10 +50,7 @@ fn test(machine: &IntCode, x: i64, y: i64) -> bool {
     let mut machine = machine.clone();
     machine.input(x);
     machine.input(y);
-    match machine.run() {
-        Output(1) => true,
-        _ => false
-    }
+    machine.run() == Output(1)
 }
 
 struct Input {

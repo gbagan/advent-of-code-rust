@@ -93,7 +93,7 @@ impl IntCode {
                     let a = self.address(1, mode1);
                     if self.data[a] != 0 {
                         let b = self.address(2, mode2);
-                        self.ip = self.data[b] as usize;
+                        self.ip = self.data[b];
                     } else {    
                         self.ip += 3;
                     }
@@ -102,7 +102,7 @@ impl IntCode {
                     let a = self.address(1, mode1);
                     if self.data[a] == 0 {
                         let b = self.address(2, mode2);
-                        self.ip = self.data[b] as usize;
+                        self.ip = self.data[b];
                     } else {
                         self.ip += 3;
                     }
@@ -123,7 +123,7 @@ impl IntCode {
                 }
                 9 => {
                     let a = self.address(1, mode1);
-                    self.base += self.data[a] as usize;
+                    self.base += self.data[a];
                     self.ip += 2;
                 }
                 99 => return Status::Halt,

@@ -14,14 +14,14 @@ fn divisor_sum(mut n: u32) -> u32 {
     let mut sum = 1;
 
 	let mut factor = |n: &mut u32, m: u32| {
-		if *n % m == 0 {
+		if (*n).is_multiple_of(m) {
 			let mut mult = 1;
             let mut mk = 1;
 			loop {
 				*n /= m;
 				mk *= m;
 				mult += mk;
-                if *n % m != 0 {
+                if !(*n).is_multiple_of(m) {
                     break
                 }
             }

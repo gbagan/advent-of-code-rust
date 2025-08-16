@@ -1,9 +1,8 @@
 use std::ops::{Add,AddAssign,Mul,Neg,Sub, SubAssign};
 use std::iter::Sum;
-use num_integer::Integer;
-use num_traits::{ConstOne, Signed};
+use num_traits::{ConstOne, Num, Signed};
 
-fn distance<A: Integer + Ord>(a: A, b: A) -> A {
+fn distance<A: Num + Ord>(a: A, b: A) -> A {
     if a >= b { a - b } else { b - a} 
 }
 
@@ -13,7 +12,7 @@ pub struct Coord<A> {
     pub x: A,
 }
 
-impl<A: Copy + Integer + ConstOne> Coord<A> {
+impl<A: Copy + Num + Ord + ConstOne> Coord<A> {
     #[inline]
     pub fn new(x: A, y: A) -> Coord<A> {
         Coord { x, y }
@@ -49,7 +48,7 @@ impl<A: Copy + Integer + ConstOne> Coord<A> {
     }
 }
 
-impl<A: Copy + Ord + Integer + Signed + ConstOne> Coord<A> {
+impl<A: Copy + Ord + Signed + ConstOne> Coord<A> {
     #[inline]
     pub fn turn_left(&self) -> Self {
         Coord { x: self.y, y: -self.x }
@@ -68,7 +67,7 @@ impl<A: Copy + Ord + Integer + Signed + ConstOne> Coord<A> {
     }
 }
 
-impl<A: Integer> Add for Coord<A> {
+impl<A: Num> Add for Coord<A> {
     type Output = Self;
 
     #[inline]
@@ -80,7 +79,7 @@ impl<A: Integer> Add for Coord<A> {
     }
 }
 
-impl<A: Integer + Copy> AddAssign for Coord<A> {
+impl<A: Num + Copy> AddAssign for Coord<A> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
         self.x = self.x + other.x;
@@ -88,7 +87,7 @@ impl<A: Integer + Copy> AddAssign for Coord<A> {
     }
 }
 
-impl<A: Integer + Copy> SubAssign for Coord<A> {
+impl<A: Num + Copy> SubAssign for Coord<A> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
         self.x = self.x - other.x;
@@ -108,7 +107,7 @@ impl<A: Signed> Neg for Coord<A> {
     }
 }
 
-impl<A: Integer + Copy> Mul<A> for Coord<A> {
+impl<A: Num + Copy> Mul<A> for Coord<A> {
     type Output = Self;
 
     #[inline]
@@ -120,7 +119,7 @@ impl<A: Integer + Copy> Mul<A> for Coord<A> {
     }
 }
 
-impl<A: Integer>Sub for Coord<A> {
+impl<A: Num>Sub for Coord<A> {
     type Output = Self;
 
     #[inline]

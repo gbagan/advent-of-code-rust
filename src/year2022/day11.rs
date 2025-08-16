@@ -1,5 +1,4 @@
-use num_integer::Integer;
-use crate::util::{iter::*, parallel::*, parser::*};
+use crate::util::{iter::*, math::*, parallel::*, parser::*};
 use std::sync::Mutex;
 
 pub enum Operation {
@@ -63,7 +62,7 @@ fn part1(monkeys: &[Monkey], items: &[(usize, u64)]) -> u64 {
 fn part2(monkeys: &[Monkey], items: &[(usize, u64)]) -> u64 {
     let mutex = Mutex::new(vec![0; monkeys.len()]);
 
-    let lcm = monkeys.iter().fold(1, |acc, monkey| acc.lcm(&monkey.divided_by));
+    let lcm = monkeys.iter().fold(1, |acc, monkey| acc.lcm(monkey.divided_by));
     
     items.into_par_iter().for_each(|&item| {
         let item_business = simulate_item(monkeys, item, 10_000, |n| n % lcm);

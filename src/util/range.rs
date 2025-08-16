@@ -1,5 +1,4 @@
-use num_integer::Integer;
-use num_traits::ConstOne;
+use num_traits::{ConstOne, Num};
 
 #[derive (PartialEq, Eq, Copy, Clone, Debug)]
 pub struct Range<A> {
@@ -7,7 +6,7 @@ pub struct Range<A> {
     pub upper: A,
 }
 
-impl<A: Integer + Copy + Ord + ConstOne> Range<A> {
+impl<A: Num + Copy + Ord + ConstOne> Range<A> {
     #[inline]
     pub fn new(lower: A, upper: A) -> Self {
         Range { lower, upper }
@@ -84,7 +83,7 @@ impl<A: Integer + Copy + Ord + ConstOne> Range<A> {
 pub trait RangeIter<A>: Iterator<Item=Range<A>> 
     where
         Self: Sized,
-        A: Integer + Ord + Copy + ConstOne {
+        A: Num + Ord + Copy + ConstOne {
     fn disjoint_union(&mut self) -> Vec<Range<A>> {
         let mut ranges: Vec<_> = self.collect();
         ranges.sort_unstable_by_key(|r| r.lower); 
@@ -106,7 +105,7 @@ pub trait RangeIter<A>: Iterator<Item=Range<A>>
     }
 }
 
-impl<A: Ord+Integer+Copy+ConstOne, I: Iterator<Item=Range<A>>> RangeIter<A> for I {}
+impl<A: Ord+Num+Copy+ConstOne, I: Iterator<Item=Range<A>>> RangeIter<A> for I {}
 
 #[test]
 fn length_test () {

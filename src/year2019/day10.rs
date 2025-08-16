@@ -1,5 +1,4 @@
-use num_integer::Integer;
-use crate::util::coord::*;
+use crate::util::{coord::*, math::*};
 use std::cmp::Ordering;
 
 type Point = Coord<i32>;
@@ -29,7 +28,7 @@ fn part1(asteroids: &[Point], width: i32, height: i32) -> (usize, i32) {
     for i in 0..asteroids.len() - 1 {
         for j in i+1..asteroids.len() {
             let mut delta = asteroids[j] - asteroids[i];
-            let gcd = delta.x.gcd(&delta.y).abs();
+            let gcd = delta.x.gcd(delta.y).abs();
             delta.x /= gcd;
             delta.y /= gcd;
             let index = (2 * width * (delta.y + height) + delta.x + width) as usize;
