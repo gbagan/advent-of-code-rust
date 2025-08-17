@@ -1,59 +1,108 @@
-pub fn solve(input: &str) -> (u32, u32) {    
-    let mut grid: Vec<_> = input.lines().map(|line| line.as_bytes()).collect();
-    let width = grid[0].len();
+// assume there are 1000 numbers of 12 bits and no duplicate numbers
+
+use std::simd::prelude::*;
+use crate::util::bits::*;
+
+const N: usize = 1000;
+
+pub fn solve(input: &str) -> (u64, u32) {
+    let mut input = input.as_bytes();
+    
+    assert_eq!(input.len(), 13*N); 
+
+    let one = u8x16::splat(b'1');
+    let mask = u8x16::from_array([
+        0xff, 0xff, 0xff, 0xff,
+        0xff, 0xff, 0xff, 0xff,
+        0xff, 0xff, 0xff, 0xff,
+        0, 0, 0, 0,
+    ]);
+
+    let mut masks = [0u64; 64];
+    let mut counts = i16x16::splat(0);
+    
+    while input.len() >= 16 {
+        let t = u8x16::from_slice(input);
+        let t = (t & mask).simd_eq(one);
+        let value = t.to_bitmask().reverse_bits() >> 52;
+        masks[(value >> 6) as usize] |= 1 << (value & 63);
+
+        counts = counts - t.cast::<i16>().to_int();
+        input = &input[13..];
+    }
+
+    let mut counts = counts.to_array();
+    
+    // last line
+    let mut value = 0;
+    for (i, &c) in input[input.len()-13..input.len()-1].iter().enumerate() {
+        counts[i] += (c == b'1') as i16;
+        value = value << 1 | (c == b'1') as u64;
+    }
+    masks[(value >> 6) as usize] |= 1 << (value & 63);
+
+    // part 1
 
     let mut gamma = 0;
-    let mut epsilon = 0;
-
-    for i in 0..width {
-        let ones = count_ones(&grid, i);
-        let majority = (ones + ones >= grid.len()) as u32;
-        gamma = gamma << 1 | majority;
-        epsilon = epsilon << 1 | (1 - majority);
+    let mut epsilon = 0; 
+    for &n in &counts[..12] {
+        if n >= (N/2) as i16 {
+            gamma = gamma << 1 | 1;
+            epsilon <<= 1;
+        } else {
+            gamma <<= 1;
+            epsilon = epsilon << 1 | 1;
+        }
     }
 
     let p1 = gamma * epsilon;
 
-    let mut grid2 = grid.clone();
-    filter::<true>(&mut grid, width);
-    filter::<false>(&mut grid2, width);
+    // part 2
 
-    let p2 = to_int(grid[0]) * to_int(grid2[0]);
+    let mut numbers = [0; N];
+    let mut i = 0;
+    for (j, &mask) in masks.iter().enumerate() {
+        for k in mask.bit_iterator() {
+            numbers[i] = (j << 6 | k) as u32;
+            i += 1;
+        }
+    }
+
+    let split = search_split(&numbers, 0x800);
+    let first = &numbers[..split];
+    let last = &numbers[split..];
+
+    let o2 = lookup::<true>(if split > 500 { first } else { last });
+    let co2 = lookup::<false>(if split > 500 { last } else { first });
+    let p2 = o2 * co2;
 
     (p1, p2)
 }
 
-#[inline]
-fn count_ones(grid: &[&[u8]], idx: usize) -> usize {
-    grid.iter().filter(|row| row[idx] == b'1').count()
-}
-
-fn to_int(bytes: &[u8]) -> u32 {
-    let mut n = 0;
-    for &b in bytes {
-        n = (2 * n) | (b == b'1') as u32;
-    }
-    n
-}
-
-fn filter<const PART1: bool>(grid: &mut Vec<&[u8]>, width: usize) { 
-    for i in 0..width {
-        let count = count_ones(grid, i);
-        let bit = if PART1 {
-            if count + count >= grid.len() { b'1' } else { b'0' }
+fn search_split(numbers: &[u32], bit: u32) -> usize {
+    let mut start = 0;
+    let mut end = numbers.len();
+    while start + 1 < end {
+        let mid = start.midpoint(end);
+        if numbers[mid] & bit == 0 {
+            start = mid;
         } else {
-            if count + count < grid.len() { b'1' } else { b'0' }
-        };
-        let mut j = 0;
-        while j < grid.len() {
-            if grid[j][i] == bit {
-                j += 1;
-            } else {
-                grid.swap_remove(j);
-            }
-        }
-        if grid.len() == 1 {
-            break;
+            end = mid;
         }
     }
+    end
+}
+
+fn lookup<const O2: bool>(mut numbers: &[u32]) -> u32 {
+    let mut bit = 0x400;
+    while numbers.len() > 1 {
+        let split = search_split(numbers, bit);
+        if (numbers.len() - split < split) == O2 {
+            numbers = &numbers[..split];
+		} else {
+			numbers = &numbers[split..];
+		}
+        bit >>= 1;
+    }
+    numbers[0]
 }

@@ -1,8 +1,7 @@
 use core::hash::Hash;
 use ahash::{HashSet, HashMap, HashMapExt, HashSetExt};
 use std::{marker::PhantomData, ops::AddAssign};
-
-use num_traits::ConstZero;
+use num_traits::{ConstZero, PrimInt};
 
 pub trait AOCIter: Iterator+Sized {
     fn all_distinct(self) -> bool 
@@ -33,7 +32,6 @@ pub trait AOCIter: Iterator+Sized {
         }
         psums
     }
-
 
     fn find_duplicate(self) -> Option<(usize, usize, Self::Item)>
     where
@@ -96,6 +94,18 @@ pub trait AOCIter: Iterator+Sized {
 
 impl<I: Iterator> AOCIter for I {}
 
+pub trait BoolIter: Iterator::<Item=bool>+Sized {
+    #[inline]
+    fn to_bitmask<A>(self) -> A 
+    where
+        A: ConstZero + PrimInt + From<bool>,
+    {
+        self.fold(A::ZERO, |acc, b| acc << 1 | <A as From<bool>>::from(b))
+    }
+        
+}
+
+impl<I: Iterator<Item=bool>> BoolIter for I {}
 
 
 pub trait Tuple: Sized {
