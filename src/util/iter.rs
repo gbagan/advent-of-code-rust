@@ -73,6 +73,19 @@ pub trait AOCIter: Iterator+Sized {
         Some((min, max))
     }
 
+    fn minmax_by_key<A>(mut self, mut f: impl FnMut(&Self::Item) -> A) -> Option<(Self::Item, Self::Item)>
+    where Self::Item: Clone, A: Ord {
+        let first = self.next()?;
+        Some(self.fold((first.clone(), first), |(mut min, mut max), x| {
+            if f(&x) < f(&min) {
+                min = x;
+            } else if f(&x) > f(&max) {
+                max = x;
+            }
+            (min, max)
+        }))
+    }
+
     fn with_putback(self) -> WithPutBack<Self::Item, Self> {
         WithPutBack { iter: self, back: Vec::new() }
     }

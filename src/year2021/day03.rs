@@ -1,7 +1,7 @@
 // assume there are 1000 numbers of 12 bits and no duplicate numbers
 
 use std::simd::prelude::*;
-use crate::util::bits::*;
+use crate::util::{bits::*, iter::BoolIter};
 
 const N: usize = 1000;
 
@@ -43,18 +43,8 @@ pub fn solve(input: &str) -> (u64, u32) {
 
     // part 1
 
-    let mut gamma = 0;
-    let mut epsilon = 0; 
-    for &n in &counts[..12] {
-        if n >= (N/2) as i16 {
-            gamma = gamma << 1 | 1;
-            epsilon <<= 1;
-        } else {
-            gamma <<= 1;
-            epsilon = epsilon << 1 | 1;
-        }
-    }
-
+    let gamma: u64 =  counts[..12].iter().map(|&n| n >= (N/2) as i16).to_bitmask();
+    let epsilon = !gamma & 0xfff;
     let p1 = gamma * epsilon;
 
     // part 2

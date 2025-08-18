@@ -1,4 +1,4 @@
-use crate::util::parser::*;
+use crate::util::{iter::*, parser::*};
 
 const ROWS: [[usize; 5]; 10] = [
     [0, 1, 2, 3, 4],
@@ -23,7 +23,7 @@ pub fn solve(input: &str) -> (u32, u32) {
         inverse_draw[n as usize] = i as u32;
     }
 
-    let mut boards: Vec<_> = numbers
+    let boards: Vec<_> = numbers
         .array_chunks::<25>()
         .map(|b| {
             let b2 = b.map(|i| inverse_draw[i as usize]);
@@ -33,10 +33,8 @@ pub fn solve(input: &str) -> (u32, u32) {
         })
         .collect();
 
-    boards.sort_unstable_by_key(|b| b.1);
+    let (&(p1, _), &(p2, _)) = boards.iter().minmax_by_key(|b| b.1).unwrap();
     
-    let p1 = boards[0].0;
-    let p2 = boards.last().unwrap().0;
     (p1, p2)
 }
 
