@@ -1,14 +1,14 @@
 use num_traits::*;
 
 pub trait Bits<T> {
-    fn bit_iterator(self) -> BitsIterator<T>;
+    fn bits(self) -> BitsIterator<T>;
 }
 
 impl<T> Bits<T> for T
 where
     T: Zero,
 {
-    fn bit_iterator(self) -> BitsIterator<T> {
+    fn bits(self) -> BitsIterator<T> {
         BitsIterator { n: self }
     }
 }

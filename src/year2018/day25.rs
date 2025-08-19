@@ -31,7 +31,7 @@ pub fn solve(input: &str) -> (usize, u32) {
             dist = (dist + (dist >> 16)) & ff;
             let mask = dist.simd_lt(four).to_bitmask();
             if mask != 0 {
-                for b in mask.bit_iterator() {
+                for b in mask.bits() {
                     let k = j + b;
                     if i < k {
                         uf.union(i, k);

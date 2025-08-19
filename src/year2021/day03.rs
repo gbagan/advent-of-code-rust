@@ -52,7 +52,7 @@ pub fn solve(input: &str) -> (u64, u32) {
     let mut numbers = [0; N];
     let mut i = 0;
     for (j, &mask) in masks.iter().enumerate() {
-        for k in mask.bit_iterator() {
+        for k in mask.bits() {
             numbers[i] = (j << 6 | k) as u32;
             i += 1;
         }

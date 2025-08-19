@@ -75,6 +75,7 @@ pub fn solve(input: &str) -> (u32, u32) {
         }
     }
 
+    // Floyd-Warshal
     for k in 0..30 {
         for i in 0..30 {
             for j in 0..30 {
@@ -124,8 +125,8 @@ fn dijkstra(matrix: &[[Edge; 30]; 30], robots: u32, missing_keys: u32) -> u32 {
             return total;
         }
 
-        for from in positions.bit_iterator() {
-            for to in missing_keys.bit_iterator() {
+        for from in positions.bits() {
+            for to in missing_keys.bits() {
                 let Edge { distance, doors } = matrix[from][to];
 
                 if distance != u32::MAX && missing_keys & doors == 0 {

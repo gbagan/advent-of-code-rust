@@ -16,8 +16,8 @@ struct Solution {
 
 macro_rules! solution {
     ($year:tt, $day:tt) => {{
-        let year = stringify!($year).trim_matches(char::is_alphabetic).to_string(); 
-        let day = stringify!($day).trim_matches(char::is_alphabetic).to_string();
+        let year = stringify!($year).strip_prefix("year").unwrap().to_string(); 
+        let day = stringify!($day).strip_prefix("day").unwrap().to_string();
         let func = |input: &String| {
             let instant = Instant::now();
             let (p1, p2) = $year::$day::solve(input);
@@ -401,7 +401,7 @@ fn solutions() -> Vec<Solution> {
         solution!(year2022, day13),
         solution!(year2022, day14),
         solution!(year2022, day15),
-        // solution2!(year2022, day16),
+        solution!(year2022, day16),
         // todo
         solution!(year2022, day18),
         solution!(year2022, day19),
