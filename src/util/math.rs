@@ -121,7 +121,7 @@ pub trait MathInteger {
                 p = (p * x) % modulo;
             }
             x = (x * x) % modulo;
-            i /= 2;
+            i >>= 1;
         }
         p
     }
@@ -212,4 +212,23 @@ pub fn chinese_remainder2<A>(pairs: &[(A, A)]) -> Option<(A, A)>
     }
 
     Some((a, n))
+}
+
+// only works if all mi are pairwise coprime
+pub fn chinese_remainder3<A>(pairs: &[(A, A)]) -> Option<(A, A)> 
+    where A: Num + Euclid + Signed + Copy + MathInteger
+         + std::iter::Sum + std::iter::Product
+{
+    if pairs.is_empty() {
+        return None
+    }
+    let n: A = pairs.iter().map(|p| p.1).product();
+
+    let x: A = pairs.iter().map(|&(ai, ni)| {
+        let qi = n / ni;
+        let mi = qi.modular_inverse(ni);
+        ai * qi * mi
+    }).sum();
+
+    Some((x.rem_euclid(&n), n))
 }
