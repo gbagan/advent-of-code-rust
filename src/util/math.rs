@@ -108,6 +108,23 @@ pub trait MathInteger {
         }
         t
     }
+
+    fn mod_pow(self, n: usize, modulo: Self) -> Self where Self: Num + Copy {
+        if n == 0 {
+            return Self::one();
+        }
+        let mut i = n-1;
+        let mut p = self;
+        let mut x = self;
+        while i > 0 {
+            if !i.is_multiple_of(2) {
+                p = (p * x) % modulo;
+            }
+            x = (x * x) % modulo;
+            i /= 2;
+        }
+        p
+    }
 }
 
 macro_rules! unsigned_integer_impl {
@@ -134,6 +151,11 @@ macro_rules! signed_integer_impl {
 
 unsigned_integer_impl!(u8 u16 u64 u128 usize);
 signed_integer_impl!(i8 i16 i32 i64 i128);
+
+#[test]
+fn mod_pow_test() {
+    assert_eq!(2.mod_pow(4, 9), 7);
+}
 
 #[test]
 fn gcd_test() {
