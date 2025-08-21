@@ -360,6 +360,9 @@ fn solutions() -> Vec<Solution> {
         solution!(year2020, day11),
         solution!(year2020, day12),
         solution!(year2020, day13),
+        solution!(year2020, day14),
+        solution!(year2020, day15),
+        solution!(year2020, day16),
         // todo
         solution!(year2020, day18),
         //todo
