@@ -16,7 +16,7 @@ pub fn solve(input: &str) -> (i64, i64) {
         for line in lines.by_ref() {
             if line.is_empty() { break }
             let (destination, source, length) = line.iter_unsigned().next_tuple().unwrap();
-            let range = Range{lower: source, upper: source+length-1};
+            let range = Range{start: source, end: source+length-1};
             map.push(ShiftRange {range, shift: destination - source});
         }
         maps.push(map)
@@ -59,10 +59,10 @@ fn step2(seeds: &Vec<Range<i64>>, ranges: &Vec<ShiftRange>) -> Vec<Range<i64>> {
 fn part2(seeds: &[i64], maps: &[Vec<ShiftRange>]) -> i64 {
     let mut seeds: Vec<_> = seeds.iter()
                                 .tuples()
-                                .map(|(&lower, &length)| Range {lower, upper: lower+length-1})
+                                .map(|(&lower, &length)| Range {start: lower, end: lower+length-1})
                                 .collect();
     for ranges in maps {
         seeds = step2(&seeds, ranges);
     }
-    seeds.iter().map(|seed| seed.lower).min().unwrap()
+    seeds.iter().map(|seed| seed.start).min().unwrap()
 }

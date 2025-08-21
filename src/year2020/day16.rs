@@ -1,14 +1,13 @@
 // perfect matching
+// assume that there are 20 fields and 20 values per ticket
+// assume that all values are between 0 and 999
 
 use crate::util::{iter::*, parser::*, range::*};
-use arrayvec::ArrayVec;
-
-const N: usize = 20;
 
 struct Field {
     departure: bool,
-    range1: Range<u32>,
-    range2: Range<u32>,
+    range1: Range<usize>,
+    range2: Range<usize>,
 }
 
 impl Field {
@@ -20,100 +19,81 @@ impl Field {
         let range2 = Range::new(c, d);
         Self { departure, range1, range2 }
     }
-
 }
 
-struct Input {
-    fields: ArrayVec<Field, N>,
-    my_ticket: ArrayVec<u32, N>,
-    nearby_tickets: Vec<ArrayVec<u32, N>>,
-    table: [bool; 1000]
+pub fn solve(input: &str) -> (usize, u64) {
+    solve_for::<20>(input)
 }
 
-pub fn solve(input: &str) -> (u32, u64) {
-    let input = parse(input);
-    let p1 = part1(&input);
-    let p2 = part2(&input);
-
-    (p1, p2)
-}
-
-fn parse(input: &str) -> Input {
+fn solve_for<const N: usize>(input: &str) -> (usize, u64) {
     let mut lines = input.lines();
-    //let mut fields = ArrayVec::new();
-    //while let Some(line) = lines.next() && !line.is_empty() {
-    //    fields.push(Field::parse(line));
-    //}
-    let fields: ArrayVec<Field, _> = lines.by_ref().take(N).map(Field::parse).collect();
-    lines.next();
-    lines.next();
-    let my_ticket = lines.next().unwrap().iter_unsigned().collect();
-    lines.next();
-    lines.next();
-    let nearby_tickets = lines.map(|line| line.iter_unsigned().collect()).collect();
-
-    let mut table = [false; 1000];
     
-    for field in &fields {
-        for i in field.range1.lower..field.range1.upper {
-            table[i as usize] = true;
-        }
-        for i in field.range2.lower..field.range2.upper {
-            table[i as usize] = true;
-        }
+    let fields: [Field; N] = std::array::from_fn(|_| Field::parse(lines.next().unwrap()));
+    
+    // the i-th bit of field_masks[val] is 1 iff val is a valid value for the i-th field.
+    let mut field_masks = [0; 1000];
+    for (i, field) in fields.iter().enumerate() {
+        field_masks[field.range1.start] += 1 << i;
+        field_masks[field.range1.end+1] -= 1 << i;
+        field_masks[field.range2.start] += 1 << i;
+        field_masks[field.range2.end+1] -= 1 << i;
+    }
+    // partial sum
+    let mut sum = 0;
+    for mask in &mut field_masks {
+        sum += *mask;
+        *mask = sum;
     }
 
-    Input { fields, my_ticket, nearby_tickets, table }
-}
 
-fn part1(input: &Input) -> u32 {
+    lines.next();
+    lines.next();
+    let line = lines.next().unwrap();
+    let mut it = line.iter_unsigned::<u32>();
+    let my_ticket: [u32; N] = std::array::from_fn(|_| it.next().unwrap());
+    lines.next();
+    lines.next();
+
     let mut p1 = 0;
+    let mut ticket_masks = [(1u32 << N) - 1; 20];
 
-    for ticket in &input.nearby_tickets {
-        for &value in ticket {
-            if !input.table[value as usize] {
-                p1 += value;
+    for line in lines {
+        let mut iter = line.iter_unsigned();
+        let values: [usize; 20] = std::array::from_fn(|_| iter.next().unwrap());
+        
+        let mut valid_ticket = true;
+
+        for &val in &values {
+            if field_masks[val] == 0 {
+                valid_ticket = false;
+                p1 += val;
             }
         }
-    }
 
-    p1
-}
-
-fn part2(input: &Input) -> u64 {
-    let good_tickets: Vec<_> = input.nearby_tickets
-        .iter()
-        .filter(|ticket| ticket.iter().all(|&v| input.table[v as usize]))
-        .collect();
-
-    let matched = |i: usize, j: usize| {
-        let field = &input.fields[i];
-        good_tickets.iter().all(|&ticket| {
-            field.range1.contains(ticket[j]) || field.range2.contains(ticket[j])
-        })
-    };
-
-    let mut graph = [0u32; N];
-    for (i, mask) in graph.iter_mut().enumerate() {
-        for j in 0..N {
-            *mask |= (matched(i, j) as u32) << j;
+        if valid_ticket {
+            for (i, val) in values.into_iter().enumerate() {
+                ticket_masks[i] &= field_masks[val];
+            }
         }
+
     }
 
     // perfect matching
 
     let mut matching = [0; N];
     for _ in 0..N {
-        let i = graph.iter().position(|mask| mask.count_ones() == 1).unwrap();
-        let mask = graph[i];
-        matching[i] = mask.trailing_zeros() as usize;
-        for mask2 in &mut graph {
+        let i = ticket_masks.iter().position(|mask| mask.count_ones() == 1).unwrap();
+        let mask = ticket_masks[i];
+        matching[mask.trailing_zeros() as usize] = i;
+        for mask2 in &mut ticket_masks {
             *mask2 &= !mask;
         }
     }
 
-    (0..N)
-        .filter(|&i| input.fields[i].departure)
-        .map(|i| input.my_ticket[matching[i]] as u64)
-        .product()
+    let p2 = (0..N)
+        .filter(|&i| fields[i].departure)
+        .map(|i| my_ticket[matching[i]] as u64)
+        .product();
+
+    (p1, p2)
 }

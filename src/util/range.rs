@@ -2,54 +2,54 @@ use num_traits::{ConstOne, Num};
 
 #[derive (PartialEq, Eq, Copy, Clone, Debug)]
 pub struct Range<A> {
-    pub lower: A,
-    pub upper: A,
+    pub start: A,
+    pub end: A,
 }
 
 impl<A: Num + Copy + Ord + ConstOne> Range<A> {
     #[inline]
     pub fn new(lower: A, upper: A) -> Self {
-        Range { lower, upper }
+        Range { start: lower, end: upper }
     }
     
     #[inline]
     pub fn contains(&self, v: A) -> bool {
-        v >= self.lower && v <= self.upper
+        v >= self.start && v <= self.end
     }
 
     #[inline]
     pub fn fully_contains(&self, other: &Self) -> bool {
-        self.lower <= other.lower && other.upper <= self.upper
+        self.start <= other.start && other.end <= self.end
     }
 
     #[inline]
     pub fn length(&self) -> A {
-        self.upper - self.lower + A::ONE
+        self.end - self.start + A::ONE
     }
 
     #[inline]
     pub fn overlaps(&self, other: &Self) -> bool {
-        self.upper >= other.lower && other.upper >= self.lower
+        self.end >= other.start && other.end >= self.start
     }
 
     #[inline]
     pub fn shift(&self, v: A) -> Self {
-        Range { lower: self.lower + v, upper: self.upper + v }       
+        Range { start: self.start + v, end: self.end + v }       
     }
 
     pub fn union(&self, other: &Self) -> Option<Self> {
-        if self.lower.max(other.lower) <= self.upper.min(other.upper) + A::ONE {
-            Some(Range::new(self.lower.min(other.lower), self.upper.max(other.upper)))
+        if self.start.max(other.start) <= self.end.min(other.end) + A::ONE {
+            Some(Range::new(self.start.min(other.start), self.end.max(other.end)))
         } else {
             None
         }
     }
 
     pub fn intersection(&self, other: &Self) -> Option<Self> {
-        if self.upper < other.lower || other.upper < self.lower {
+        if self.end < other.start || other.end < self.start {
             None
         } else {
-            Some(Range::new(self.lower.max(other.lower), self.upper.min(other.upper)))
+            Some(Range::new(self.start.max(other.start), self.end.min(other.end)))
         }
     }
 
@@ -59,7 +59,7 @@ impl<A: Num + Copy + Ord + ConstOne> Range<A> {
         //A: Integer + Ord + Copy + ConstOne
     {
         let mut ranges: Vec<_> = it.into_iter().collect();
-        ranges.sort_unstable_by_key(|r| r.lower); 
+        ranges.sort_unstable_by_key(|r| r.start); 
         let mut it = ranges.iter();
         let mut output = vec!();
         if let Some(&first) = it.next() {
@@ -86,7 +86,7 @@ pub trait RangeIter<A>: Iterator<Item=Range<A>>
         A: Num + Ord + Copy + ConstOne {
     fn disjoint_union(&mut self) -> Vec<Range<A>> {
         let mut ranges: Vec<_> = self.collect();
-        ranges.sort_unstable_by_key(|r| r.lower); 
+        ranges.sort_unstable_by_key(|r| r.start); 
         let mut it = ranges.iter();
         let mut output = vec!();
         if let Some(&first) = it.next() {
