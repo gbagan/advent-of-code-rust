@@ -49,8 +49,8 @@ fn solve_for<const N: usize>(input: &str) -> (usize, u64) {
     lines.next();
     lines.next();
     let line = lines.next().unwrap();
-    let mut it = line.iter_unsigned::<u32>();
-    let my_ticket: [u32; N] = std::array::from_fn(|_| it.next().unwrap());
+    let mut it = line.iter_unsigned();
+    let my_ticket: [u64; N] = std::array::from_fn(|_| it.next().unwrap());
     lines.next();
     lines.next();
 
@@ -75,7 +75,6 @@ fn solve_for<const N: usize>(input: &str) -> (usize, u64) {
                 ticket_masks[i] &= field_masks[val];
             }
         }
-
     }
 
     // perfect matching
@@ -92,7 +91,7 @@ fn solve_for<const N: usize>(input: &str) -> (usize, u64) {
 
     let p2 = (0..N)
         .filter(|&i| fields[i].departure)
-        .map(|i| my_ticket[matching[i]] as u64)
+        .map(|i| my_ticket[matching[i]])
         .product();
 
     (p1, p2)
