@@ -94,9 +94,9 @@ fn part2(input: &Input) -> u64 {
     };
 
     let mut graph = [0u32; N];
-    for i in 0..N {
+    for (i, mask) in graph.iter_mut().enumerate() {
         for j in 0..N {
-            graph[i] |= (matched(i, j) as u32) << j;
+            *mask |= (matched(i, j) as u32) << j;
         }
     }
 
@@ -112,10 +112,8 @@ fn part2(input: &Input) -> u64 {
         }
     }
 
-    let p2 = (0..N)
+    (0..N)
         .filter(|&i| input.fields[i].departure)
         .map(|i| input.my_ticket[matching[i]] as u64)
-        .product();
-
-    p2
+        .product()
 }

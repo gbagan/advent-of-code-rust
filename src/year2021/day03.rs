@@ -27,7 +27,7 @@ pub fn solve(input: &str) -> (u64, u32) {
         let value = t.to_bitmask().reverse_bits() >> 52;
         masks[(value >> 6) as usize] |= 1 << (value & 63);
 
-        counts = counts - t.cast::<i16>().to_int();
+        counts -= t.cast::<i16>().to_int();
         input = &input[13..];
     }
 

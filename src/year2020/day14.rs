@@ -70,7 +70,7 @@ impl Set {
     }
 
     fn intersect(&self, other: &Self) -> Option<Self> {
-        ((self.ones ^ other.ones) & !(self.floating | other.floating) == 0).then(||
+        ((self.ones ^ other.ones) & !(self.floating | other.floating) == 0).then_some(
             Self {
                 ones: self.ones | other.ones,
                 floating: self.floating & other.floating,
