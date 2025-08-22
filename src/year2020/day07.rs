@@ -29,7 +29,7 @@ const ATTRIBUTE1: [&str; 18] = [
     "wavy"
 ];
 
-static ATTRIBUTE2: [&str; 33] = [
+const ATTRIBUTE2: [&str; 33] = [
     "aqua",
     "beige",
     "black",

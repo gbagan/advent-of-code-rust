@@ -1,75 +1,82 @@
-use ahash::HashMap;
 use crate::util::parser::*;
 
-type Passport<'a> = HashMap<&'a str, &'a str>;
-
-const MANDATORY_FIELDS: [&str; 7] =  ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
-
 pub fn solve(input: &str) -> (u32, u32) {
+    let input = input.as_bytes();
     let mut p1 = 0;
     let mut p2 = 0;
-    
-    for passport in input.split("\n\n").map(parse_passport) {
-        if check1(&passport) {
-            p1 += 1;
-            if check2(&passport) {
-                p2 += 1;
+
+    let mut nb_fields = 0;
+    let mut is_ok = true;
+    for field in input.split(|&c| c == b' ' || c == b'\n') {
+        if field.is_empty() {
+            p1 += (nb_fields == 7) as u32;
+            p2 += (nb_fields == 7 && is_ok) as u32;
+            nb_fields = 0;
+            is_ok = true;
+        } else {
+            let f = encode(field[0], field[1], field[2]);
+            if f != CID {
+                nb_fields += 1;
             }
+            if !is_ok {
+                continue;
+            }
+            let field2 = &field[4..];
+            is_ok = is_ok && match f {
+                BYR => check_range(field2, 1920, 2002),
+                IYR => check_range(field2, 2010, 2020),
+                EYR => check_range(field2, 2020, 2030),
+                HGT => check_height(field2),
+                HCL => check_hair_color(field2),
+                ECL => check_eye_color(field2),
+                PID => check_pid(field2),
+                _ => true,
+            };
         }
     }
 
     (p1, p2)
 }
 
-fn parse_passport(input: &str) -> Passport<'_> {
-    input
-        .split_ascii_whitespace()
-        .map(|token| token.split_once(':').unwrap())
-        .collect()
+const fn encode(a: u8, b: u8, c: u8) -> u32 {
+    (a as u32) << 16 | (b as u32) << 8 | c as u32
 }
 
-fn check1(passport: &Passport) -> bool {
-    MANDATORY_FIELDS.iter().all(|field| passport.contains_key(field))
-}
+const BYR: u32 = encode(b'b', b'y', b'r');
+const EYR: u32 = encode(b'e', b'y', b'r');
+const CID: u32 = encode(b'c', b'i', b'd');
+const IYR: u32 = encode(b'i', b'y', b'r');
+const HGT: u32 = encode(b'h', b'g', b't');
+const PID: u32 = encode(b'p', b'i', b'd');
+const HCL: u32 = encode(b'h', b'c', b'l');
+const ECL: u32 = encode(b'e', b'c', b'l');
 
-fn check2(passport: &Passport) -> bool {
-    check_range(passport["byr"], 1920, 2002)
-        && check_range(passport["iyr"], 2010, 2020)
-        && check_range(passport["eyr"], 2020, 2030)
-        && check_height(passport["hgt"])
-        && check_hair_color(passport["hcl"])
-        && check_eye_color(passport["ecl"])
-        && check_pid(passport["pid"])
-}
-
-fn check_range(field: &str, min: u32, max: u32) -> bool {
+fn check_range(field: &[u8], min: u32, max: u32) -> bool {
     if let Some(year) = field.try_unsigned::<u32>() && year >= min && year <= max {
         return true; 
     }
     false
 }
 
-fn check_height(field: &str) -> bool {
-    if let Some(prefix) = field.strip_prefix("cm") {
+fn check_height(field: &[u8]) -> bool {
+    if let Some(prefix) = field.strip_suffix(b"cm") {
         check_range(prefix, 150, 193)
-    } else if let Some(prefix) = field.strip_prefix("in") {
+    } else if let Some(prefix) = field.strip_suffix(b"in") {
         check_range(prefix, 59, 76)
     } else {
         false
     }
 }
 
-fn check_hair_color(field: &str) -> bool {
-    let field = field.as_bytes();
+fn check_hair_color(field: &[u8]) -> bool {
     field.len() == 7 && field[0] == b'#' 
         && field[1..].iter().all(|&c| matches!(c, b'0'..=b'9' | b'a'..=b'f'))
 }
 
-fn check_eye_color(field: &str) -> bool {
-    matches!(field, "amb" | "blu" | "brn" | "gry" | "grn" | "hzl" | "oth")
+fn check_eye_color(field: &[u8]) -> bool {
+    matches!(field, b"amb" | b"blu" | b"brn" | b"gry" | b"grn" | b"hzl" | b"oth")
 }
 
-fn check_pid(field: &str) -> bool {
-    let field = field.as_bytes();
+fn check_pid(field: &[u8]) -> bool {
     field.len() == 9 && field.iter().all(u8::is_ascii_digit)
 }

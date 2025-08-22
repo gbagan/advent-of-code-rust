@@ -1,4 +1,4 @@
-use crate::util::parser::*;
+use crate::util::{iter::*, parser::*};
 
 struct Password<'a> {
     value1: usize,
@@ -17,7 +17,7 @@ pub fn solve(input: &str) -> (usize, usize) {
 }
 
 fn parse_line(line: &str) -> Password<'_> {
-    let [token1, token2, token3, token4] = line.split(&[' ', '-']).next_chunk().unwrap();
+    let (token1, token2, token3, token4) = line.split(&[' ', '-']).next_tuple().unwrap();
     let value1 = token1.try_unsigned().unwrap();
     let value2 = token2.try_unsigned().unwrap();
     let letter = token3.as_bytes()[0];

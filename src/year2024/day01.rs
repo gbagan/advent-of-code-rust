@@ -9,11 +9,9 @@ pub fn solve(input: &str) ->(u32, u32) {
     let mut line = input.as_bytes();
 
     for i in 0..N {
-        unsafe {
-            list1[i] = parse_5first(to_u64(line.get_unchecked(0..8)));
-            list2[i] = parse_5last(to_u64(line.get_unchecked(5..13)));
-            line = line.get_unchecked(14..);
-        }
+        list1[i] = parse_digits(line);
+        list2[i] = parse_digits(&line[8..]);
+        line = &line[14..];
     }
 
     unsafe {
@@ -43,6 +41,17 @@ pub fn solve(input: &str) ->(u32, u32) {
     (p1, p2)
 }
 
+fn parse_digits(s: &[u8]) -> u32 {
+    let s0 = s[0] as u32;
+    let s1 = s[1] as u32;
+    let s2 = s[2] as u32;
+    let s3 = s[3] as u32;
+    let s4 = s[4] as u32;
+
+    (s0 * 10000 + s1 * 1000 + s2 * 100 + s3 * 10 + s4) - 533328
+}
+
+/*
 #[inline]
 fn parse_5first(val: u64) -> u32 {
     parse_8digits((val << 24) - 0x3030303030000000)
@@ -58,6 +67,7 @@ fn to_u64(s: &[u8]) -> u64 {
     u64::from_le_bytes(s.try_into().unwrap())
 }
 
+
 #[inline]
 fn parse_8digits(mut val: u64) -> u32 {
     const MASK: u64 = 0xFF | (0xFF << 32);
@@ -68,6 +78,7 @@ fn parse_8digits(mut val: u64) -> u32 {
     val = ((val & MASK).wrapping_mul(MUL1) + ((val >> 16) & MASK).wrapping_mul(MUL2)) >> 32;
     val as u32
 }
+*/
 
 unsafe fn radix_sort<const N: usize>(arr: &mut [u32; N]) {
     let mut lowbits_count: [u16; 256] = [0; 256];
