@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use std::thread;
 use std::simd::prelude::*;
 
-const LANES: usize = 16;
+const LANES: usize = 8;
 
 pub struct Shared {
     p1: u64,
@@ -16,7 +16,7 @@ pub fn solve(input: &str) -> (u64, u16) {
     numbers.resize(numbers.len().next_multiple_of(LANES), 0);
     let start = AtomicUsize::new(0);
     let mutex = Mutex::new(Shared {p1: 0, prices: vec![0; 130336]});
-    let nb_threads = thread::available_parallelism().unwrap().get();
+    let nb_threads = 8; //thread::available_parallelism().unwrap().get();
     let chunks_size = (numbers.len() / LANES).div_ceil(nb_threads);
 
     thread::scope(|scope| {
@@ -75,27 +75,16 @@ fn worker(numbers: &[u32], chunks_size: usize, start: &AtomicUsize, mutex: &Mute
     }
     let mut shared = mutex.lock().unwrap();
     shared.p1 += p1;
-    unsafe {
-        add_vector(&mut shared.prices, &prices)
-    }
+    shared.prices.iter_mut().zip(prices).for_each(|(a, b)| *a += b);
 }
 
 #[inline]
 fn next_secret(mut n: Simd<u32, LANES>) -> Simd<u32, LANES> {
-    let mask = Simd::splat(16777215);
+    let mask = Simd::splat(0xffffff);
     n ^= n << 6;
     n &= mask;
     n ^= n >> 5;
     n &= mask;
     n ^= n << 11;
     n & mask
-}
-
-unsafe fn add_vector(v1: &mut [u16], v2: &[u16]) {
-    let n = v1.len() / 32;
-    for i in 0..n {
-        let s1 = u16x32::from_slice( unsafe { v1.get_unchecked(32*i..) });
-        let s2 = u16x32::from_slice( unsafe { v2.get_unchecked(32*i..) });
-        (s1 + s2).copy_to_slice( unsafe { v1.get_unchecked_mut(32*i..) })
-    }
 }

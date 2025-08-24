@@ -1,6 +1,7 @@
 use std::ops::{Range, RangeInclusive};
 use std::thread;
 use std::sync::atomic::{AtomicI32, AtomicU32, AtomicU64, AtomicUsize, Ordering};
+use crate::util::constants::*;
 
 struct Shared<A> {
     counter: AtomicUsize,
@@ -45,7 +46,7 @@ pub trait ParallelIterator: Sized + Send {
     {
         let counter = AtomicUsize::new(self.start());
         thread::scope(|scope| {
-            for _ in 0..thread::available_parallelism().unwrap().get() {
+            for _ in 0..THREADS {
                 scope.spawn(|| {
                     while let i = counter.fetch_add(1, Ordering::Relaxed) && i < self.end() {
                         if let Some(res) = self.get(i) {
@@ -64,8 +65,7 @@ pub trait ParallelIterator: Sized + Send {
         R: Fn(&Self::Item, &Self::Item) -> Self::Item + Sync + Send,
         Self: Sized + Send + Sync,
     {
-        let n = thread::available_parallelism().unwrap().get();
-        let mut results: Vec<Self::Item> = (0..n).map(|_| id()).collect();
+        let mut results: [Self::Item; THREADS] = std::array::from_fn(|_| id());
         let counter = AtomicUsize::new(self.start());
         thread::scope(|scope| {
             for res in &mut results {
@@ -92,7 +92,7 @@ macro_rules! parallel_iterator {
             {
                 let shared = Shared { counter: AtomicUsize::new(self.start()), result: $atomic::new(init) };
                 thread::scope(|scope| {
-                    for _ in 0..thread::available_parallelism().unwrap().get() {
+                    for _ in 0..THREADS {
                         scope.spawn(|| {
                             loop {
                                 let i = shared.counter.fetch_add(1, Ordering::Relaxed);

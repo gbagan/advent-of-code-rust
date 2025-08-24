@@ -99,7 +99,6 @@ fn part2_grid(grid: &[u8]) -> Vec<u8> {
     res
 }
 
-#[inline]
 fn push_horizontal(grid: &mut [u8], position: usize, direction: usize) -> usize {
     let next = position.wrapping_add(direction);
     let mut x = next;
@@ -121,7 +120,6 @@ fn push_horizontal(grid: &mut [u8], position: usize, direction: usize) -> usize 
     }
 }
 
-#[inline]
 fn push_vertical(
     grid: &mut [u8],
     seen: &mut [u16],

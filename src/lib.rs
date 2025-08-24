@@ -8,6 +8,9 @@
 #![feature(slice_split_once)]
 #![feature(str_lines_remainder)]
 
+// todo remove
+#![allow(static_mut_refs)]
+
 
 pub mod util;
 

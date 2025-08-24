@@ -30,24 +30,19 @@ fn part1(grid: &[u8], distances: &mut [[u32; 2]]) -> u32 {
             let (dist, node, direction) =
                 if index >= todo.len() {
                     match queue.pop_front() {
-                        Some(n) => n,
+                        Some(t) => t,
                         _ => break,
                     }
+                } else if let Some(&tuple) = queue.front() && tuple.0 <= todo[index].0 {
+                    queue.pop_front();
+                    tuple
                 } else {
-                    match queue.front() {
-                        Some(&tuple) if tuple.0 <= todo[index].0 => {
-                            queue.pop_front();
-                            tuple
-                        },
-                        _ => {
-                            let tuple= todo[index];
-                            index += 1;
-                            tuple
-                        }
-                    }
+                    let tuple = todo[index];
+                    index += 1;
+                    tuple
                 };
-            let is_horizontal = direction == 1 || direction == usize::MAX;
-            if is_horizontal {
+            
+            if direction == 1 || direction == usize::MAX {
                 if distances[node][0] != u32::MAX {
                     continue;
                 }
