@@ -17,11 +17,20 @@ pub fn solve(input: &str) -> (u64, u32) {
 }
 
 fn discrete_logarithm(n: u64) -> u64 {
-	(CHINESE[0] * log_mod_2(n)
-    + CHINESE[1] * log_mod_3(n)
-	+ CHINESE[2] * log_mod_29(n)
-    + CHINESE[3] * log_mod_116099(n)
-    ) % (MODULO - 1)
+    const N1: u64 = 2;
+    const N2: u64 = 3;
+    const N3: u64 = 29;
+    const N4: u64 = 116_099;
+    const Q1: u64 = (MODULO - 1) / N1;
+    const Q2: u64 = (MODULO - 1) / N2;
+    const Q3: u64 = (MODULO - 1) / N3;
+    const Q4: u64 = (MODULO - 1) / N4;
+    const M1: u64 = Q1 * modular_inverse(Q1, N1);
+    const M2: u64 = Q2 * modular_inverse(Q2, N2);
+    const M3: u64 = Q3 * modular_inverse(Q3, N3);
+    const M4: u64 = Q4 * modular_inverse(Q4, N4);
+    
+    (M1 * log_mod_2(n) + M2 * log_mod_3(n) + M3 * log_mod_29(n) + M4 * log_mod_116099(n)) % (MODULO - 1)
 }
 
 fn log_mod_2(n: u64) -> u64 {
@@ -105,23 +114,6 @@ fn log_mod_116099(n: u64) -> u64 {
 
 	unreachable!();
 }
-
-const CHINESE: [u64; 4] = {
-    let n1 = 2;
-    let n2 = 3;
-    let n3 = 29;
-    let n4 = 116_099;
-    let q1 = (MODULO - 1) / n1;
-    let q2 = (MODULO - 1) / n2;
-    let q3 = (MODULO - 1) / n3;
-    let q4 = (MODULO - 1) / n4;
-    let m1 = modular_inverse(q1, n1);
-    let m2 = modular_inverse(q2, n2);
-    let m3 = modular_inverse(q3, n3);
-    let m4 = modular_inverse(q4, n4);
-
-    [q1 * m1, q2 * m2, q3 * m3, q4 * m4]
-};
 
 const fn mod_pow(mut x: u64, mut n: u64) -> u64 {
     let mut p = 1;
