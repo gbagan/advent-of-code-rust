@@ -40,7 +40,7 @@ benchmark!(year2020
 );
 
 benchmark!(year2022
-    day20
+    day20, day21
 );
 
 benchmark!(year2024
