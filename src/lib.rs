@@ -215,8 +215,10 @@ pub mod year2022 {
     pub mod day14;
     pub mod day15;
     pub mod day16;
+    // todo
     pub mod day18;
     pub mod day19;
+    pub mod day20;
     pub mod day24;
     pub mod day25;
 }

@@ -119,9 +119,9 @@ const fn mod_pow(mut x: u64, mut n: u64) -> u64 {
     let mut p = 1;
     while n > 0 {
         if n & 1 == 1 {
-            p = (p * x) % MODULO;
+            p = p * x % MODULO;
         }
-        x = (x * x) % MODULO;
+        x = x * x % MODULO;
         n >>= 1;
     }
     p
