@@ -52,30 +52,6 @@ impl<A: Num + Copy + Ord + ConstOne> Range<A> {
             Some(Range::new(self.start.max(other.start), self.end.min(other.end)))
         }
     }
-
-    pub fn disjoint_union<I>(it: I) -> Vec<Range<A>> 
-    where 
-        I: IntoIterator<Item=Range<A>>,
-        //A: Integer + Ord + Copy + ConstOne
-    {
-        let mut ranges: Vec<_> = it.into_iter().collect();
-        ranges.sort_unstable_by_key(|r| r.start); 
-        let mut it = ranges.iter();
-        let mut output = vec!();
-        if let Some(&first) = it.next() {
-            let mut previous = first;
-            for current in it {
-                if let Some(union) = previous.union(current) {
-                    previous = union;
-                } else {
-                    output.push(previous);
-                    previous = *current;
-                }
-            }
-            output.push(previous);
-        }
-        output
-    }
 }
 
 
@@ -84,24 +60,25 @@ pub trait RangeIter<A>: Iterator<Item=Range<A>>
     where
         Self: Sized,
         A: Num + Ord + Copy + ConstOne {
-    fn disjoint_union(&mut self) -> Vec<Range<A>> {
+    fn to_disjoint_union(&mut self) -> Vec<Range<A>> {
         let mut ranges: Vec<_> = self.collect();
-        ranges.sort_unstable_by_key(|r| r.start); 
-        let mut it = ranges.iter();
-        let mut output = vec!();
-        if let Some(&first) = it.next() {
-            let mut previous = first;
-            for current in it {
-                if let Some(union) = previous.union(current) {
-                    previous = union;
-                } else {
-                    output.push(previous);
-                    previous = *current;
-                }
+        ranges.sort_unstable_by_key(|r| r.start);
+        let mut j = 0;
+        let mut previous = ranges[0];
+        for i in 1..ranges.len() {
+            let current = ranges[i];
+            if current.start <= previous.end + A::ONE {
+                previous.end = previous.end.max(current.end);
+            } else {
+                ranges[j] = previous;
+                j += 1;
+                previous = current;
             }
-            output.push(previous);
         }
-        output
+        ranges[j] = previous;
+        j += 1;
+        ranges.truncate(j);
+        ranges
     }
 }
 
@@ -117,5 +94,5 @@ fn length_test () {
 fn disjoint_union_test () {
     let ranges = vec!(Range::new(3, 4), Range::new(0, 1), Range::new(6, 7), Range::new(1, 2));
     let expected = vec!(Range::new(0, 4), Range::new(6, 7));
-    assert_eq!(Range::disjoint_union(ranges), expected);
+    assert_eq!(ranges.iter().copied().to_disjoint_union(), expected);
 }

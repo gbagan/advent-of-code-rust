@@ -17,6 +17,7 @@ struct Input {
     square_size: usize,
     grid_offsets: [usize; 6],
     supergrid: [[usize; 4]; 4],
+    start: usize,
     path: Vec<Instruction>,
 }
 
@@ -80,11 +81,11 @@ fn get_password(input: &Input, borders: &Borders) -> usize {
     };
 
 
-    let mut pos = board.iter().position(|&c| c == b'.').unwrap();
+    let mut pos = input.start;
     let mut dir = EAST;
     let mut vdir = 1;
 
-    let change_face = |pos: usize, dir: usize| {
+    let change_square = |pos: usize, dir: usize| {
         let mut xpos = (pos % width) - 1;
         let mut ypos = (pos / width) - 1;
         let size = square_size - 1;
@@ -134,7 +135,7 @@ fn get_password(input: &Input, borders: &Borders) -> usize {
                     match board[pos + vdir] {
                         b'#' => break,
                         _ => {
-                            let (next, next_dir) = change_face(pos, dir);
+                            let (next, next_dir) = change_square(pos, dir);
                             if board[next] == b'#' {
                                 break;
                             }
@@ -183,8 +184,9 @@ fn prepare(board: &[&[u8]], path: Vec<Instruction>) -> Input {
             }
         }
     }
+    let start = board.iter().position(|&c| c == b'.').unwrap();
 
-    Input { board, square_size, width, grid_offsets, supergrid, path }
+    Input { board, square_size, width, grid_offsets, supergrid, start, path }
 }
 
 fn part1_borders(supergrid: &[[usize; 4]; 4]) -> Borders {
@@ -222,8 +224,8 @@ const CUBE_EDGES: [[(usize, usize); 4]; 6] = [
 ];
 
 fn part2_borders(supergrid: &[[usize; 4]; 4]) -> Borders {
-    let mut assignment = [(usize::MAX, usize::MAX); 6];
-    assignment[0] = (0, 0);
+    let mut mapping = [(usize::MAX, usize::MAX); 6];
+    mapping[0] = (0, 0);
 
     let mut start = (usize::MAX, usize::MAX);
     'outer: for y in 0..4 {
@@ -237,7 +239,7 @@ fn part2_borders(supergrid: &[[usize; 4]; 4]) -> Borders {
 
     let mut queue = vec![start];
     while let Some((x, y)) = queue.pop() {
-        let (face, rot) = assignment[supergrid[y][x]];
+        let (face, rot) = mapping[supergrid[y][x]];
         for (i, &(xnext, ynext)) in [(x+1, y), (x, y+1), (x.wrapping_sub(1), y), (x, y.wrapping_sub(1))]
             .iter()
             .enumerate()
@@ -246,26 +248,25 @@ fn part2_borders(supergrid: &[[usize; 4]; 4]) -> Borders {
                 continue;
             }
             let square = supergrid[ynext][xnext];
-            if square == usize::MAX || assignment[square].0 != usize::MAX {
+            if square == usize::MAX || mapping[square].0 != usize::MAX {
                 continue
             }
-            
             let (new_face, new_rot) = CUBE_EDGES[face][(rot + i) & 3];
-            assignment[square] = (new_face, (6 + new_rot - i) & 3);
+            mapping[square] = (new_face, (6 + new_rot - i) & 3);
             queue.push((xnext, ynext));
         }
     }
 
-    let mut inv_assignment = [0; 6];
-    for (i, &(j, _)) in assignment.iter().enumerate() {
-        inv_assignment[j] = i;
+    let mut inv_mapping = [0; 6];
+    for (i, &(j, _)) in mapping.iter().enumerate() {
+        inv_mapping[j] = i;
     }
 
-    assignment.map(|(face, rot)| {
+    mapping.map(|(face, rot)| {
         let mut row = [(0, 0); 4];
-        for (j, &(face2, rot2)) in CUBE_EDGES[face].iter().enumerate() {
-            let next_square = inv_assignment[face2];
-            row[(j+4-rot) & 3] = (next_square, (8 + assignment[next_square].1 + rot2 - rot - j) & 3);
+        for (i, &(next_face, rot2)) in CUBE_EDGES[face].iter().enumerate() {
+            let next_square = inv_mapping[next_face];
+            row[(i+4-rot) & 3] = (next_square, (8 + mapping[next_square].1 + rot2 - rot - i) & 3);
         }
         row
     })

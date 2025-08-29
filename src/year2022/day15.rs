@@ -37,10 +37,11 @@ fn intersection_ball_with_row(center: Coord<i32>, radius: i32, row: i32) -> Opti
 
 // union of disjoint intervals that do not cointain non detected beacons
 fn intervals_without_beacons(y: i32, scans: &[Scan]) -> Vec<Range<i32>> {
-    let ranges = scans.iter().filter_map(|scan|
+    scans
+        .iter()
+        .filter_map(|scan|
             intersection_ball_with_row(scan.sensor, scan.distance, y)
-    );
-    Range::disjoint_union(ranges)
+        ).to_disjoint_union()
 }
 
 fn part1(scans: &[Scan]) -> i32 {
