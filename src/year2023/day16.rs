@@ -1,5 +1,4 @@
-use std::cmp::max;
-use crate::util::{coord::Coord, grid::Grid, parallel::*};
+use crate::util::{coord::*, grid::*, parallel::*};
 
 type Point = Coord::<i32>;
 
@@ -16,6 +15,7 @@ const EAST: u8 = 1;
 const SOUTH: u8 = 2;
 const WEST: u8 = 3;
 
+// todo
 #[inline]
 fn next_directions (c: u8, dir: u8) -> Vec<u8> {
     match c {
@@ -154,5 +154,5 @@ fn part2(input: &Input) -> u64 {
     starts
         .par_iter()
         .map(|(pos, dir)| count_energized(input, *pos, *dir))
-        .reduce(0, max)
+        .reduce(|| 0, |&x, &y| x.max(y))
 }

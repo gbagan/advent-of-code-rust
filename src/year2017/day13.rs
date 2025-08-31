@@ -1,15 +1,14 @@
-use arrayvec::ArrayVec;
 use crate::util::{iter::*, math::*, parser::*};
 
-pub fn solve(input: &str) -> (i32, i32) {
-    let mut pairs: Vec<(i32, i32)> = input.iter_unsigned().tuples().collect();
+pub fn solve(input: &str) -> (u32, u32) {
+    let mut pairs: Vec<(u32, u32)> = input.iter_unsigned().tuples().collect();
     pairs.sort_unstable_by_key(|p| p.1);
     let p1 = part1(&pairs);
     let p2 = part2(&pairs);
     (p1, p2)
 }
 
-fn part1(pairs: &[(i32, i32)]) -> i32 {
+fn part1(pairs: &[(u32, u32)]) -> u32 {
     pairs
         .iter()
         .filter(|&&(depth, range)| caught(depth, range))
@@ -17,32 +16,22 @@ fn part1(pairs: &[(i32, i32)]) -> i32 {
         .sum()
 }
 
-fn part2(pairs: &[(i32, i32)]) -> i32 {
-    let mut forbiddens: Vec<(i32, ArrayVec<i32, 16>)> = vec!();
-    let mut prev_range = 0;
-    for &(depth, range) in pairs {
-        let period = 2 * (range - 1);
-        let depth = depth % period; 
-        if range == prev_range {
-            let last = forbiddens.len()-1; 
-            forbiddens[last].1.push(depth);
-        } else {
-            let mut v = ArrayVec::new();
-            v.push(depth);
-            forbiddens.push((period, v));
-        }
-        prev_range = range;
-    }
+#[inline]
+fn caught(depth: u32, range: u32) -> bool {
+    depth.is_multiple_of((range-1)*2)
+}
 
+fn part2(pairs: &[(u32, u32)]) -> u32 {
     let mut lcm = 1;
     let mut current_sieve = vec!(1);
     let mut next_sieve = Vec::new();
 
-    for (period, forbidden) in forbiddens {
+    for (depth, range) in pairs {
+        let period = 2 * (range - 1);
         let next_lcm = lcm.lcm(period);
         for i in (0..next_lcm).step_by(lcm as usize) {
             for j in &current_sieve {
-                if !forbidden.contains(&(-i - j).rem_euclid(period)) {
+                if !(depth + i + j).is_multiple_of(period) {
                     next_sieve.push(i + j);
                 }
             }
@@ -55,7 +44,3 @@ fn part2(pairs: &[(i32, i32)]) -> i32 {
     current_sieve[0]
 }
 
-#[inline]
-fn caught(depth: i32, range: i32) -> bool {
-    depth % ((range-1)*2) == 0
-}

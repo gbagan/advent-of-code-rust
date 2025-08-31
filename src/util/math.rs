@@ -149,7 +149,7 @@ macro_rules! signed_integer_impl {
     )*)
 }
 
-unsigned_integer_impl!(u8 u16 u64 u128 usize);
+unsigned_integer_impl!(u8 u16 u32 u64 u128 usize);
 signed_integer_impl!(i8 i16 i32 i64 i128);
 
 #[test]

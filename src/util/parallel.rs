@@ -1,12 +1,9 @@
-use std::ops::{Range, RangeInclusive};
+use std::ops::{Add, Range, RangeInclusive};
 use std::thread;
-use std::sync::atomic::{AtomicI32, AtomicU32, AtomicU64, AtomicUsize, Ordering};
-use crate::util::constants::*;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use num_traits::Zero;
 
-struct Shared<A> {
-    counter: AtomicUsize,
-    result: A,
-}
+use crate::util::constants::*;
 
 pub trait ParallelIterator: Sized + Send {
     type Item: Send;
@@ -59,7 +56,7 @@ pub trait ParallelIterator: Sized + Send {
     }
 
 
-    fn reduce2<I, R>(self, id: I, r: R) -> Self::Item
+    fn reduce<I, R>(self, id: I, r: R) -> Self::Item
     where
         I: Fn() -> Self::Item + Sync + Send,
         R: Fn(&Self::Item, &Self::Item) -> Self::Item + Sync + Send,
@@ -80,54 +77,15 @@ pub trait ParallelIterator: Sized + Send {
         });
         results.iter().fold(id(), |x, y| r(&x, y))
     }
-}
 
-macro_rules! parallel_iterator {
-    ($name:tt, $item:ty, $atomic: tt) => {
-        pub trait $name: ParallelIterator<Item=$item> {
-            fn reduce<R>(&self, init: $item, reduce: R) -> $item
-            where
-                Self: Sized + Send + Sync,
-                R: Fn($item, $item)-> $item + Sync + Send
-            {
-                let shared = Shared { counter: AtomicUsize::new(self.start()), result: $atomic::new(init) };
-                thread::scope(|scope| {
-                    for _ in 0..THREADS {
-                        scope.spawn(|| {
-                            loop {
-                                let i = shared.counter.fetch_add(1, Ordering::Relaxed);
-                                if i >= self.end() {
-                                    break;
-                                }
-                                if let Some(res) = self.get(i) {
-                                    let _ = shared.result.fetch_update(Ordering::Relaxed,
-                                                                      Ordering::Relaxed,
-                                                                      |x| Some(reduce(x, res)));
-                                    }
-                            }
-                        });
-                    }
-                });
-                shared.result.load(Ordering::Relaxed)
-            }
-
-            fn sum(self) -> $item
-            where
-                Self: Sized + Send + Sync,
-            {
-                self.reduce(0, |x, y| x+y)
-            }
-        }
-
-        impl<I: ParallelIterator<Item=$item>> $name for I {}
+    fn sum(self) -> Self::Item
+    where
+        Self: Sized + Send + Sync,
+        Self::Item: Add + Copy + Zero,
+    {
+        self.reduce(Self::Item::zero, |&x, &y| x+y)
     }
 }
-
-parallel_iterator!(ParallelIteratorI32, i32, AtomicI32);
-parallel_iterator!(ParallelIteratorU32, u32, AtomicU32);
-parallel_iterator!(ParallelIteratorU64, u64, AtomicU64);
-parallel_iterator!(ParallelIteratorUSize, usize, AtomicUsize);
-
 
 
 pub trait IntoParallelIterator {

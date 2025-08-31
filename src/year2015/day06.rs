@@ -59,5 +59,5 @@ pub fn solve(input: &str) -> (usize, u32) {
             let p1 = p1.into_iter().filter(|&x| x).count();
             let p2 = p2.into_iter().map(|x| x as u32).sum();
             (p1, p2)
-        }).reduce2(|| (0, 0), |(a1, b1), (a2, b2)| (a1+a2, b1+b2))
+        }).reduce(|| (0, 0), |(a1, b1), (a2, b2)| (a1+a2, b1+b2))
 }

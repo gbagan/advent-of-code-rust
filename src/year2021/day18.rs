@@ -16,7 +16,7 @@ pub fn solve(input: &str) -> (u32, u32) {
                 .iter().map(|fish2| fish.add(fish2).magnitude())
                 .max()
                 .unwrap()
-        }).reduce(0, std::cmp::max);
+        }).reduce(|| 0, |&x, &y| x.max(y));
 
     (p1, p2)
 }
