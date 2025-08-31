@@ -6,12 +6,13 @@ const SQUARE: (u32, usize) = (0b00000000_00000000_00110000_00110000, 2);
 const ROCKS: [(u32, usize); 5] = [HL, PLUS, IL, I, SQUARE];
 const WALLS: u32 = 0x01010101;
 
-pub fn solve(input: &str) -> (usize, u32) {
+pub fn solve(input: &str) -> (usize, usize) {
     let input = input.trim().as_bytes();
     
     let p1 = part1(input);
+    let p2 = part2(input);
 
-    (p1, 0)
+    (p1, p2)
 }
 
 fn part1(input: &[u8]) -> usize {
@@ -48,4 +49,58 @@ fn part1(input: &[u8]) -> usize {
         }
     }
     height
+}
+
+fn part2(input: &[u8]) -> usize {
+    let mut cave = [0u8; 5000];
+    let mut heights = [0u16; 5000];
+    cave[0] = 0xff;
+    let mut height = 0;
+    let mut rocks = ROCKS.iter().copied().enumerate().cycle();
+    let mut jets = input.iter().copied().enumerate().cycle();
+
+    let mut seen = vec![[0; 5]; input.len()];
+    let mut rock_nb = 0;
+
+    let last_seen = 'outer: loop {
+        let (rock_idx, (mut rock, size)) = rocks.next().unwrap();
+        //println!("{rock_idx}");
+        let mut index = height + 3;
+        let mut blocks = WALLS;
+
+        loop {
+            let (jet_idx, jet) = jets.next().unwrap();
+            let next = if jet == b'<' { rock << 1 } else { rock >> 1 };
+            if next & blocks == 0 {
+                rock = next;
+            }
+
+            blocks = blocks << 8 | WALLS | cave[index] as u32;
+            if rock & blocks == 0 {
+                index -= 1;
+            } else {
+                let [row1, row2, row3, row4] = rock.to_le_bytes();
+                cave[index+1] |= row1;
+                cave[index+2] |= row2;
+                cave[index+3] |= row3;
+                cave[index+4] |= row4;
+                height = height.max(index + size);
+                if seen[jet_idx][rock_idx] >= 1000 {
+                    break 'outer seen[jet_idx][rock_idx] as usize
+                } else {
+                    seen[jet_idx][rock_idx] = rock_nb as u16;
+                    heights[rock_nb] = height as u16;
+                    rock_nb += 1;
+                    break;
+                }
+            }
+        }
+    };
+
+    let height_delta = height - heights[last_seen] as usize;
+    let period = rock_nb - last_seen;
+    let cycles = (1_000_000_000_000 - 1 - last_seen) / period;
+    let remaining = (1_000_000_000_000 - 1 - last_seen) % period;
+
+    height_delta * cycles + heights[last_seen+remaining] as usize
 }
