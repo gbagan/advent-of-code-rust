@@ -1,13 +1,14 @@
 use std::sync::Mutex;
 use std::thread;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use crate::util::constants::THREADS;
 use crate::util::{coord::Coord, grid::Grid, knothash::knothash};
 
 pub fn solve(input: &str) -> (u32, usize) {
     let mutex = Mutex::new([[0u8; 16]; 128]);
     let counter = AtomicUsize::new(0);
     thread::scope(|scope| {
-        for _ in 0..thread::available_parallelism().unwrap().get() {
+        for _ in 0..THREADS {
             scope.spawn(|| worker(input, &counter, &mutex));
         }
     });    
