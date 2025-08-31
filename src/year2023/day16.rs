@@ -17,13 +17,13 @@ const WEST: u8 = 3;
 
 // todo
 #[inline]
-fn next_directions (c: u8, dir: u8) -> Vec<u8> {
+fn for_each_next_direction (c: u8, dir: u8, mut f: impl FnMut(u8)) {
     match c {
-        b'/' => vec!(dir ^ 1),
-        b'\\' => vec!(3 - dir),
-        b'-' if dir & 1 == 0 => vec!(WEST, EAST),
-        b'|' if dir & 1 != 0 => vec!(NORTH, SOUTH),
-        _ => vec!(dir)
+        b'/' => f(dir ^ 1),
+        b'\\' => f(3 - dir),
+        b'-' if dir & 1 == 0 => {f(WEST); f(EAST) }
+        b'|' if dir & 1 != 0 => {f(NORTH); f(SOUTH) },
+        _ => f(dir)
     }
 }
 
@@ -85,7 +85,7 @@ pub fn solve(input: &str) -> (u64, u64){
 fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> u64 {
     let Input { grid, north, south, west, east } = input;
     let mut energized = input.grid.map(|_| false);
-    let mut visited: Grid<u8> = input.grid.map(|_|  0);
+    let mut visited: Grid<u8> = input.grid.map(|_| 0);
     let mut stack = vec!((start_pos, start_dir));
 
     while let Some((pos, dir)) = stack.pop() {
@@ -94,7 +94,7 @@ fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> u64 {
             continue;
         }
         visited[pos] |= mask;
-        for dir in next_directions(grid[pos], dir) {
+        for_each_next_direction(grid[pos], dir, |dir| {
             match dir {
                 NORTH => {
                     let next_y = north[pos];
@@ -123,7 +123,7 @@ fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> u64 {
                         stack.push((Coord::new(next_x, pos.y), dir));
                     }
                 }
-                EAST => {
+                _ => { // EAST
                     let next_x = east[pos];
                     for x in pos.x..next_x {
                         energized[(x, pos.y)] = true;
@@ -132,9 +132,8 @@ fn count_energized(input: &Input, start_pos: Point, start_dir: u8) -> u64 {
                         stack.push((Coord::new(next_x, pos.y), dir));
                     }
                 }
-                _ => unreachable!()
             }
-        }
+        })
     }
     energized.vec.iter().filter(|&&x| x).count() as u64
 }
