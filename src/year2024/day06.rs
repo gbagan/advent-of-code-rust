@@ -58,7 +58,7 @@ pub fn solve(input: &str) -> (usize, usize) {
     let moves = compute_moves(&input);
 
     let p2 = (&seen[1..])
-        .into_par_iter()
+        .par_iter()
         .chunks(100)
         .map(|rocks| {
             let mut moves = moves.clone();

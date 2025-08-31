@@ -64,7 +64,7 @@ fn part2(monkeys: &[Monkey], items: &[(usize, u64)]) -> u64 {
 
     let lcm = monkeys.iter().fold(1, |acc, monkey| acc.lcm(monkey.divided_by));
     
-    items.into_par_iter().for_each(|&item| {
+    items.par_iter().for_each(|&item| {
         let item_business = simulate_item(monkeys, item, 10_000, |n| n % lcm);
         let mut business = mutex.lock().unwrap();
         for (i, v) in item_business.iter().enumerate() {

@@ -40,7 +40,7 @@ pub fn solve(input: &str) -> (usize, String) {
 fn fold(dots: &mut[[u32; 2]], line: &str) -> (bool, usize) {
     let line = line.as_bytes();
     let along_x = line[11] == b'x';
-    let n = (&line[13..]).try_unsigned::<u32>().unwrap();
+    let n = line[13..].try_unsigned::<u32>().unwrap();
 
     if along_x {
         for dot in dots {

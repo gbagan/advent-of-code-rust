@@ -14,9 +14,9 @@ pub fn solve(input: &str) -> (usize, u32) {
         .as_chunks::<48>().0
         .iter()
         .map(|line| {
-            let [x, y] = (&line[16..22]).iter_unsigned().next_chunk().unwrap();
-            let used = (&line[30..33]).try_unsigned().unwrap();
-            let avail = (&line[37..40]).try_unsigned().unwrap();
+            let [x, y] = line[16..22].iter_unsigned().next_chunk().unwrap();
+            let used = line[30..33].try_unsigned().unwrap();
+            let avail = line[37..40].try_unsigned().unwrap();
             Node { x, y, used, avail }
         })
         .collect::<Vec<_>>();

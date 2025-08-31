@@ -197,6 +197,29 @@ impl ParserIter for &[u8] {
     }
 }
 
+impl ParserIter for [u8] {
+    fn to_unsigned<T: Num + Ten + From<u8>>(&self) -> T {
+        to_unsigned(self)
+    }
+    
+    fn try_signed<T: Signed + ConstZero + Ten + From<u8>>(&self) -> Option<T> {
+        try_signed(&mut self.iter())
+    }
+    
+    fn try_unsigned<T: Num + Ten + From<u8>>(&self) -> Option<T> {
+        next_unsigned(&mut self.iter())
+    }
+
+
+    fn iter_unsigned<T: Num + Ten + From<u8>>(&self) -> ParseUnsigned<'_, T> {
+        ParseUnsigned { bytes: self.iter(), phantom: PhantomData }
+    }
+
+    fn iter_signed<T: Num + Signed + Ten + From<u8>>(&self) -> ParseSigned<'_, T> {
+        ParseSigned { bytes: self.iter(), phantom: PhantomData }
+    }
+}
+
 impl ParserIter for &str {
     fn to_unsigned<T: Num + Ten + From<u8>>(&self) -> T {
         to_unsigned(self.as_bytes())

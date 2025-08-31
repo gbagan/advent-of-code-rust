@@ -13,17 +13,17 @@ pub fn solve(input: &str) -> (u32, u32) {
     for line in lines {
         match line.len() {
             31 => { // falls asleep
-                start = (&line[15..17]).to_unsigned();
+                start = line[15..17].to_unsigned();
             }, 
             27 => { // wakes up
-                let end = (&line[15..17]).to_unsigned();
+                let end = line[15..17].to_unsigned();
                 let minutes = guards.entry(guard).or_insert_with(|| [0u32; 60]);
                 for minute in minutes.iter_mut().take(end).skip(start) {
                     *minute += 1
                 };
             },
             _ => { // shift
-                guard = (&line[26..line.len()-13]).to_unsigned();
+                guard = line[26..line.len()-13].to_unsigned();
             }
         }
     }

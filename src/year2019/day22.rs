@@ -20,11 +20,11 @@ fn parse_line(line: &str) -> (i128, i128) {
     match line[5] {
         b'i'  => (-1, -1), // new stack
         b'w' => { // increment
-            let a = (&line[20..]).to_unsigned();
+            let a = line[20..].to_unsigned();
             (a, 0)
         },
         _ => { // cut
-            let b = -(&line[3..]).try_signed::<i128>().unwrap();
+            let b = -line[3..].try_signed::<i128>().unwrap();
             (1, b)
         }
     }

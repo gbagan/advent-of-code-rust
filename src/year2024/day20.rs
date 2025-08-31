@@ -30,7 +30,7 @@ pub fn solve(input: &str) -> (u32, u32) {
     }
 
     let res = path
-        .into_par_iter()
+        .par_iter()
         .chunks_with_index(128)
         .map(|(index, chunk)| {
             let mut acc1 = 0u32;

@@ -8,7 +8,7 @@ pub fn solve(input: &str) -> (u32, u32) {
     
     calories.sort_unstable();
 
-    let (&top1, &top2, &top3) = calories.iter().rev().next_tuple().unwrap();
+    let (top1, top2, top3) = calories.into_iter().rev().next_tuple().unwrap();
 
     (top1, top1 + top2 + top3)
 }

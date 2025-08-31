@@ -134,7 +134,7 @@ pub trait IntoParallelIterator {
     type Iter: ParallelIterator<Item = Self::Item>;
     type Item: Send;
 
-    fn into_par_iter(self) -> Self::Iter;
+    fn par_iter(self) -> Self::Iter;
 }
 
 
@@ -148,7 +148,7 @@ impl<'a, T: Send + Sync + 'a> IntoParallelIterator for &'a [T] {
     type Item = &'a T;
     type Iter = SliceIter<'a, T>;
 
-    fn into_par_iter(self) -> Self::Iter {
+    fn par_iter(self) -> Self::Iter {
         SliceIter { slice: self }
     }
 }
@@ -238,8 +238,8 @@ impl<'a, T: Send + Sync + 'a> IntoParallelIterator for &'a Vec<T> {
     type Item = &'a T;
     type Iter = SliceIter<'a, T>;
 
-    fn into_par_iter(self) -> Self::Iter {
-        <&[T]>::into_par_iter(self)
+    fn par_iter(self) -> Self::Iter {
+        <&[T]>::par_iter(self)
     }
 }
 
@@ -253,7 +253,7 @@ impl IntoParallelIterator for Range<usize> {
     type Item = usize;
     type Iter = RangeIter<usize>;
 
-    fn into_par_iter(self) -> Self::Iter {
+    fn par_iter(self) -> Self::Iter {
         RangeIter { range: self }
     }
 }
@@ -286,7 +286,7 @@ impl IntoParallelIterator for RangeInclusive<usize> {
     type Item = usize;
     type Iter = RangeInclusiveIter<usize>;
 
-    fn into_par_iter(self) -> Self::Iter {
+    fn par_iter(self) -> Self::Iter {
         RangeInclusiveIter { range: self }
     }
 }

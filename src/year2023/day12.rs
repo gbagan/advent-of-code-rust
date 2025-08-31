@@ -16,7 +16,7 @@ pub fn solve(input: &str) -> (u64, u64) {
     }).sum();
     
     let p2 = puzzles
-        .into_par_iter()
+        .par_iter()
         .chunks(16)
         .map(|puzzles| {
             let max_spring_len = puzzles.iter().map(|p| p.0.len()*5+5).max().unwrap();

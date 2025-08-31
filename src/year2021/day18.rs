@@ -10,7 +10,7 @@ pub fn solve(input: &str) -> (u32, u32) {
         .unwrap()
         .magnitude();
 
-    let p2 = snailfishes.into_par_iter()
+    let p2 = snailfishes.par_iter()
         .map(|fish| {
             snailfishes
                 .iter().map(|fish2| fish.add(fish2).magnitude())

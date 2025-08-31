@@ -1,4 +1,4 @@
-use crate::util::{boxes::Box, parser::*};
+use crate::util::{iter::*, parallel::*, parser::*};
 
 #[derive(Clone, Copy)]
 enum Command {
@@ -7,17 +7,11 @@ enum Command {
 
 struct Instruction {
     cmd: Command,
-    rectangle: Box,
+    xmin: usize,
+    xmax: usize,
+    ymin: usize,
+    ymax: usize,
 }
-
-pub struct Input {
-    instrs: Vec<Instruction>,
-    rect_xs: Vec<i32>,
-    rect_ys: Vec<i32>,
-    x_index: [usize; 1001],
-    y_index: [usize; 1001],
-}
-
 
 fn parse_instruction(line: &str) -> Instruction {
     let (cmd, s) =
@@ -30,117 +24,40 @@ fn parse_instruction(line: &str) -> Instruction {
         } else {
             panic!();
         };
-    let [xmin, ymin, xmax, ymax] = s.iter_unsigned().next_chunk().unwrap();
-    let rectangle = Box { xmin, ymin, xmax, ymax };
-    Instruction { cmd, rectangle }
+    let (xmin, ymin, xmax, ymax) = s.iter_unsigned().next_tuple().unwrap();
+    Instruction { cmd, xmin, xmax, ymin, ymax }
 }
 
-fn do_cmd1(cmd: Command, v: &mut bool) {
-    match cmd {
-        Command::On     => *v = true,
-        Command::Off    => *v = false,
-        Command::Toggle => *v = !*v,
-    }
-}
-
-fn do_cmd2(cmd: Command, v: &mut i32) {
-    match cmd {
-        Command::On     => *v += 1,
-        Command::Off    => *v = (*v-1).max(0),
-        Command::Toggle => *v += 2,
-    }
-}
-
-pub fn solve(input: &str) -> (i32, i32) {
+pub fn solve(input: &str) -> (usize, u32) {
     let instrs: Vec<_> = input.lines().map(parse_instruction).collect();
     
-    let mut rect_xs: Vec<i32> = Vec::with_capacity(2*instrs.len());
-    let mut rect_ys: Vec<i32> = Vec::with_capacity(2*instrs.len());
-    
-    for instr in &instrs {
-        rect_xs.push(instr.rectangle.xmin);
-        rect_xs.push(instr.rectangle.xmax+1);
-        rect_ys.push(instr.rectangle.ymin);
-        rect_ys.push(instr.rectangle.ymax+1);
-    }
-    rect_xs.sort_unstable();
-    rect_xs.dedup();
-    rect_ys.sort_unstable();
-    rect_ys.dedup();
+    (0..1000)
+        .par_iter()
+        .map(|i| {
+            let mut p1 = [false; 1000];
+            let mut p2 = [0u16; 1000];
+            
+            for instr in &instrs {
+                if (instr.ymin..=instr.ymax).contains(&i) {
+                    match instr.cmd {
+                        Command::On => {
+                            p1[instr.xmin..=instr.xmax].fill(true);
+                            p2[instr.xmin..=instr.xmax].iter_mut().for_each(|x| *x += 1);
+                        }
+                        Command::Off => {
+                            p1[instr.xmin..=instr.xmax].fill(false);
+                            p2[instr.xmin..=instr.xmax].iter_mut().for_each(|x| *x = x.saturating_sub(1));
+                        }
+                        Command::Toggle => {
+                            p1[instr.xmin..=instr.xmax].iter_mut().for_each(|x| *x = !*x);
+                            p2[instr.xmin..=instr.xmax].iter_mut().for_each(|x| *x += 2);
+                        }
 
-    let mut x_index = [0; 1001];
-    for (i, &x) in rect_xs.iter().enumerate() {
-        x_index[x as usize] = i;
-    }
-
-    let mut y_index = [0; 1001];
-    for (i, &y) in rect_ys.iter().enumerate() {
-        y_index[y as usize] = i;
-    }
-
-    let input = Input {instrs, rect_xs, rect_ys, x_index, y_index };
-
-    let p1 = part1(&input);
-    let p2 = part2(&input);
-    (p1, p2)
-
-}
-
-pub fn part1(input: &Input) -> i32 {
-    let width = input.rect_xs.len();
-    let size = width * input.rect_ys.len();
-
-    let mut grid = vec![false; size];
-
-    for instr in &input.instrs {
-        let xmin = input.x_index[instr.rectangle.xmin as usize];
-        let xmax = input.x_index[instr.rectangle.xmax as usize + 1];
-        let ymin = input.y_index[instr.rectangle.ymin as usize];
-        let ymax = input.y_index[instr.rectangle.ymax as usize + 1];
-        for x in xmin..xmax {
-            for y in ymin..ymax {
-                do_cmd1(instr.cmd,&mut grid[y * width + x]);
+                    }
+                }
             }
-        }
-    }
-
-    let mut total = 0;
-    for x in 0..input.rect_xs.len()-1 {
-        for y in 0..input.rect_ys.len()-1 {
-            if grid[y * width + x] {
-                total += (input.rect_xs[x+1] - input.rect_xs[x]) * (input.rect_ys[y+1] - input.rect_ys[y])
-            }
-        }
-    }
-    total
-}
-
-pub fn part2(input: &Input) -> i32 {
-    let width = input.rect_xs.len();
-    let size = width * input.rect_ys.len();
-
-    let mut grid = vec![0; size];
-
-    for instr in &input.instrs {
-        let xmin = input.x_index[instr.rectangle.xmin as usize];
-        let xmax = input.x_index[instr.rectangle.xmax as usize + 1];
-        let ymin = input.y_index[instr.rectangle.ymin as usize];
-        let ymax = input.y_index[instr.rectangle.ymax as usize + 1];
-        for x in xmin..xmax {
-            for y in ymin..ymax {
-                do_cmd2(instr.cmd,&mut grid[y * width + x]);
-            }
-        }
-    }
-
-    let mut total = 0;
-    for x in 0..input.rect_xs.len()-1 {
-        for y in 0..input.rect_ys.len()-1 {
-            let s = grid[y * width + x];
-            if s > 0 {
-                total += s * (input.rect_xs[x+1] - input.rect_xs[x]) * (input.rect_ys[y+1] - input.rect_ys[y])
-            }
-        }
-    }
-    total
+            let p1 = p1.into_iter().filter(|&x| x).count();
+            let p2 = p2.into_iter().map(|x| x as u32).sum();
+            (p1, p2)
+        }).reduce2(|| (0, 0), |(a1, b1), (a2, b2)| (a1+a2, b1+b2))
 }

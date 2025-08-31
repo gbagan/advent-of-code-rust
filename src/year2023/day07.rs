@@ -47,8 +47,9 @@ pub fn solve(input: &str) -> (u32, u32) {
 }
 
 fn parse_hand(line: &str) -> Hand<'_> {
-    let bid = (&line[6..]).try_unsigned().unwrap();
-    let cards = line.as_bytes()[0..5].try_into().unwrap();
+    let line = line.as_bytes();
+    let bid = line[6..].try_unsigned().unwrap();
+    let cards = line[0..5].try_into().unwrap();
     (cards, bid)
 }
 

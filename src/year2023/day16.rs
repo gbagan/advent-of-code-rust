@@ -152,7 +152,7 @@ fn part2(input: &Input) -> u64 {
     }
 
     starts
-        .into_par_iter()
+        .par_iter()
         .map(|(pos, dir)| count_energized(input, *pos, *dir))
         .reduce(0, max)
 }
