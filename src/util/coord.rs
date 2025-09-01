@@ -1,5 +1,4 @@
-use std::ops::{Add,AddAssign,Mul,Neg,Sub, SubAssign};
-use std::iter::Sum;
+use std::ops::{Add,AddAssign,Mul,Neg,Sub, SubAssign, Div};
 use num_traits::{ConstOne, Num, Signed};
 
 fn distance<A: Num + Ord>(a: A, b: A) -> A {
@@ -162,36 +161,58 @@ macro_rules! constant {
 constant!(i16 i32 i64 i128);
 
 
-
-
 #[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord, Hash)]
-pub struct Coord3 {
-    pub x: i32,
-    pub y: i32,
-    pub z: i32,
+pub struct Coord3<A> {
+    pub x: A,
+    pub y: A,
+    pub z: A,
 }
 
-impl Coord3 {
-    pub const ORIGIN: Coord3 = Self { x: 0, y: 0, z: 0 };
+impl<A: Copy + Num + Ord + ConstOne> Coord3<A> {
+    //pub const ORIGIN: Coord3 = Self { x: 0, y: 0, z: 0 };
 
     #[inline]
-    pub const fn new(x: i32, y: i32, z: i32) -> Self {
+    pub const fn new(x: A, y: A, z: A) -> Self {
         Self { x, y, z }
     }
 
     #[inline]
-    pub fn manhattan(&self, other: &Self) -> i32 {
-        (self.x - other.x).abs() +  (self.y - other.y).abs() +  (self.z - other.z).abs()
+    pub fn manhattan(&self, other: Self) -> A {
+        distance(self.x, other.x) + distance(self.y, other.y) + distance(self.z, other.z)
     }
 
     #[inline]
-    pub fn euclidean(&self, other: &Self) -> i32 {
+    pub fn euclidean(&self, other: &Self) -> A {
         let Self { x, y, z } = *self - *other;
         x * x + y * y + z * z
     }
+
+    #[inline]
+    pub fn dot(&self, other: &Self) -> A {
+        self.x * other.x + self.y * other.y + self.z * other.z
+    }
+
+    #[inline]
+    pub fn cross(&self, other: &Self) -> Self {
+        Self {
+            x: self.y * other.z - self.z * other.y,
+            y: self.z * other.x - self.x * other.z,
+            z: self.x * other.y - self.y * other.x,
+        }
+    }
 }
 
-impl Add for Coord3 {
+macro_rules! constant3 {
+    ($($t:ty)*) => ($(
+        impl Coord3<$t> {
+            pub const ORIGIN: Coord3<$t> = Coord3 { x: 0, y: 0, z: 0 };
+        }
+    )*)
+}
+
+constant3!(u16 u32 u64 u128 i16 i32 i64 i128);
+
+impl<A> Add for Coord3<A> where A: Num {
     type Output = Self;
 
     #[inline]
@@ -204,18 +225,16 @@ impl Add for Coord3 {
     }
 }
 
-impl AddAssign for Coord3 {
+impl<A: AddAssign> AddAssign for Coord3<A> where {
     #[inline]
     fn add_assign(&mut self, other: Self) {
-        *self = Self {
-            x: self.x + other.x,
-            y: self.y + other.y,
-            z: self.z + other.z,
-        }
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
     }
 }
 
-impl Neg for Coord3 {
+impl<A: Signed> Neg for Coord3<A> {
     type Output = Self;
 
     #[inline]
@@ -228,11 +247,11 @@ impl Neg for Coord3 {
     }
 }
 
-impl Mul<i32> for Coord3 {
+impl<A: Num+Copy> Mul<A> for Coord3<A> {
     type Output = Self;
 
     #[inline]
-    fn mul(self, n: i32) -> Self::Output {
+    fn mul(self, n: A) -> Self::Output {
         Self {
             x: n * self.x,
             y: n * self.y,
@@ -241,7 +260,7 @@ impl Mul<i32> for Coord3 {
     }
 }
 
-impl Sub for Coord3 {
+impl<A: Num> Sub for Coord3<A> {
     type Output = Self;
 
     #[inline]
@@ -254,7 +273,21 @@ impl Sub for Coord3 {
     }
 }
 
-impl Sum for Coord3 {
+impl<A: Num+Copy> Div<A> for Coord3<A> {
+    type Output = Self;
+
+    #[inline]
+    fn div(self, n: A) -> Self::Output {
+        Self {
+            x: self.x / n,
+            y: self.y / n,
+            z: self.z / n,
+        }
+    }
+}
+
+/*
+impl<A> Sum for Coord3<A> {
     fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
         iter.fold(Self::ORIGIN, |a, b| a + b)
     }
@@ -267,3 +300,4 @@ impl<'a> Sum<&'a Self> for Coord3 {
         iter.fold(Self::ORIGIN, |a, b| a + *b)
     }
 }
+*/

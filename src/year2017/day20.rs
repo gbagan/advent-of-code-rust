@@ -1,11 +1,13 @@
 use ahash::{HashMap, HashMapExt};
 use crate::util::{coord::*, iter::*, parser::*};
 
+type V3 = Coord3<i32>;
+
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
 struct Particle {
-    p: Coord3,
-    v: Coord3,
-    a: Coord3
+    p: V3,
+    v: V3,
+    a: V3
 }
 
 impl Particle {
@@ -36,7 +38,7 @@ fn part1(particles: &[Particle]) -> usize {
     particles
     .iter()
     .enumerate()
-    .min_by_key(|(_, p)|  p.a.manhattan(&Coord3::ORIGIN))
+    .min_by_key(|(_, p)|  p.a.manhattan(V3::ORIGIN))
     .unwrap()
     .0
 }

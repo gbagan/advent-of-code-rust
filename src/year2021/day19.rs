@@ -62,7 +62,7 @@ pub fn solve(input: &str) -> (usize, i32) {
     let mut p2 = 0;
     for i in 0..located_scanners.len() - 1 {
         for j in i+1..located_scanners.len() {
-            p2 = p2.max(located_scanners[i].manhattan(&located_scanners[j]));
+            p2 = p2.max(located_scanners[i].manhattan(located_scanners[j]));
         }
     }
 
@@ -89,7 +89,7 @@ struct Rotation {
 }
 
 impl Rotation {
-    const fn apply(self, point: Coord3) -> Coord3 {
+    const fn apply(self, point: Coord3<i32>) -> Coord3<i32> {
         let Coord3 {x, y, z} = point;
         match self.idx {
             0 => Coord3::new(x, y, z),
@@ -195,12 +195,12 @@ const INVERSE: [u32; 24] = {
 #[derive(Clone, Copy, Debug)]
 struct Transformation {
     rotation: Rotation,
-    translation: Coord3,
+    translation: Coord3<i32>,
 }
 
 impl Transformation {
     #[inline]
-    fn apply(&self, point: Coord3) -> Coord3 {
+    fn apply(&self, point: Coord3<i32>) -> Coord3<i32> {
         self.rotation.apply(point) + self.translation
     }
 
@@ -228,7 +228,7 @@ impl Transformation {
 
 
 struct Scanner {
-    beacons: Vec<Coord3>,
+    beacons: Vec<Coord3<i32>>,
     distances: HashMap<i32, [usize; 2]>,
 }
 
@@ -249,7 +249,7 @@ impl Scanner {
     }
 
     fn overlaps(&self, other: &Self) -> Option<Transformation> {
-        fn overlaps_helper(scan1: &Scanner, scan2: &Scanner, points: [Coord3; 4]) -> Option<Transformation> {
+        fn overlaps_helper(scan1: &Scanner, scan2: &Scanner, points: [Coord3<i32>; 4]) -> Option<Transformation> {
             let [p11, p12, p21, p22] = points;
 
             for idx in 0..24 {

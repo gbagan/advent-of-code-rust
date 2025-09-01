@@ -1,5 +1,4 @@
-use ordered_float::OrderedFloat;
-use crate::util::{iter::*, math::solve_linear_system, parser::*};
+use crate::util::{coord::*, iter::*, parser::*};
 
 struct Hailstone {
     px: i64,
@@ -10,7 +9,7 @@ struct Hailstone {
     vz: i64,
 } 
 
-pub fn solve(input: &str) -> (u32, i64) {
+pub fn solve(input: &str) -> (u32, i128) {
     let hailstones: Vec<_> = input
         .iter_signed()
         .tuples()
@@ -28,9 +27,7 @@ fn part1(hailstones: &[Hailstone]) -> u32 {
     let mut counter = 0;
     for (i, h1) in hailstones.iter().enumerate() {
         for h2 in &hailstones[i+1..] {
-            if crosses_inside_test_area(START, END, h1, h2) {
-                counter += 1;
-            }
+            counter += crosses_inside_test_area(START, END, h1, h2) as u32;
         }
     }
     counter
@@ -55,30 +52,31 @@ fn crosses_inside_test_area(start: i64, end: i64, h1: &Hailstone, h2: &Hailstone
     x >= start && y >= start && x <= end && y <= end
 }
 
-fn build_equations(h: &Hailstone) -> [[i64; 7]; 3] {
-    let &Hailstone {px, py, pz, vx, vy, vz} = h;
-    [ [vy, -vx, 0, -py, px, 0, px * vy - py * vx],
-      [vz, 0, -vx, -pz, 0, px, px * vz - pz * vx],
-      [0, vz, -vy, 0, -pz, py, py * vz - pz * vy]
-    ]
+type V3 = Coord3::<i128>;
+
+fn part2(hs: &[Hailstone]) -> i128 {
+    let extract = |i: usize| {
+        let pos = V3::new(hs[i].px as i128, hs[i].py as i128, hs[i].pz as i128);
+        let vel = V3::new(hs[i].vx as i128, hs[i].vy as i128, hs[i].vz as i128);
+        (pos, vel)
+    };
+    
+    let (pos0, vel0) = extract(0);
+    let (pos1, vel1) = extract(1);
+    let (pos2, vel2) = extract(2);
+    let p1 = pos1 - pos0;
+    let v1 = vel1 - vel0;
+    let p2 = pos2 - pos0;
+    let v2 = vel2 - vel0;
+    let t1 = -p1.cross(&p2).dot(&v2) / v1.cross(&p2).dot(&v2);
+    let t2 = -p1.cross(&p2).dot(&v1) / p1.cross(&v2).dot(&v1);
+    let c1 = pos1 + vel1 * t1;
+    let c2 = pos2 + vel2 * t2;
+    let v = (c2 - c1) / (t2 - t1);
+    let p = c1 - v * t1;
+    p.x + p.y + p.z
 }
 
-fn diff_equations<'a, const N: usize>(e1: &'a [[i64; N]], e2: &'a [[i64; N]]) -> impl Iterator<Item=[OrderedFloat<f64>; N]> + 'a {
-    e1.iter()
-        .zip(e2.iter())
-        .map(|(row1, row2)| std::array::from_fn(|i| OrderedFloat((row1[i] - row2[i]) as f64)))
-}
-
-fn part2(hs: &[Hailstone]) -> i64 {
-    let e1 = build_equations(&hs[0]);
-    let e2 = build_equations(&hs[1]);
-    let e3 = build_equations(&hs[2]);
-    let mut eqs = Vec::with_capacity(6);
-    eqs.extend(diff_equations(&e1, &e2));
-    eqs.extend(diff_equations(&e2, &e3));
-    let sol = solve_linear_system(&eqs).unwrap();
-    (sol[0].into_inner() + sol[1].into_inner() + sol[2].into_inner()).round() as i64
-}
 
 #[test]
 fn cross_test() {

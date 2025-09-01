@@ -4,6 +4,8 @@
 use ahash::{HashMap, HashMapExt};
 use crate::util::{coord::*, grid::*, iter::*, parser::*};
 
+type Point = Coord3::<i32>;
+
 type Dominators = Vec<(usize, u32)>;
 
 pub fn solve(input: &str) -> (usize, u32) {
@@ -61,7 +63,7 @@ pub fn solve(input: &str) -> (usize, u32) {
     (p1, p2)
 }   
 
-fn cubes_of((pmin, pmax): &(Coord3, Coord3), cubes: &mut Vec<Coord3>) {
+fn cubes_of((pmin, pmax): &(Point, Point), cubes: &mut Vec<Point>) {
     cubes.clear();
     for x in pmin.x..pmax.x+1 {
         for y in pmin.y..pmax.y+1 {
