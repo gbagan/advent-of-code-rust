@@ -1,5 +1,5 @@
-//use ahash::{HashMap, HashMapExt};
-use nohash_hasher::IntMap;
+use ahash::{HashMap, HashMapExt};
+//use nohash_hasher::IntMap;
 use crate::util::{iter::*, parser::*};
 
 struct Bot<'a> {
@@ -15,7 +15,7 @@ pub fn solve(input: &str) -> (u32, u32) {
     
     let mut tokens = input.split_ascii_whitespace();
     let mut gifts = Vec::new();
-    let mut bots = IntMap::default();
+    let mut bots = HashMap::with_capacity(100);
     while let Some(token) = tokens.next() {
         if token == "value" {
             let (value, _, _, bot, bot_no) = tokens.next_tuple().unwrap();
