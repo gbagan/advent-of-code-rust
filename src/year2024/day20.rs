@@ -29,19 +29,19 @@ pub fn solve(input: &str) -> (u32, u32) {
         }
     }
 
-    let res = path
+    path
         .par_iter()
         .chunks_with_index(128)
         .map(|(index, chunk)| {
-            let mut acc1 = 0u32;
-            let mut acc2 = 0u32;
+            let mut p1 = 0u32;
+            let mut p2 = 0u32;
             for (index2, &pos) in chunk.iter().enumerate() {
                 let dist = (index + index2) as i16;
         
-                for j in [pos - width - 1, pos - width + 1, pos + width - 1, pos + width + 1, pos - 2, pos + 2, pos - 2 * width, pos + 2 * width] {
-                    if distances[j] < dist - 100 {
-                        acc1 += 1;
-                    }
+                for j in [pos - width - 1, pos - width + 1, pos + width - 1, pos + width + 1,
+                            pos - 2, pos + 2, pos - 2 * width, pos + 2 * width]
+                {
+                    p1 += (distances[j] < dist - 100) as u32;
                 }
                 
                 let px = pos % width;
@@ -52,7 +52,7 @@ pub fn solve(input: &str) -> (u32, u32) {
                     for (next, &next_dist) in distances.iter().enumerate().take(max+1).skip(min) {
                         let j = next.abs_diff(nexty) as i16;
                         if next_dist <= dist - 100 - i as i16 - j {
-                            acc2 += 1;
+                            p2 += 1;
                         }
                     }
                     nexty += width;
@@ -67,7 +67,7 @@ pub fn solve(input: &str) -> (u32, u32) {
                     for (next, &next_dist) in distances.iter().enumerate().take(max+1).skip(min) {
                         let j = next.abs_diff(nexty) as i16;
                         if next_dist <= dist - 100 - i as i16 - j {
-                            acc2 += 1;
+                            p2 += 1;
                         }
                     }
                     nexty -= width;
@@ -76,8 +76,7 @@ pub fn solve(input: &str) -> (u32, u32) {
                     }
                 }
             }
-            acc2 << 11 | acc1
-        }).sum();
-
-    (res & 2047, res >> 11)
+            // todo
+            (p1, p2)
+        }).reduce(|| (0, 0), |(x1, y1), (x2, y2)| (x1+x2, y1+y2))
 }

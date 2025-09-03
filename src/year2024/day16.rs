@@ -6,7 +6,7 @@ const START: usize = WIDTH * (SIZE - 2) + 1;
 const END: usize = WIDTH * 2 - 3;
 const UP: usize = 0usize.wrapping_sub(WIDTH);
 
-pub fn solve(input: &str) -> (u32, u32) {
+pub fn solve(input: &str) -> (u32, usize) {
     let grid= input.as_bytes();
     let mut distances = vec![[u32::MAX; 2]; input.len()];
 
@@ -22,7 +22,7 @@ fn part1(grid: &[u8], distances: &mut [[u32; 2]]) -> u32 {
 
     todo.push((1, START, 1));
     
-    let directions = [1, usize::MAX, WIDTH, UP];
+    const DIRECTIONS: [usize; 4] = [1, usize::MAX, WIDTH, UP];
 
     loop {
         let mut index = 0;
@@ -57,7 +57,7 @@ fn part1(grid: &[u8], distances: &mut [[u32; 2]]) -> u32 {
                 return dist-1;
             }
 
-            for next_direction in directions {
+            for next_direction in DIRECTIONS {
                 let next = node.wrapping_add(next_direction);
                 if direction.wrapping_add(next_direction) == 0 || grid[next] == b'#' {
                     continue
@@ -73,18 +73,18 @@ fn part1(grid: &[u8], distances: &mut [[u32; 2]]) -> u32 {
     }
 }
 
-fn part2(distances: &[[u32; 2]]) -> u32 {
+fn part2(distances: &[[u32; 2]]) -> usize {
     let mut stack = Vec::new();
-    let mut seen = vec![(false, false); distances.len()];
+    let mut seen = vec![0; distances.len()];
 
     let [d1, d2] = distances[END];
     if d1 <= d2 {
         stack.push((END, true));
-        seen[END].0 = true;
+        seen[END] |= 1;
     }
     if d2 <= d1 {
         stack.push((END, false));
-        seen[END].1 = true;
+        seen[END] |= 2;
     }
 
     while let Some((node, is_horizontal)) = stack.pop() {
@@ -92,54 +92,48 @@ fn part2(distances: &[[u32; 2]]) -> u32 {
             let dist = distances[node];
             
             let next = node + 1;
-            if distances[next][0].wrapping_add(1) == dist[0] && !seen[next].0 {
-                seen[next].0 = true;
+            if distances[next][0].wrapping_add(1) == dist[0] && seen[next] & 1 == 0 {
+                seen[next] |= 1;
                 stack.push((next, true))
             }
-            if distances[next][1].wrapping_add(1001) == dist[0] && !seen[next].1 {
-                seen[next].1 = true;
+            if distances[next][1].wrapping_add(1001) == dist[0] && seen[next] & 2 == 0 {
+                seen[next] |= 2;
                 stack.push((next, false))
             }
             
             let next = node - 1;
-            if distances[next][0].wrapping_add(1) == dist[0] && !seen[next].0 {
-                seen[next].0 = true;
+            if distances[next][0].wrapping_add(1) == dist[0] && seen[next] & 1 == 0 {
+                seen[next] |= 1;
                 stack.push((next, true))
             }
-            if distances[next][1].wrapping_add(1001) == dist[0] && !seen[next].1 {
-                seen[next].1 = true;
+            if distances[next][1].wrapping_add(1001) == dist[0] && seen[next] & 2 == 0 {
+                seen[next] |= 2;
                 stack.push((next, false))
             }
         } else { // vertical
             let dist = distances[node];
             
             let next = node + WIDTH;
-            if distances[next][1].wrapping_add(1) == dist[1] && !seen[next].1 {
-                seen[next].1 = true;
+            if distances[next][1].wrapping_add(1) == dist[1] && seen[next] & 2 == 0 {
+                seen[next] |= 2;
                 stack.push((next, false))
             }
-            if distances[next][0].wrapping_add(1001) == dist[1] && !seen[next].0 {
-                seen[next].0 = true;
+            if distances[next][0].wrapping_add(1001) == dist[1] && seen[next] & 1 == 0 {
+                seen[next] |= 1;
                 stack.push((next, true))
             }
             
             let next = node - WIDTH;
-            if distances[next][1].wrapping_add(1) == dist[1] && !seen[next].1 {
-                seen[next].1 = true;
+            if distances[next][1].wrapping_add(1) == dist[1] && seen[next] & 2 == 0 {
+                seen[next] |= 2;
                 stack.push((next, false))
             }
-            if distances[next][0].wrapping_add(1001) == dist[1] && !seen[next].0  {
-                seen[next].0 = true;
+            if distances[next][0].wrapping_add(1001) == dist[1] && seen[next] & 1 == 0  {
+                seen[next] |= 1;
                 stack.push((next, true))
             }
         }
     }
 
-    let mut counter = 0;
-    for (h, w) in seen {
-        if h || w {
-            counter += 1;
-        }
-    }
-    counter
+    seen.into_iter().filter(|&b| b > 0).count()
 }

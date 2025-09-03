@@ -70,19 +70,19 @@ pub fn solve(input: &str) -> (u32, u32) {
         state.floor[i] = Floor::new(generators, microchips);
     }
     state.elevator = 0;
-    let p1 = bfs(state);
+    let p1 = bfs(state, 256, 2500);
     state.floor[0] = state.floor[0].add(Floor::new(2, 2));
-    let p2 = bfs(state);
+    let p2 = bfs(state, 1024, 10_000);
 
     (p1, p2)
 }
 
 
-fn bfs(start: State) -> u32 {       
+fn bfs(start: State, queue_capacity: usize, seen_capacity: usize) -> u32 {       
     let moves = [Floor::new(1, 1), Floor::new(2, 0), Floor::new(0, 2), Floor::new(1, 0), Floor::new(0, 1)];
-    let mut queue1 = Vec::new();
-    let mut queue2 = Vec::new();
-    let mut seen = HashSet::new();
+    let mut queue1 = Vec::with_capacity(queue_capacity);
+    let mut queue2 = Vec::with_capacity(queue_capacity);
+    let mut seen = HashSet::with_capacity(seen_capacity);
     queue1.push(start);
     let mut dist = 0;
     while !queue1.is_empty() {
@@ -154,4 +154,22 @@ fn bfs(start: State) -> u32 {
         queue2.clear();
     }
     unreachable!();
+}
+
+
+
+
+#[test]
+fn bfs_test() {
+    let state = State {
+        elevator: 0,
+        floor: [
+            Floor::new(0, 2),
+            Floor::new(1, 0),
+            Floor::new(1, 0),
+            Floor::new(0, 0),
+        ]
+    };
+    let res = bfs(state, 256, 2500);
+    assert_eq!(res, 11);
 }
