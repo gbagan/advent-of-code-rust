@@ -27,9 +27,11 @@ pub fn solve(input: &str) -> (u32, u32) {
 
     let mut p1 = i32x16::splat(0);
  
+    let botc = bot.as_chunks::<16>().0;
+
     for x in top {
         let x = u32x16::splat(x);
-        for &y in bot.as_chunks::<16>().0 {
+        for &y in botc {
             let y = u32x16::from_array(y);
             p1 += (x & y).simd_eq(u32x16::splat(0)).to_int();
         }
