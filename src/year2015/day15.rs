@@ -32,7 +32,7 @@ fn score(quantities: [i32; 4], ingredients: &[[i32; 5]]) -> i32 {
         quantities.iter().zip(ingredients).map(|(&q, ing)| q * ing[i]).sum()
     );
 
-    let v= vals[0].min(0) + vals[1].min(0) + vals[2].min(0) + vals[3].min(0);
+    let v = vals[0].min(0) + vals[1].min(0) + vals[2].min(0) + vals[3].min(0);
     if v == 0 {
         vals[0] * vals[1] * vals[2] * vals[3]
     } else {
@@ -63,8 +63,7 @@ pub fn part2(ingredients: &[[i32; 5]]) -> i32 {
             let c1 = i * ingredients[0][4];
             for k in 0..101-i {
                 let c3 = k * ingredients[2][4];
-                if let Some((j, l)) = solve_equations(c2, c4, 100 - i - k, 500 - c1 - c3) {
-                
+                if let Some((j, l)) = solve_equations(c2, c4, 100 - i - k, 500 - c1 - c3) {               
                     let quantities = [i, j, k, l];
                     best_score = best_score.max(score(quantities, ingredients));
                 }
