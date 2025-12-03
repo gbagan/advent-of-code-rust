@@ -74,5 +74,5 @@ pub fn solve(input: &str) -> (u64, u64) {
 fn sum_invalid_ids(start: u64, end: u64, mult: u64) -> u64 {
     let first = start.div_ceil(mult);
     let last = end / mult;
-    mult * ((first + last) * (last - first + 1) / 2)
+    mult * (last - first + 1) * (first + last) / 2
 }
