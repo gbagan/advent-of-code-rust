@@ -5,7 +5,7 @@ pub fn solve(input: &str) -> (usize, u32) {
     let width = grid.width;
     let grid = grid.vec;
     let mut nbors = vec![255; grid.len()];
-    let mut stack = Vec::with_capacity(1000);
+    let mut stack = Vec::with_capacity(500);
 
     for (i, &c) in grid.iter().enumerate() {
         if c == b'.'  {
@@ -32,13 +32,13 @@ pub fn solve(input: &str) -> (usize, u32) {
 
     macro_rules! do_next {
         ($i: expr) => {
-            nbors[$i] -= 1;
-            if nbors[$i] == 3 {
-                stack.push($i);
+            let j = $i;
+            nbors[j] -= 1;
+            if nbors[j] == 3 {
+                stack.push(j);
             }
         }
     }
-
 
     while let Some(i) = stack.pop() {
         p2 += 1;
