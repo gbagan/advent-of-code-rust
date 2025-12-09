@@ -1,4 +1,4 @@
-use crate::util::{grid::Grid, iter::*, parallel::*, parser::*};
+use crate::util::{grid::Grid, iter::*, parser::*};
 use ahash::HashMap;
 
 pub fn solve(input: &str) -> (u64, u64) {
@@ -47,7 +47,7 @@ fn part2(points: &[(u64, u64)]) -> u64 {
             let xmax = x1.max(x2);
             for x in xmin..xmax+1 {
                 grid[(x, y1)] = b'#';
-            } 
+            }
         }
     };
 
@@ -58,35 +58,41 @@ fn part2(points: &[(u64, u64)]) -> u64 {
 
     flood_grid(&mut grid);
 
-    //println!("{}", grid.draw());
+    let mut empty_table = Grid::new(xpositions.len()+2, ypositions.len()+2, 0);
+    let w = empty_table.width;
+    for j in 1..empty_table.height {
+        for i in 1..empty_table.width {
+            let index = j * empty_table.width + i;
+            empty_table[index] =
+                empty_table[index-1]
+                + empty_table[index-w]
+                - empty_table[index-w-1]
+                + (grid[index] == b'.') as i32;
+        }
+    }
 
-    (0..points.len()-1)
-        .par_iter()
-        .map(|i| {
-            let mut max = 0;
-            let (x1, y1) = points[i];
-            let (px1, py1) = indices[i];
-            'outer: for j in i+1..points.len() {
+    let mut best_area = 0;
+    for i in 0..points.len() - 1 {
+        let (x1, y1) = indices[i];
+        for j in i+1..points.len() {
+            let (x2, y2) = indices[j];
+            let xmin = x1.min(x2);
+            let xmax = x1.max(x2);
+            let ymin = y1.min(y2);
+            let ymax = y1.max(y2);
+            let empty_count =
+                empty_table[(xmax, ymax)]
+                + empty_table[(xmin-1, ymin-1)]
+                - empty_table[(xmin-1, ymax)]
+                - empty_table[(xmax, ymin-1)];
+            if empty_count == 0 {
+                let (x1, y1) = points[i];
                 let (x2, y2) = points[j];
-                let (px2, py2) = indices[j];
-                let xmin = px1.min(px2);
-                let xmax = px1.max(px2);
-                let ymin = py1.min(py2);
-                let ymax = py1.max(py2);
-                for px in xmin..xmax+1 {
-                    if grid[(px, ymin)] == b'.' || grid[(px, ymax)] == b'.' {
-                        continue 'outer;
-                    }
-                }
-                for py in ymin..ymax+1 {
-                    if grid[(xmin, py)] == b'.' || grid[(xmin, py)] == b'.' {
-                        continue 'outer;
-                    }
-                }
-                max = max.max((x1.abs_diff(x2) + 1) * (y1.abs_diff(y2) + 1));
+                best_area = best_area.max((x1.abs_diff(x2) + 1) * (y1.abs_diff(y2) + 1));
             }
-            max
-        }).reduce(|| 0, |&a, &b| a.max(b))
+        }
+    }
+    best_area
 }
 
 fn flood_grid(grid: &mut Grid<u8>) {
