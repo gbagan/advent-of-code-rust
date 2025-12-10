@@ -18,22 +18,33 @@ fn part1(points: &[(u64, u64)]) -> u64 {
     p1
 }
 
-fn part2(points: &[(u64, u64)]) -> u64 {    
-    let mut xs: Vec<_> = points.iter().map(|p| p.0).collect();
-    let mut ys: Vec<_> = points.iter().map(|p| p.1).collect();
+fn part2(points: &[(u64, u64)]) -> u64 {
+    let mut xs = Vec::with_capacity(2*points.len());
+    let mut ys = Vec::with_capacity(2*points.len());
+    for &(x, y) in points {
+        xs.push(x);
+        xs.push(x+1);
+        ys.push(y);
+        ys.push(y+1);
+    }
+
+    //let mut xs: Vec<_> = points.iter().map(|p| p.0).collect();
+    //let mut ys: Vec<_> = points.iter().map(|p| p.1).collect();
     xs.sort_unstable();
+    xs.dedup();
     ys.sort_unstable();
-    let xpositions: HashMap<_, _> =
-        xs.iter().step_by(2).enumerate().map(|(i, &x)| (x, i+1)).collect();
-    let ypositions: HashMap<_, _> =
-        ys.iter().step_by(2).enumerate().map(|(i, &y)| (y, i+1)).collect();
+    ys.dedup();
+    let x_index: HashMap<_, _> =
+        xs.iter().enumerate().map(|(i, &x)| (x, i+1)).collect();
+    let y_index: HashMap<_, _> =
+        ys.iter().enumerate().map(|(i, &y)| (y, i+1)).collect();
 
     let indices: Vec<_> = points
         .iter()
-        .map(|(x, y)| (xpositions[x], ypositions[y]))
+        .map(|(x, y)| (x_index[x], y_index[y]))
         .collect();
 
-    let mut grid = Grid::new(xpositions.len()+2, ypositions.len()+2, b'@');
+    let mut grid = Grid::new(x_index.len()+1, y_index.len()+1, b'*');
 
     let mut fill_line = |(x1, y1): (usize, usize), (x2, y2): (usize, usize)| {
         if x1 == x2 {
@@ -58,7 +69,7 @@ fn part2(points: &[(u64, u64)]) -> u64 {
 
     flood_grid(&mut grid);
 
-    let mut empty_table = Grid::new(xpositions.len()+2, ypositions.len()+2, 0);
+    let mut empty_table = Grid::new(grid.width, grid.height, 0);
     let w = empty_table.width;
     for j in 1..empty_table.height {
         for i in 1..empty_table.width {
@@ -67,7 +78,7 @@ fn part2(points: &[(u64, u64)]) -> u64 {
                 empty_table[index-1]
                 + empty_table[index-w]
                 - empty_table[index-w-1]
-                + (grid[index] == b'.') as i32;
+                + (grid[index] == b'.') as u32;
         }
     }
 
@@ -102,10 +113,10 @@ fn flood_grid(grid: &mut Grid<u8>) {
         for (x2, y2) in [(x-1, y-1), (x-1, y), (x-1, y+1), (x, y-1), (x, y+1),
             (x+1, y-1), (x+1, y), (x+1, y+1)]
         {
-            if x2 < grid.width && y2 < grid.height && grid[(x2, y2)] == b'@' {
+            if x2 < grid.width && y2 < grid.height && grid[(x2, y2)] == b'*' {
                 grid[(x2, y2)] =  b'.';
                 stack.push((x2, y2));
-            }    
+            }
         }
     }
 }

@@ -69,7 +69,7 @@ impl<T: Copy> Grid<T> {
             }
         }
 
-        Grid { width, height: width, vec }
+        Grid { width, height, vec }
     }
 }
 
