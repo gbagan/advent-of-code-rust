@@ -37,34 +37,40 @@ pub fn solve(input: &str) -> (u64, u64) {
     }
 
     let order = topological_ordering(&graph);
+    let mut index = vec![0; order.len()];
+    for (i, &j) in order.iter().enumerate() {
+        index[j] = i;
+    }
 
-    let p1 = compute_paths(&graph, &order, 0)[1];
+    let mut table = vec![0; graph.len()];
 
-    let from_svr = compute_paths(&graph, &order, 2);
-    let svr_dac = from_svr[3];
-    let svr_fft = from_svr[4];
-    let from_dac = compute_paths(&graph, &order, 3);
-    let dac_out = from_dac[1];
-    let dac_fft = from_dac[4];
-    let from_fft = compute_paths(&graph, &order, 4);
-    let fft_out = from_fft[1];
-    let fft_dac = from_fft[3];
+    let p1 = compute_paths(&graph, &order, &index, &mut table, 0, 1);
 
-    let p2 = svr_dac * dac_fft * fft_out + svr_fft * fft_dac * dac_out;
+    let p2 = if index[3] < index[4] {
+        let svr_dac = compute_paths(&graph, &order, &index, &mut table, 2, 3);
+        let dac_fft = compute_paths(&graph, &order, &index, &mut table, 3, 4);
+        let fft_out = compute_paths(&graph, &order, &index, &mut table, 4, 1);
+        svr_dac * dac_fft * fft_out
+    } else {
+        let svr_fft = compute_paths(&graph, &order, &index, &mut table, 2, 4);
+        let fft_dac = compute_paths(&graph, &order, &index, &mut table, 4, 3);
+        let dac_out = compute_paths(&graph, &order, &index, &mut table, 3, 1);
+        svr_fft * fft_dac * dac_out
+    };
 
     (p1, p2)
 }
 
-fn compute_paths(graph: &[Vec<u16>], order: &[usize], start: usize) -> Vec<u64> {
-    let mut paths = vec![0; graph.len()];
-    paths[start] = 1;
+fn compute_paths(graph: &[Vec<u16>], order: &[usize], index:& [usize], table: &mut [u64], source: usize, dest: usize) -> u64 {
+    table.fill(0);
+    table[source] = 1;
 
-    for &u in order {
+    for &u in &order[index[source]..index[dest]] {
         for &v in &graph[u] {
-            paths[v as usize] += paths[u];
+            table[v as usize] += table[u];
         }
     }
-    paths
+    table[dest]
 }
 
 fn topological_ordering(graph: &[Vec<u16>]) -> Vec<usize> {
