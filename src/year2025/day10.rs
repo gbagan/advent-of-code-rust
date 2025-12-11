@@ -5,8 +5,8 @@ struct Input {
     size: usize,
     goal: u32,
     buttons: Vec<u32>,
-    matrix: Grid<i64>,
-    part2: Vec<i64>,
+    matrix: Grid<i32>,
+    part2: Vec<i32>,
 }
 
 fn parse_line(line: &str) -> Input {
@@ -26,7 +26,7 @@ fn parse_line(line: &str) -> Input {
         .collect();
     
     let matrix = Grid::generate(buttons.len(), size, |c, r| {
-        ((buttons[c] & 1 << r) != 0) as i64
+        ((buttons[c] & 1 << r) != 0) as i32
     });
 
     let part2: Vec<_> = tokens[tokens.len()-1].iter_unsigned().collect();
@@ -57,32 +57,14 @@ fn part1(input: &Input) -> u32 {
 }
 
 
-fn part2(input: &Input) -> i64 {
+fn part2(input: &Input) -> i32 {
     let (mat, is_pivot) = gauss(&input.matrix, &input.part2);
-    //if free.len() > 2 {
-
-    /*
-    println!("ouaf {} {} {} {}", matrix.width, matrix.height, buttons.len(), part2.len());
-    for row in 0..matrix.height {
-        for col in 0..matrix.width {
-            //println!("meuh {row} {col} {} {}", matrix.height, matrix.width);
-            print!("{} ", matrix[(col, row)]);
-        }
-        println!("");
-    }
-    println!("");
-
-
-    for row in 0..meuh.height {
-        for col in 0..meuh.width {
-            //println!("meuh {row} {col} {} {}", matrix.height, matrix.width);
-            print!("{} ", meuh[(col, row)]);
-        }
-        println!("");
-    }
-    println!("");
-    //println!("{:?}", free);
-    */
+    
+    let min_joltage: Vec<_> = (0..input.matrix.width).map(|i| 
+        (0..input.matrix.height).map(|j| {
+            if input.matrix[(i, j)] == 1 { input.part2[j] } else { i32::MAX }
+        }).min().unwrap()
+    ).collect();
 
     let mut start_row = mat.height - 1;
     while (0..mat.width-1).all(|i| mat[(i, start_row)] == 0) {
@@ -95,12 +77,37 @@ fn part2(input: &Input) -> i64 {
         .collect();
 
     let non_pivot_count = is_pivot.iter().filter(|&&b| !b).count();
-    let limit = if non_pivot_count <= 2 { 200 } else { 30 };
+    //let limit = if non_pivot_count <= 2 { 200 } else { 30 };
 
-    explore(&mat, &is_pivot, &mut solution, &mut res, start_row, mat.width-2, limit)
+    let a = explore(&mat, &is_pivot, &min_joltage, &mut solution, &mut res, start_row, mat.width-2);
+    if a == i32::MAX {
+    //println!("ouaf {} {} {} {}", input.matrix.width, matrix.height, buttons.len(), part2.len());
+    for row in 0..input.matrix.height {
+        for col in 0..input.matrix.width {
+            //println!("meuh {row} {col} {} {}", matrix.height, matrix.width);
+            print!("{} ", input.matrix[(col, row)]);
+        }
+        println!("{}", input.part2[row]);
+    }
+    println!("{non_pivot_count}");
+
+
+    for row in 0..mat.height {
+        for col in 0..mat.width {
+            //println!("meuh {row} {col} {} {}", matrix.height, matrix.width);
+            print!("{} ", mat[(col, row)]);
+        }
+        println!("");
+    }
+    println!("");
+
+    }
+
+
+    a
 }
 
-pub fn solve(input: &str) -> (u32, i64) {
+pub fn solve(input: &str) -> (u32, i32) {
     let lines: Vec<_> = input.lines().collect();
     lines
         .par_iter()
@@ -112,8 +119,7 @@ pub fn solve(input: &str) -> (u32, i64) {
         }).reduce(|| (0, 0), |(a, b), (c, d)| (a+c, b+d))
 }
 
-
-fn gauss(matrix: &Grid<i64>, b: &[i64]) -> (Grid<i64>, Vec<bool>) {
+fn gauss(matrix: &Grid<i32>, b: &[i32]) -> (Grid<i32>, Vec<bool>) {
     let n = matrix.height;
     let m = matrix.width;
     let mut is_pivot = vec![false; matrix.width];
@@ -158,8 +164,8 @@ fn gauss(matrix: &Grid<i64>, b: &[i64]) -> (Grid<i64>, Vec<bool>) {
     (mat, is_pivot)
 }
 
-fn explore(mat: &Grid<i64>, is_pivot: &[bool], solution: &mut [i64], res: &mut [i64],
-                mut row: usize, mut col: usize, limit: i64) -> i64
+fn explore(mat: &Grid<i32>, is_pivot: &[bool], min_joltage: &[i32], solution: &mut [i32], b: &mut [i32],
+                mut row: usize, mut col: usize) -> i32
 {
     loop {    
         if col == usize::MAX {
@@ -170,35 +176,37 @@ fn explore(mat: &Grid<i64>, is_pivot: &[bool], solution: &mut [i64], res: &mut [
         }
 
         let v = mat[(col, row)];
-        let u = res[row];
+        let u = b[row];
         if u % v != 0 {
-            return i64::MAX;
+            return i32::MAX;
         }
         let w = u / v;
         if w < 0 {
-            return i64::MAX;
+            return i32::MAX;
         }
         //let mut solution = solution.to_vec();
         //let mut res = res.to_vec();
         solution[col] = w;
         for row2 in 0..row {
-            res[row2] -= w * mat[(col, row2)];
+            b[row2] -= w * mat[(col, row2)];
         }
         row -= 1;
         col -= 1;
     }
-    let mut best_solution = i64::MAX;
+    let mut best_solution = i32::MAX;
     let mut solution2 = solution.to_vec();
-    let mut res2 = res.to_vec();
+    let mut b2 = b.to_vec();
 
-    for w in 0..limit {
+    for w in 0..min_joltage[col]+1 {
         solution2.copy_from_slice(&solution);
-        res2.copy_from_slice(&res);
+        b2.copy_from_slice(&b);
         solution2[col] = w;
         for row2 in 0..row+1 {
-            res2[row2] -= w * mat[(col, row2)];
+            b2[row2] -= w * mat[(col, row2)];
         }
-        best_solution = best_solution.min(explore(mat, is_pivot, &mut solution2, &mut res2, row, col-1, limit));
+        best_solution = best_solution.min(
+            explore(mat, is_pivot, min_joltage, &mut solution2, &mut b2, row, col-1)
+        );
     }
     best_solution
 }

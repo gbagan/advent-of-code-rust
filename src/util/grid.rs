@@ -71,6 +71,11 @@ impl<T: Copy> Grid<T> {
 
         Grid { width, height, vec }
     }
+
+    pub fn swap(&mut self, x1: usize, y1: usize, x2: usize, y2: usize) {
+        let m = self.width;
+        self.vec.swap(m * y1 + x1, m * y2 + x2);
+    }
 }
 
 impl<T> Index<usize> for Grid<T> {
